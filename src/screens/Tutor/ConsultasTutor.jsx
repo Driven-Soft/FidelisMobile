@@ -1,12 +1,11 @@
-import {Text,StyleSheet,View,Button} from "react-native"
+import { StyleSheet, Text, View } from "react-native";
 
-export default function HomeVet({navigation}){
- 
-    return(
+export default function ConsultasTutor() {
+  return (
     <View style={styles.container}>
-      <Text style={styles.title}>Página inicial do veterinário!</Text>
+      <Text style={styles.title}>Consultas do tutor</Text>
     </View>
-    )
+  );
 }
 
 const styles = StyleSheet.create({
