@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MOCK_TUTOR_PETS, getPetAgeLabel } from '../../data/fidelisData';
+import { UserContext } from '../../context/UserContext';
 import Card from '../../components/common/Card';
 import SectionHeader from '../../components/common/SectionHeader';
 import AvatarBadge from '../../components/common/AvatarBadge';
 import Button from '../../components/common/Button';
 
 const PetsTutor = ({ navigation }) => {
+  const { tutorPets } = useContext(UserContext);
+  const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
+
   return (
     <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="px-4 pb-6">
@@ -23,7 +27,7 @@ const PetsTutor = ({ navigation }) => {
         </TouchableOpacity>
 
         <View className="mt-3 space-y-3">
-          {MOCK_TUTOR_PETS.map((pet) => (
+          {pets.map((pet) => (
             <TouchableOpacity
               key={pet.id}
               onPress={() => navigation.navigate('PetProfile', { petId: pet.id })}

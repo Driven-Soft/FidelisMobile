@@ -10,8 +10,9 @@ import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 
 export default function HomeTutor({ navigation }) {
-  const { user } = useContext(UserContext);
+  const { user, tutorPets } = useContext(UserContext);
   const tutorName = user?.name ?? MOCK_TUTOR_PROFILE.name;
+  const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
   const upcomingReminders = [...MOCK_TUTOR_REMINDERS]
     .sort((left, right) => left.dueDate - right.dueDate)
     .slice(0, 3);
@@ -29,7 +30,7 @@ export default function HomeTutor({ navigation }) {
 
         <SectionHeader title="Meus Pets" subtitle="Arraste para o lado ou toque para abrir o perfil" />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="mb-2 space-x-3 pr-4">
-          {MOCK_TUTOR_PETS.map((pet) => (
+          {pets.map((pet) => (
             <TouchableOpacity key={pet.id} onPress={() => navigation.navigate('PetProfile', { petId: pet.id })} className="w-40">
               <Card className="items-center py-4">
                 <AvatarBadge emoji={pet.avatar} size={74} backgroundColor={pet.color} style={{ marginBottom: 16 }} />

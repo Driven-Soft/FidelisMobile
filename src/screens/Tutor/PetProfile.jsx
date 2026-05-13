@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MOCK_TUTOR_PETS } from '../../data/fidelisData';
+import { MOCK_TUTOR_PETS, parsePtDate } from '../../data/fidelisData';
+import { UserContext } from '../../context/UserContext';
 import Card from '../../components/common/Card';
 import AvatarBadge from '../../components/common/AvatarBadge';
 
 const PetProfile = ({ route, navigation }) => {
   const { petId } = route.params;
-  const pet = MOCK_TUTOR_PETS.find((p) => p.id === petId);
+  const { tutorPets } = useContext(UserContext);
+  const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
+  const pet = pets.find((p) => p.id === petId);
   const [activeTab, setActiveTab] = useState('Vacinas');
 
   const calculateAge = (birthDate) => {
     const today = new Date();
-    const birth = new Date(birthDate);
+    const birth = parsePtDate(birthDate);
+    if (!birth) return 0;
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
@@ -67,7 +71,7 @@ const PetProfile = ({ route, navigation }) => {
 
           <Card className="mb-4">
             <Text className="mb-1 text-xs text-slate-500">Clínica Vinculada</Text>
-            <Text className="text-base font-semibold text-slate-900">{pet.clinicAssociated}</Text>
+            <Text className="text-base font-semibold text-slate-900">{pet.clinic ?? pet.clinicAssociated ?? '-'}</Text>
           </Card>
 
           <View className="mb-4 flex-row border-b-2 border-slate-200">

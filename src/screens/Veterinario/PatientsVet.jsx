@@ -1,7 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useContext, useEffect } from 'react';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MOCK_VET_PATIENTS } from '../../data/fidelisData';
+import { UserContext } from '../../context/UserContext';
 import Input from '../../components/common/Input';
 import Card from '../../components/common/Card';
 import SectionHeader from '../../components/common/SectionHeader';
@@ -10,10 +12,50 @@ import AvatarBadge from '../../components/common/AvatarBadge';
 import Badge from '../../components/common/Badge';
 
 const PatientsVet = ({ navigation }) => {
+  const { user, userType } = useContext(UserContext);
   const [searchText, setSearchText] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('Todos');
 
   const filterOptions = ['Todos', 'Cão', 'Gato', 'Ave', 'Outros'];
+
+  const storageKey = useMemo(() => {
+    const owner = user?.email ?? 'guest';
+    const portal = userType ?? 'VET';
+    return `@fidelis:vetPatientsFilter:${portal}:${owner}`;
+  }, [user?.email, userType]);
+
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const saved = await AsyncStorage.getItem(storageKey);
+        if (!saved) return;
+        const parsed = JSON.parse(saved);
+        if (typeof parsed?.searchText === 'string') {
+          setSearchText(parsed.searchText);
+        }
+        if (filterOptions.includes(parsed?.selectedFilter)) {
+          setSelectedFilter(parsed.selectedFilter);
+        }
+      } catch (error) {
+      }
+    };
+
+    loadFilters();
+  }, [storageKey]);
+
+  useEffect(() => {
+    const persistFilters = async () => {
+      try {
+        await AsyncStorage.setItem(
+          storageKey,
+          JSON.stringify({ searchText, selectedFilter })
+        );
+      } catch (error) {
+      }
+    };
+
+    persistFilters();
+  }, [searchText, selectedFilter, storageKey]);
 
   const filteredPatients = useMemo(() => {
     return MOCK_VET_PATIENTS.filter((patient) => {

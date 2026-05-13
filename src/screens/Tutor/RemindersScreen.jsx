@@ -1,19 +1,59 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef, useContext, useEffect } from 'react';
 import { View, ScrollView, Text, TouchableOpacity, Animated } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MOCK_TUTOR_REMINDERS, MOCK_TUTOR_PETS } from '../../data/fidelisData';
+import { UserContext } from '../../context/UserContext';
 import SectionHeader from '../../components/common/SectionHeader';
 import ReminderCard from '../../components/Tutor/ReminderCard';
 import NewReminderModal from '../../components/Tutor/NewReminderModal';
 
 const RemindersScreen = () => {
+  const { user, userType, tutorPets } = useContext(UserContext);
   const [reminders, setReminders] = useState(MOCK_TUTOR_REMINDERS);
   const [filterType, setFilterType] = useState('Todos');
   const [modalVisible, setModalVisible] = useState(false);
+  const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
+
+  const storageKey = useMemo(() => {
+    const owner = user?.email ?? 'guest';
+    const portal = userType ?? 'TUTOR';
+    return `@fidelis:reminders:${portal}:${owner}`;
+  }, [user?.email, userType]);
 
   const filterOptions = ['Todos', 'VACINA', 'RETORNO', 'MEDICAMENTO', 'CHECKUP', 'VERMÍFUGO'];
 
   const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const loadReminders = async () => {
+      try {
+        const saved = await AsyncStorage.getItem(storageKey);
+        if (!saved) {
+          setReminders(MOCK_TUTOR_REMINDERS);
+          return;
+        }
+
+        const parsed = JSON.parse(saved);
+        setReminders(Array.isArray(parsed) ? parsed : MOCK_TUTOR_REMINDERS);
+      } catch (error) {
+        setReminders(MOCK_TUTOR_REMINDERS);
+      }
+    };
+
+    loadReminders();
+  }, [storageKey]);
+
+  useEffect(() => {
+    const persistReminders = async () => {
+      try {
+        await AsyncStorage.setItem(storageKey, JSON.stringify(reminders));
+      } catch (error) {
+      }
+    };
+
+    persistReminders();
+  }, [reminders, storageKey]);
 
   const filteredReminders = useMemo(() => {
     return reminders.filter((item) => (filterType === 'Todos' ? true : item.type === filterType));
@@ -73,7 +113,7 @@ const RemindersScreen = () => {
               <SectionHeader title="Atrasados" subtitle={`${buckets.delayed.length} lembretes`} />
               <View className="pb-6">
                 {buckets.delayed.map((reminder) => (
-                  <ReminderCard key={reminder.id} reminder={{...reminder, ...(MOCK_TUTOR_PETS.find(p=>p.id===reminder.petId) || {})}} onComplete={markAsComplete} />
+                  <ReminderCard key={reminder.id} reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} onComplete={markAsComplete} />
                 ))}
               </View>
             </View>
@@ -84,7 +124,7 @@ const RemindersScreen = () => {
               <SectionHeader title="Pendentes" subtitle={`${buckets.pending.length} lembretes`} />
               <View className="pb-6">
                 {buckets.pending.map((reminder) => (
-                  <ReminderCard key={reminder.id} reminder={{...reminder, ...(MOCK_TUTOR_PETS.find(p=>p.id===reminder.petId) || {})}} onComplete={markAsComplete} onIgnore={ignoreReminder} />
+                  <ReminderCard key={reminder.id} reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} onComplete={markAsComplete} onIgnore={ignoreReminder} />
                 ))}
               </View>
             </View>
@@ -95,7 +135,7 @@ const RemindersScreen = () => {
               <SectionHeader title="Concluídos" subtitle={`${buckets.completed.length} lembretes`} />
               <View className="pb-6">
                 {buckets.completed.map((reminder) => (
-                  <ReminderCard key={reminder.id} reminder={{...reminder, ...(MOCK_TUTOR_PETS.find(p=>p.id===reminder.petId) || {})}} />
+                  <ReminderCard key={reminder.id} reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} />
                 ))}
               </View>
             </View>
@@ -108,7 +148,7 @@ const RemindersScreen = () => {
           )}
         </View>
       </ScrollView>
-      <NewReminderModal visible={modalVisible} onClose={() => setModalVisible(false)} onSave={handleCreate} pets={MOCK_TUTOR_PETS} />
+      <NewReminderModal visible={modalVisible} onClose={() => setModalVisible(false)} onSave={handleCreate} pets={pets} />
 
       <Animated.View style={{ position: 'absolute', bottom: 24, right: 20, transform: [{ scale }] }}>
         <TouchableOpacity

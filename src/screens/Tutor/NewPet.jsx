@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { View, ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import AvatarBadge from '../../components/common/AvatarBadge';
+import { UserContext } from '../../context/UserContext';
 
 const initialForm = {
   name: '',
@@ -18,11 +19,31 @@ const initialForm = {
 };
 
 const NewPet = ({ navigation }) => {
+  const { addTutorPet, user } = useContext(UserContext);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
 
   const setField = (field, value) => setForm((current) => ({ ...current, [field]: value }));
+
+  const parsePtDate = (value) => {
+    const match = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (!match) return null;
+
+    const day = Number(match[1]);
+    const month = Number(match[2]);
+    const year = Number(match[3]);
+    const parsed = new Date(year, month - 1, day);
+    if (
+      parsed.getFullYear() !== year ||
+      parsed.getMonth() !== month - 1 ||
+      parsed.getDate() !== day
+    ) {
+      return null;
+    }
+
+    return parsed;
+  };
 
   const validateStep = () => {
     const nextErrors = {};
@@ -36,7 +57,11 @@ const NewPet = ({ navigation }) => {
     if (step === 2) {
       if (!form.weight.trim()) nextErrors.weight = 'Informe o peso';
       if (!form.sex.trim()) nextErrors.sex = 'Informe o sexo';
-      if (!form.birthDate.trim()) nextErrors.birthDate = 'Informe a data de nascimento';
+      if (!form.birthDate.trim()) {
+        nextErrors.birthDate = 'Informe a data de nascimento';
+      } else if (!parsePtDate(form.birthDate.trim())) {
+        nextErrors.birthDate = 'Use o formato dd/mm/aaaa';
+      }
     }
 
     setErrors(nextErrors);
@@ -51,6 +76,20 @@ const NewPet = ({ navigation }) => {
       return;
     }
 
+    const nextPet = {
+      id: `${Date.now()}`,
+      name: form.name.trim(),
+      species: form.species.trim(),
+      breed: form.breed.trim(),
+      sex: form.sex.trim(),
+      birthDate: form.birthDate.trim(),
+      avatar: form.emoji?.trim() || '🐾',
+      color: '#E0F2FE',
+      accent: '#0EA5E9',
+      clinic: user?.clinic ?? 'Clínica VetCare São Paulo',
+    };
+
+    addTutorPet(nextPet);
     navigation.goBack();
   };
 
@@ -97,7 +136,7 @@ const NewPet = ({ navigation }) => {
             <>
               <Input label="Peso" placeholder="Ex.: 28 kg" value={form.weight} onChangeText={(value) => setField('weight', value)} error={errors.weight} />
               <Input label="Sexo" placeholder="Ex.: Macho / Fêmea" value={form.sex} onChangeText={(value) => setField('sex', value)} error={errors.sex} />
-              <Input label="Data de nascimento" placeholder="AAAA-MM-DD" value={form.birthDate} onChangeText={(value) => setField('birthDate', value)} error={errors.birthDate} />
+              <Input label="Data de nascimento" placeholder="DD/MM/AAAA" value={form.birthDate} onChangeText={(value) => setField('birthDate', value)} error={errors.birthDate} />
             </>
           )}
 

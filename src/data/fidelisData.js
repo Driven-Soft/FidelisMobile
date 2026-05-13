@@ -613,8 +613,36 @@ export const formatPtDate = (date) => {
   });
 };
 
+export const parsePtDate = (value) => {
+  if (!value) return null;
+  if (value instanceof Date) return value;
+
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (match) {
+      const day = Number(match[1]);
+      const month = Number(match[2]);
+      const year = Number(match[3]);
+      const parsed = new Date(year, month - 1, day);
+      if (
+        parsed.getFullYear() === year &&
+        parsed.getMonth() === month - 1 &&
+        parsed.getDate() === day
+      ) {
+        return parsed;
+      }
+      return null;
+    }
+  }
+
+  const fallback = new Date(value);
+  if (Number.isNaN(fallback.getTime())) return null;
+  return fallback;
+};
+
 export const getPetAgeLabel = (birthDate) => {
-  const birth = new Date(birthDate);
+  const birth = parsePtDate(birthDate);
+  if (!birth) return 'Idade desconhecida';
   const now = new Date();
   let age = now.getFullYear() - birth.getFullYear();
   const monthDiff = now.getMonth() - birth.getMonth();

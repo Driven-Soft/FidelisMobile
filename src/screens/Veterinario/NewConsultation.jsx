@@ -1,7 +1,9 @@
-import React, { useMemo, useState } from 'react';
-import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import React, { useMemo, useState, useContext } from 'react';
+import { Alert, View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MOCK_NEW_CONSULTATION_PATIENTS } from '../../data/fidelisData';
+import { UserContext } from '../../context/UserContext';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
@@ -10,6 +12,7 @@ import SectionHeader from '../../components/common/SectionHeader';
 const emptyItem = { id: String(Date.now()), value: '' };
 
 const NewConsultation = ({ route, navigation }) => {
+  const { user, userType } = useContext(UserContext);
   const initialPatientId = route?.params?.patientId ?? MOCK_NEW_CONSULTATION_PATIENTS[0]?.id ?? '';
   const [patientId, setPatientId] = useState(initialPatientId);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
@@ -26,12 +29,47 @@ const NewConsultation = ({ route, navigation }) => {
     [patientId]
   );
 
+  const storageKey = useMemo(() => {
+    const owner = user?.email ?? 'guest';
+    const portal = userType ?? 'VET';
+    return `@fidelis:consultations:${portal}:${owner}`;
+  }, [user?.email, userType]);
+
   const addItem = (setter) => setter((current) => [...current, { id: String(Date.now() + Math.random()), value: '' }]);
   const updateItem = (setter, itemId, value) => setter((current) => current.map((item) => (item.id === itemId ? { ...item, value } : item)));
   const removeItem = (setter, itemId) => setter((current) => current.length > 1 ? current.filter((item) => item.id !== itemId) : current);
 
-  const handleSave = () => {
-    navigation.goBack();
+  const handleSave = async () => {
+    if (!patientId || !date.trim() || !time.trim() || !reason.trim()) {
+      Alert.alert('Campos obrigatorios', 'Preencha paciente, data, hora e motivo.');
+      return;
+    }
+
+    const payload = {
+      id: String(Date.now()),
+      patientId,
+      patientLabel: selectedPatient?.label ?? '',
+      date: date.trim(),
+      time: time.trim(),
+      reason: reason.trim(),
+      anamnesis: anamnesis.trim(),
+      diagnosis: diagnosis.trim(),
+      notes: notes.trim(),
+      prescriptions: prescriptions.map((item) => item.value).filter(Boolean),
+      exams: exams.map((item) => item.value).filter(Boolean),
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      const saved = await AsyncStorage.getItem(storageKey);
+      const parsed = saved ? JSON.parse(saved) : [];
+      const next = Array.isArray(parsed) ? [payload, ...parsed] : [payload];
+      await AsyncStorage.setItem(storageKey, JSON.stringify(next));
+      Alert.alert('Sucesso', 'Consulta salva.');
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Erro', 'Nao foi possivel salvar a consulta.');
+    }
   };
 
   return (
