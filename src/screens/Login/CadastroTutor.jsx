@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Card from '../../components/common/Card';
-import SectionHeader from '../../components/common/SectionHeader';
+
+const STORAGE_KEY_CADASTRO_TUTOR = '@fidelis:cadastro_tutor';
 
 export default function CadastroTutor({ navigation }) {
   const [step, setStep] = useState(1);
@@ -22,11 +24,16 @@ export default function CadastroTutor({ navigation }) {
   };
 
   const handleNext = () => {
+    if (!validateStep(step)) {
+      return;
+    }
+
     if (step < 3) {
       setStep(step + 1);
-    } else {
-      handleComplete();
+      return;
     }
+
+    handleComplete();
   };
 
   const handleBack = () => {
@@ -35,8 +42,78 @@ export default function CadastroTutor({ navigation }) {
     }
   };
 
-  const handleComplete = () => {
-    navigation.replace('Login');
+  const handleComplete = async () => {
+    try {
+      await AsyncStorage.setItem(
+        STORAGE_KEY_CADASTRO_TUTOR,
+        JSON.stringify({
+          userType: 'TUTOR',
+          name: formData.name.trim(),
+          email: formData.email.trim().toLowerCase(),
+          phone: formData.phone.trim(),
+          cpf: formData.cpf.trim(),
+          password: formData.password,
+        })
+      );
+      Alert.alert('Sucesso', 'Cadastro de tutor realizado.');
+      navigation.replace('Login');
+    } catch (error) {
+      Alert.alert('Erro', 'Nao foi possivel salvar o cadastro.');
+    }
+  };
+
+  const validateStep = (currentStep) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const digitsOnly = (value) => value.replace(/\D/g, '');
+
+    if (currentStep === 1) {
+      if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()) {
+        Alert.alert('Campos obrigatorios', 'Preencha nome, email e telefone.');
+        return false;
+      }
+
+      if (!emailRegex.test(formData.email.trim())) {
+        Alert.alert('Email invalido', 'Informe um email valido.');
+        return false;
+      }
+
+      if (digitsOnly(formData.phone).length < 10) {
+        Alert.alert('Telefone invalido', 'Informe um telefone com DDD.');
+        return false;
+      }
+    }
+
+    if (currentStep === 2) {
+      const cpfDigits = digitsOnly(formData.cpf);
+      if (!cpfDigits) {
+        Alert.alert('Campos obrigatorios', 'Informe o CPF.');
+        return false;
+      }
+
+      if (cpfDigits.length !== 11) {
+        Alert.alert('CPF invalido', 'Informe um CPF com 11 digitos.');
+        return false;
+      }
+    }
+
+    if (currentStep === 3) {
+      if (!formData.password || !formData.confirmPassword) {
+        Alert.alert('Campos obrigatorios', 'Preencha a senha e a confirmacao.');
+        return false;
+      }
+
+      if (formData.password.length < 6) {
+        Alert.alert('Senha invalida', 'A senha deve ter ao menos 6 caracteres.');
+        return false;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        Alert.alert('Senha invalida', 'As senhas nao conferem.');
+        return false;
+      }
+    }
+
+    return true;
   };
 
   const progressSteps = [

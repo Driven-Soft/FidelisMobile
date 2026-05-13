@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MOCK_TUTOR_PROFILE, MOCK_TUTOR_PETS, MOCK_TUTOR_REMINDERS, MOCK_TUTOR_HISTORY, formatPtDate, getPetAgeLabel } from '../../data/fidelisData';
+import { UserContext } from '../../context/UserContext';
 import AvatarBadge from '../../components/common/AvatarBadge';
 import Card from '../../components/common/Card';
 import SectionHeader from '../../components/common/SectionHeader';
@@ -9,6 +10,8 @@ import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 
 export default function HomeTutor({ navigation }) {
+  const { user } = useContext(UserContext);
+  const tutorName = user?.name ?? MOCK_TUTOR_PROFILE.name;
   const upcomingReminders = [...MOCK_TUTOR_REMINDERS]
     .sort((left, right) => left.dueDate - right.dueDate)
     .slice(0, 3);
@@ -17,7 +20,7 @@ export default function HomeTutor({ navigation }) {
     <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="px-4 pb-6">
         <View className="mt-4 rounded-3xl bg-cyan-700 p-6 shadow-sm">
-          <Text className="mb-1 text-sm text-white/75">Olá, {MOCK_TUTOR_PROFILE.name.split(' ')[0]}</Text>
+          <Text className="mb-1 text-sm text-white/75">Olá, {tutorName.split(' ')[0]}</Text>
           <Text className="mb-2 text-4xl font-bold text-white">Tudo sob controle para hoje</Text>
           <Text className="text-sm leading-5 text-white/90">
             Acompanhe os pets, próximos cuidados e o histórico mais recente em um só lugar.

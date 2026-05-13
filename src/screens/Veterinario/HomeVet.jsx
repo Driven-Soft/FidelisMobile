@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MOCK_VET_PROFILE, MOCK_VET_PATIENTS, MOCK_VET_APPOINTMENTS, MOCK_VET_ALERTS, formatPtDate } from '../../data/fidelisData';
+import { UserContext } from '../../context/UserContext';
 import Card from '../../components/common/Card';
 import SectionHeader from '../../components/common/SectionHeader';
 import Badge from '../../components/common/Badge';
@@ -9,6 +10,8 @@ import AvatarBadge from '../../components/common/AvatarBadge';
 import Button from '../../components/common/Button';
 
 export default function HomeVet({ navigation }) {
+  const { user } = useContext(UserContext);
+  const vetName = user?.name ?? MOCK_VET_PROFILE.name;
   const stats = [
     { label: 'Pets ativos', value: MOCK_VET_PATIENTS.length, tone: '#0f172a' },
     { label: 'Consultas hoje', value: MOCK_VET_APPOINTMENTS.length, tone: '#06b6d4' },
@@ -19,7 +22,7 @@ export default function HomeVet({ navigation }) {
     <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="px-4 pb-6">
         <View className="mt-4 rounded-3xl bg-slate-900 p-6 shadow-sm">
-          <Text className="mb-1 text-sm text-white/75">Olá, {MOCK_VET_PROFILE.name}</Text>
+          <Text className="mb-1 text-sm text-white/75">Olá, {vetName}</Text>
           <Text className="mb-2 text-4xl font-bold text-white">Agenda e pacientes em um só painel</Text>
           <Text className="text-sm leading-5 text-white/90">
             Revise os atendimentos do dia, acompanhe os alertas urgentes e abra a ficha clínica com um toque.

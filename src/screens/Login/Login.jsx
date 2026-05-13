@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { View, ScrollView, Text } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { UserContext } from '../../context/UserContext';
@@ -9,24 +10,72 @@ import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 
+const STORAGE_KEY_CADASTRO_TUTOR = '@fidelis:cadastro_tutor';
+const STORAGE_KEY_CADASTRO_VET = '@fidelis:cadastro_vet';
+
 export default function Login({ navigation }) {
   const { portalToggle, setPortalToggle, loginTutor, loginVet } = useContext(UserContext);
   const [portalType, setPortalType] = useState(portalToggle ?? 'TUTOR');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+
     setPortalToggle(portalType);
-    if (portalType === 'TUTOR') {
-      loginTutor(MOCK_TUTOR_PROFILE);
-    } else {
-      loginVet(MOCK_VET_PROFILE);
+
+    if (!trimmedEmail && !trimmedPassword) {
+      if (portalType === 'TUTOR') {
+        loginTutor(MOCK_TUTOR_PROFILE);
+      } else {
+        loginVet(MOCK_VET_PROFILE);
+      }
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Tabs', params: { userType: portalType } }],
+      });
+      return;
     }
 
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Tabs', params: { userType: portalType } }],
-    });
+    if (!trimmedEmail || !trimmedPassword) {
+      Alert.alert('Campos obrigatorios', 'Informe email e senha para entrar.');
+      return;
+    }
+
+    try {
+      const storageKey = portalType === 'TUTOR' ? STORAGE_KEY_CADASTRO_TUTOR : STORAGE_KEY_CADASTRO_VET;
+      const savedCadastro = await AsyncStorage.getItem(storageKey);
+
+      if (!savedCadastro) {
+        Alert.alert('Cadastro nao encontrado', 'Crie um cadastro antes de entrar.');
+        return;
+      }
+
+      const parsedCadastro = JSON.parse(savedCadastro);
+      const validCredentials =
+        parsedCadastro.email?.toLowerCase() === trimmedEmail &&
+        parsedCadastro.password === trimmedPassword;
+
+      if (!validCredentials) {
+        Alert.alert('Dados invalidos', 'Email ou senha nao conferem.');
+        return;
+      }
+
+      if (portalType === 'TUTOR') {
+        loginTutor(parsedCadastro);
+      } else {
+        loginVet(parsedCadastro);
+      }
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Tabs', params: { userType: portalType } }],
+      });
+    } catch (error) {
+      Alert.alert('Erro', 'Nao foi possivel validar o login.');
+    }
   };
 
   return (
