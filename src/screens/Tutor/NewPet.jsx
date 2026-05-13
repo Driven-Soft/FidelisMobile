@@ -1,13 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-} from 'react-native';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '../../styles/theme';
+import { View, ScrollView, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
@@ -73,25 +66,25 @@ const NewPet = ({ navigation }) => {
   const currentStep = stepLabels[step - 1];
 
   return (
-    <SafeAreaView style={styles.screen}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Cadastrar Pet</Text>
-        <Text style={styles.subtitle}>Preencha o cadastro em 3 etapas e salve o perfil do animal.</Text>
+    <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="px-4 pb-6 pt-4">
+        <Text className="text-4xl font-bold text-slate-900">Cadastrar Pet</Text>
+        <Text className="mt-2 mb-6 text-sm text-slate-500">Preencha o cadastro em 3 etapas e salve o perfil do animal.</Text>
 
-        <View style={styles.stepperRow}>
+        <View className="mb-4 flex-row items-start">
           {stepLabels.map((item) => (
-            <View key={item.number} style={styles.stepWrap}>
-              <View style={[styles.stepCircle, item.number <= step && styles.stepCircleActive]}>
-                <Text style={[styles.stepNumber, item.number <= step && styles.stepNumberActive]}>{item.number}</Text>
+            <View key={item.number} className="flex-1 items-center">
+              <View className={`mb-1 h-9 w-9 items-center justify-center rounded-full ${item.number <= step ? 'bg-cyan-600' : 'bg-slate-200'}`}>
+                <Text className={`text-sm font-bold ${item.number <= step ? 'text-white' : 'text-slate-500'}`}>{item.number}</Text>
               </View>
-              <Text style={styles.stepLabel}>{item.label}</Text>
-              {item.number < stepLabels.length && <View style={[styles.stepLine, item.number < step && styles.stepLineActive]} />}
+              <Text className="text-center text-xs text-slate-500">{item.label}</Text>
+              {item.number < stepLabels.length && <View className={`absolute top-[18px] right-[-50%] h-0.5 w-full ${item.number < step ? 'bg-cyan-600' : 'bg-slate-300'}`} />}
             </View>
           ))}
         </View>
 
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>{currentStep.label}</Text>
+        <Card className="mb-4">
+          <Text className="mb-4 text-lg font-bold text-slate-900">{currentStep.label}</Text>
           {step === 1 && (
             <>
               <Input label="Nome" placeholder="Ex.: Thor" value={form.name} onChangeText={(value) => setField('name', value)} error={errors.name} />
@@ -110,11 +103,11 @@ const NewPet = ({ navigation }) => {
 
           {step === 3 && (
             <>
-              <View style={styles.previewRow}>
+              <View className="mb-4 flex-row items-center space-x-4">
                 <AvatarBadge emoji={form.emoji || '🐾'} size={96} backgroundColor="#F3F7FB" />
-                <View style={{ flex: 1 }}>
+                <View className="flex-1">
                   <Input label="Emoji da foto" placeholder="🐶" value={form.emoji} onChangeText={(value) => setField('emoji', value)} />
-                  <Text style={styles.helpText}>No mock atual usamos emoji/foto ilustrativa. Em produção aqui entraria upload real.</Text>
+                  <Text className="mt-2 text-xs leading-5 text-slate-500">No mock atual usamos emoji/foto ilustrativa. Em produção aqui entraria upload real.</Text>
                 </View>
               </View>
               <Input
@@ -124,13 +117,13 @@ const NewPet = ({ navigation }) => {
                 onChangeText={(value) => setField('observations', value)}
                 multiline
                 numberOfLines={4}
-                style={{ marginTop: SPACING.md }}
+                style={{ marginTop: 16 }}
               />
             </>
           )}
         </Card>
 
-        <View style={styles.actions}>
+        <View className="flex-row space-x-3">
           {step > 1 && (
             <Button title="Voltar" variant="outline" onPress={() => setStep((current) => current - 1)} style={{ flex: 1 }} />
           )}
@@ -145,99 +138,5 @@ const NewPet = ({ navigation }) => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  content: {
-    paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.xl,
-    paddingTop: SPACING.lg,
-  },
-  title: {
-    fontSize: FONT_SIZES.xxxl,
-    fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.text,
-  },
-  subtitle: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textLight,
-    marginTop: SPACING.xs,
-    marginBottom: SPACING.xl,
-  },
-  stepperRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: SPACING.lg,
-  },
-  stepWrap: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  stepCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#E8EEF5',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SPACING.xs,
-  },
-  stepCircleActive: {
-    backgroundColor: COLORS.accent,
-  },
-  stepNumber: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.textLight,
-  },
-  stepNumberActive: {
-    color: COLORS.white,
-  },
-  stepLabel: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textLight,
-    textAlign: 'center',
-  },
-  stepLine: {
-    position: 'absolute',
-    top: 18,
-    right: '-50%',
-    width: '100%',
-    height: 2,
-    backgroundColor: '#D4DEEA',
-    zIndex: -1,
-  },
-  stepLineActive: {
-    backgroundColor: COLORS.accent,
-  },
-  card: {
-    marginBottom: SPACING.lg,
-  },
-  sectionTitle: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.text,
-    marginBottom: SPACING.md,
-  },
-  previewRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.md,
-    marginBottom: SPACING.md,
-  },
-  helpText: {
-    marginTop: SPACING.sm,
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textLight,
-    lineHeight: 18,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: SPACING.md,
-  },
-});
 
 export default NewPet;

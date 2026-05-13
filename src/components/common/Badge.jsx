@@ -1,63 +1,48 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '../../styles/theme';
+import { View, Text } from 'react-native';
 
 const Badge = ({ type = 'default', label, icon, style, textStyle }) => {
   const getBadgeColor = () => {
     switch (type) {
       case 'VACINA':
-        return { bg: COLORS.success, text: COLORS.white };
+        return { bg: 'bg-emerald-600', text: 'text-white' };
       case 'RETORNO':
-        return { bg: COLORS.info, text: COLORS.white };
+        return { bg: 'bg-sky-600', text: 'text-white' };
       case 'MEDICAMENTO':
-        return { bg: COLORS.warning, text: COLORS.white };
+        return { bg: 'bg-amber-500', text: 'text-white' };
+      case 'CHECKUP':
+        return { bg: 'bg-sky-600', text: 'text-white' };
       case 'VERMÍFUGO':
-        return { bg: COLORS.secondary, text: COLORS.white };
+        return { bg: 'bg-violet-600', text: 'text-white' };
       case 'CONSULTA':
-        return { bg: COLORS.primary, text: COLORS.white };
+        return { bg: 'bg-slate-900', text: 'text-white' };
       case 'PENDENTE':
-        return { bg: '#FFF4D6', text: '#9A6700' };
+        return { bg: 'bg-amber-100', text: 'text-amber-800' };
       case 'CONCLUÍDO':
-        return { bg: '#E6F6EA', text: '#157347' };
+        return { bg: 'bg-emerald-100', text: 'text-emerald-700' };
       case 'ATRASADO':
-        return { bg: '#FDECEC', text: COLORS.danger };
+        return { bg: 'bg-red-100', text: 'text-red-600' };
       case 'Rotina':
-        return { bg: '#E8F5E9', text: COLORS.success };
+        return { bg: 'bg-emerald-100', text: 'text-emerald-600' };
       case 'Retorno':
-        return { bg: '#E3F2FD', text: COLORS.info };
+        return { bg: 'bg-sky-100', text: 'text-sky-600' };
       case 'Emergência':
-        return { bg: '#FFEBEE', text: COLORS.danger };
+        return { bg: 'bg-red-100', text: 'text-red-600' };
       case 'Preventiva':
-        return { bg: '#F3E5F5', text: COLORS.secondary };
+        return { bg: 'bg-violet-100', text: 'text-violet-600' };
       default:
-        return { bg: COLORS.lightGray, text: COLORS.text };
+        return { bg: 'bg-slate-100', text: 'text-slate-700' };
     }
   };
 
   const colors = getBadgeColor();
 
-  const styles = StyleSheet.create({
-    badge: {
-      backgroundColor: colors.bg,
-      paddingVertical: SPACING.xs,
-      paddingHorizontal: SPACING.md,
-      borderRadius: BORDER_RADIUS.full,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.xs,
-      alignSelf: 'flex-start',
-    },
-    text: {
-      color: colors.text,
-      fontSize: FONT_SIZES.xs,
-      fontWeight: FONT_WEIGHTS.semibold,
-    },
-  });
-
   return (
-    <View style={[styles.badge, style]}>
+    <View className={`self-start flex-row items-center rounded-full px-3 py-1 ${colors.bg}`} style={style}>
       {icon && icon}
-      <Text style={[styles.text, textStyle]}>{label}</Text>
+      <Text className={`text-xs font-semibold ${colors.text}`} style={textStyle}>
+        {label}
+      </Text>
     </View>
   );
 };

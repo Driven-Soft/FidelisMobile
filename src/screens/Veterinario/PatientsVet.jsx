@@ -1,14 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MOCK_VET_PATIENTS } from '../../data/fidelisData';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '../../styles/theme';
 import Input from '../../components/common/Input';
 import Card from '../../components/common/Card';
 import SectionHeader from '../../components/common/SectionHeader';
@@ -33,102 +26,10 @@ const PatientsVet = ({ navigation }) => {
     });
   }, [searchText, selectedFilter]);
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: COLORS.background,
-    },
-    content: {
-      paddingHorizontal: SPACING.lg,
-    },
-    filterContainer: {
-      flexDirection: 'row',
-      gap: SPACING.sm,
-      marginBottom: SPACING.lg,
-      marginTop: SPACING.lg,
-      flexWrap: 'wrap',
-    },
-    filterButton: {
-      paddingVertical: SPACING.sm,
-      paddingHorizontal: SPACING.md,
-      borderRadius: 20,
-      backgroundColor: COLORS.white,
-      borderWidth: 1,
-      borderColor: COLORS.border,
-    },
-    filterButtonActive: {
-      backgroundColor: COLORS.primary,
-      borderColor: COLORS.primary,
-    },
-    filterText: {
-      fontSize: FONT_SIZES.sm,
-      fontWeight: FONT_WEIGHTS.medium,
-      color: COLORS.textLight,
-    },
-    filterTextActive: {
-      color: COLORS.white,
-    },
-    patientGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: SPACING.md,
-      paddingBottom: SPACING.xl,
-    },
-    patientCardContainer: {
-      width: '48%',
-    },
-    patientCard: {
-      ...SHADOWS.md,
-      overflow: 'hidden',
-    },
-    patientInfo: {
-      padding: SPACING.md,
-    },
-    petName: {
-      fontSize: FONT_SIZES.sm,
-      fontWeight: FONT_WEIGHTS.semibold,
-      color: COLORS.text,
-      marginBottom: SPACING.xs,
-    },
-    species: {
-      fontSize: FONT_SIZES.xs,
-      color: COLORS.textLight,
-      marginBottom: SPACING.xs,
-    },
-    breed: {
-      fontSize: FONT_SIZES.xs,
-      color: COLORS.textLight,
-      marginBottom: SPACING.sm,
-    },
-    tutorName: {
-      fontSize: FONT_SIZES.xs,
-      fontWeight: FONT_WEIGHTS.medium,
-      color: COLORS.accent,
-      marginBottom: SPACING.sm,
-    },
-    lastConsultation: {
-      fontSize: FONT_SIZES.xs,
-      color: COLORS.textLight,
-      marginBottom: SPACING.md,
-    },
-    avatarWrap: {
-      alignItems: 'center',
-      paddingTop: SPACING.md,
-    },
-    emptyContainer: {
-      paddingVertical: SPACING.xxl,
-      alignItems: 'center',
-    },
-    emptyText: {
-      color: COLORS.textLight,
-      fontSize: FONT_SIZES.base,
-    },
-  });
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
+        <View className="px-4">
           <SectionHeader title="Pacientes" subtitle="Busque, filtre e abra a ficha clínica rapidamente" />
 
           <Input
@@ -138,22 +39,14 @@ const PatientsVet = ({ navigation }) => {
             icon={<Text>🔍</Text>}
           />
 
-          <View style={styles.filterContainer}>
+          <View className="mt-4 flex-row flex-wrap gap-2">
             {filterOptions.map((option) => (
               <TouchableOpacity
                 key={option}
-                style={[
-                  styles.filterButton,
-                  selectedFilter === option && styles.filterButtonActive,
-                ]}
+                className={`rounded-full border px-4 py-2 ${selectedFilter === option ? 'border-slate-900 bg-slate-900' : 'border-slate-200 bg-white'}`}
                 onPress={() => setSelectedFilter(option)}
               >
-                <Text
-                  style={[
-                    styles.filterText,
-                    selectedFilter === option && styles.filterTextActive,
-                  ]}
-                >
+                <Text className={`text-sm font-medium ${selectedFilter === option ? 'text-white' : 'text-slate-500'}`}>
                   {option}
                 </Text>
               </TouchableOpacity>
@@ -161,24 +54,24 @@ const PatientsVet = ({ navigation }) => {
           </View>
 
           {filteredPatients.length > 0 ? (
-            <View style={styles.patientGrid}>
+            <View className="mt-4 flex-row flex-wrap gap-3 pb-6">
               {filteredPatients.map((patient) => (
                 <TouchableOpacity
                   key={patient.id}
-                  style={styles.patientCardContainer}
+                  className="w-[48%]"
                   onPress={() => navigation.navigate('PatientRecord', { patientId: patient.id })}
                 >
-                  <Card style={styles.patientCard} padding={false}>
-                    <View style={styles.avatarWrap}>
+                  <Card padding={false} className="overflow-hidden">
+                    <View className="items-center pt-4">
                       <AvatarBadge emoji={patient.avatar} size={78} backgroundColor={patient.color} />
                     </View>
-                    <View style={styles.patientInfo}>
-                      <Text style={styles.petName}>{patient.petName}</Text>
-                      <Text style={styles.species}>{patient.petSpecies}</Text>
-                      <Text style={styles.breed}>{patient.breed}</Text>
-                      <Text style={styles.tutorName}>{patient.tutorName}</Text>
-                      <Text style={styles.lastConsultation}>Última: {patient.lastConsultation.toLocaleDateString('pt-BR')}</Text>
-                      <Badge type="Retorno" label={patient.clinic} style={{ marginBottom: SPACING.md }} />
+                    <View className="p-4">
+                      <Text className="mb-1 text-sm font-semibold text-slate-900">{patient.petName}</Text>
+                      <Text className="mb-1 text-xs text-slate-500">{patient.petSpecies}</Text>
+                      <Text className="mb-1 text-xs text-slate-500">{patient.breed}</Text>
+                      <Text className="mb-2 text-xs font-medium text-cyan-600">{patient.tutorName}</Text>
+                      <Text className="mb-3 text-xs text-slate-500">Última: {patient.lastConsultation.toLocaleDateString('pt-BR')}</Text>
+                      <Badge type="Retorno" label={patient.clinic} style={{ marginBottom: 12 }} />
                       <Button title="Ver Ficha" variant="primary" size="sm" onPress={() => navigation.navigate('PatientRecord', { patientId: patient.id })} />
                     </View>
                   </Card>
@@ -186,8 +79,8 @@ const PatientsVet = ({ navigation }) => {
               ))}
             </View>
           ) : (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Nenhum paciente encontrado</Text>
+            <View className="items-center py-10">
+              <Text className="text-base text-slate-500">Nenhum paciente encontrado</Text>
             </View>
           )}
         </View>

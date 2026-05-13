@@ -1,17 +1,20 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { UserProvider } from './src/context/UserContext';
 import StackRoutes from './src/routes/stack.routes';
-import { StatusBar, Platform } from 'react-native';
-import * as NavigationBar from 'expo-navigation-bar';
+import { StatusBar } from 'react-native';
+import './global.css';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() {
   return (
-    <UserProvider>
-      <NavigationContainer>
-        <StatusBar hidden />
-        <StackRoutes />
-      </NavigationContainer>
-    </UserProvider>
+    <SafeAreaProvider>
+      <UserProvider>
+        <NavigationContainer>
+          <StatusBar hidden />
+          <StackRoutes />
+        </NavigationContainer>
+      </UserProvider>
+    </SafeAreaProvider>
   );
 }

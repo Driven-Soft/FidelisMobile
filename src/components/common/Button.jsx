@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '../../styles/theme';
+import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 
 const Button = ({
   onPress,
@@ -18,81 +12,38 @@ const Button = ({
   textStyle,
   ...props
 }) => {
-  const styles = StyleSheet.create({
-    base: {
-      borderRadius: BORDER_RADIUS.lg,
-      justifyContent: 'center',
-      alignItems: 'center',
-      flexDirection: 'row',
-      ...SHADOWS.sm,
-    },
-    primary: {
-      backgroundColor: COLORS.primary,
-      paddingVertical: size === 'sm' ? SPACING.md : SPACING.lg,
-      paddingHorizontal: SPACING.lg,
-    },
-    secondary: {
-      backgroundColor: COLORS.accent,
-      paddingVertical: size === 'sm' ? SPACING.md : SPACING.lg,
-      paddingHorizontal: SPACING.lg,
-    },
-    outline: {
-      backgroundColor: COLORS.white,
-      borderWidth: 2,
-      borderColor: COLORS.primary,
-      paddingVertical: size === 'sm' ? SPACING.md : SPACING.lg,
-      paddingHorizontal: SPACING.lg,
-    },
-    danger: {
-      backgroundColor: COLORS.danger,
-      paddingVertical: size === 'sm' ? SPACING.md : SPACING.lg,
-      paddingHorizontal: SPACING.lg,
-    },
-    text: {
-      primary: {
-        color: COLORS.white,
-        fontSize: size === 'sm' ? FONT_SIZES.sm : FONT_SIZES.base,
-        fontWeight: FONT_WEIGHTS.semibold,
-      },
-      secondary: {
-        color: COLORS.white,
-        fontSize: size === 'sm' ? FONT_SIZES.sm : FONT_SIZES.base,
-        fontWeight: FONT_WEIGHTS.semibold,
-      },
-      outline: {
-        color: COLORS.primary,
-        fontSize: size === 'sm' ? FONT_SIZES.sm : FONT_SIZES.base,
-        fontWeight: FONT_WEIGHTS.semibold,
-      },
-      danger: {
-        color: COLORS.white,
-        fontSize: size === 'sm' ? FONT_SIZES.sm : FONT_SIZES.base,
-        fontWeight: FONT_WEIGHTS.semibold,
-      },
-    },
-  });
+  const sizeClasses = size === 'sm' ? 'py-3' : 'py-4';
+  const variantClasses = {
+    primary: 'bg-slate-900 border border-slate-900',
+    secondary: 'bg-cyan-600 border border-cyan-600',
+    outline: 'bg-white border-2 border-slate-900',
+    danger: 'bg-red-500 border border-red-500',
+  };
 
-  const containerStyle = [
-    styles.base,
-    styles[variant],
-    disabled && { opacity: 0.5 },
-    style,
-  ];
+  const textClasses = {
+    primary: 'text-white',
+    secondary: 'text-white',
+    outline: 'text-slate-900',
+    danger: 'text-white',
+  };
 
   return (
     <TouchableOpacity
-      style={containerStyle}
+      className={`flex-row items-center justify-center rounded-2xl px-4 shadow-sm ${sizeClasses} ${variantClasses[variant]}`}
+      style={[disabled && { opacity: 0.5 }, style]}
       onPress={onPress}
       disabled={disabled || loading}
       {...props}
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'outline' ? COLORS.primary : COLORS.white}
+          color={variant === 'outline' ? '#0f172a' : '#ffffff'}
           size="small"
         />
       ) : (
-        <Text style={[styles.text[variant], textStyle]}>{title}</Text>
+        <Text className={`text-base font-semibold ${textClasses[variant]}`} style={textStyle}>
+          {title}
+        </Text>
       )}
     </TouchableOpacity>
   );

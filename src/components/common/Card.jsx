@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../styles/theme';
+import { View } from 'react-native';
 
 const Card = ({
   children,
@@ -9,17 +8,12 @@ const Card = ({
   padding = true,
   ...props
 }) => {
-  const styles = StyleSheet.create({
-    card: {
-      backgroundColor: COLORS.white,
-      borderRadius: BORDER_RADIUS.lg,
-      ...(shadow && SHADOWS.md),
-      ...(padding && { padding: SPACING.lg }),
-    },
-  });
-
   return (
-    <View style={[styles.card, style]} {...props}>
+    <View
+      className={`rounded-2xl bg-white ${padding ? 'p-4' : ''} ${shadow ? 'shadow-sm' : ''}`}
+      style={style}
+      {...props}
+    >
       {children}
     </View>
   );

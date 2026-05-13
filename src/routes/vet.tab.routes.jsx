@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
-import { COLORS, FONT_SIZES, FONT_WEIGHTS } from '../styles/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import HomeVet from '../screens/Veterinario/HomeVet';
 import PatientsVet from '../screens/Veterinario/PatientsVet';
@@ -69,23 +69,26 @@ const ProfileStack = () => {
 };
 
 export default function VetTabRoutes() {
+  const insets = useSafeAreaInsets();
+  const bottomInset = Math.max(insets.bottom, 8);
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textLight,
+        tabBarActiveTintColor: '#0f172a',
+        tabBarInactiveTintColor: '#64748b',
         tabBarStyle: {
-          backgroundColor: COLORS.white,
-          borderTopColor: COLORS.border,
+          backgroundColor: '#ffffff',
+          borderTopColor: '#e2e8f0',
           borderTopWidth: 1,
-          paddingBottom: 8,
+          paddingBottom: bottomInset,
           paddingTop: 8,
-          height: 60,
+          height: 52 + bottomInset,
         },
         tabBarLabelStyle: {
-          fontSize: FONT_SIZES.xs,
-          fontWeight: FONT_WEIGHTS.medium,
+          fontSize: 12,
+          fontWeight: '500',
         },
       }}
     >

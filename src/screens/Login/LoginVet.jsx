@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import FormLoginVet from "./Forms/FormLoginVet";
 
 export default function LoginVet({ navigation }) {
@@ -7,32 +7,11 @@ export default function LoginVet({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 justify-center gap-3 bg-slate-100 px-4">
       <FormLoginVet onContinue={handleEnter} />
-      <Pressable
-        style={styles.registerButton}
-        onPress={() => navigation.navigate("CadastroVet")}
-      >
-        <Text style={styles.registerButtonText}>Criar novo perfil de veterinario</Text>
+      <Pressable className="mt-2 items-center" onPress={() => navigation.navigate("CadastroVet")}>
+        <Text className="font-semibold text-slate-700">Criar novo perfil de veterinario</Text>
       </Pressable>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 16,
-    backgroundColor: "#f5f7fa",
-    gap: 12,
-  },
-  registerButton: {
-    marginTop: 8,
-    alignItems: "center",
-  },
-  registerButtonText: {
-    color: "#35557f",
-    fontWeight: "600",
-  },
-});

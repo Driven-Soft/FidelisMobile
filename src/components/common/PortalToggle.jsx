@@ -1,72 +1,22 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '../../styles/theme';
+import { View, TouchableOpacity, Text } from 'react-native';
 
 const PortalToggle = ({ selected, onToggle }) => {
-  const styles = StyleSheet.create({
-    container: {
-      flexDirection: 'row',
-      backgroundColor: COLORS.lightGray,
-      borderRadius: BORDER_RADIUS.full,
-      padding: SPACING.sm,
-      gap: SPACING.sm,
-      marginBottom: SPACING.xl,
-    },
-    button: {
-      flex: 1,
-      paddingVertical: SPACING.md,
-      borderRadius: BORDER_RADIUS.full,
-      alignItems: 'center',
-    },
-    active: {
-      backgroundColor: selected === 'TUTOR' ? COLORS.accent : COLORS.primary,
-    },
-    inactive: {
-      backgroundColor: 'transparent',
-    },
-    text: {
-      fontSize: FONT_SIZES.sm,
-      fontWeight: FONT_WEIGHTS.semibold,
-    },
-    activeText: {
-      color: COLORS.white,
-    },
-    inactiveText: {
-      color: COLORS.textLight,
-    },
-  });
-
   return (
-    <View style={styles.container}>
+    <View className="mb-6 flex-row rounded-full bg-slate-100 p-1.5">
       <TouchableOpacity
-        style={[
-          styles.button,
-          selected === 'TUTOR' ? styles.active : styles.inactive,
-        ]}
+        className={`flex-1 items-center rounded-full py-3 ${selected === 'TUTOR' ? 'bg-cyan-600' : 'bg-transparent'}`}
         onPress={() => onToggle('TUTOR')}
       >
-        <Text
-          style={[
-            styles.text,
-            selected === 'TUTOR' ? styles.activeText : styles.inactiveText,
-          ]}
-        >
+        <Text className={`text-sm font-semibold ${selected === 'TUTOR' ? 'text-white' : 'text-slate-500'}`}>
           🐾 Tutor
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[
-          styles.button,
-          selected === 'VET' ? styles.active : styles.inactive,
-        ]}
+        className={`flex-1 items-center rounded-full py-3 ${selected === 'VET' ? 'bg-slate-900' : 'bg-transparent'}`}
         onPress={() => onToggle('VET')}
       >
-        <Text
-          style={[
-            styles.text,
-            selected === 'VET' ? styles.activeText : styles.inactiveText,
-          ]}
-        >
+        <Text className={`text-sm font-semibold ${selected === 'VET' ? 'text-white' : 'text-slate-500'}`}>
           👨‍⚕️ Veterinário
         </Text>
       </TouchableOpacity>

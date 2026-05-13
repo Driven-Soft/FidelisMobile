@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, BORDER_RADIUS } from '../../styles/theme';
+import { View, Text } from 'react-native';
 
 const ImagePlaceholder = ({ size = 'md', emoji = '🐾', style }) => {
   const sizes = {
@@ -10,26 +9,12 @@ const ImagePlaceholder = ({ size = 'md', emoji = '🐾', style }) => {
     xl: 250,
   };
 
-  const styles = StyleSheet.create({
-    container: {
-      width: sizes[size],
-      height: sizes[size],
-      borderRadius: BORDER_RADIUS.lg,
-      backgroundColor: COLORS.lightGray,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 2,
-      borderColor: COLORS.border,
-      borderStyle: 'dashed',
-    },
-    emoji: {
-      fontSize: sizes[size] / 2,
-    },
-  });
-
   return (
-    <View style={[styles.container, style]}>
-      <Text style={styles.emoji}>{emoji}</Text>
+    <View
+      className="items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-100"
+      style={[{ width: sizes[size], height: sizes[size] }, style]}
+    >
+      <Text style={{ fontSize: sizes[size] / 2 }}>{emoji}</Text>
     </View>
   );
 };

@@ -85,6 +85,16 @@ export const MOCK_TUTOR_REMINDERS = [
     completed: false,
   },
   {
+    id: '5',
+    petId: '2',
+    petName: 'Mia',
+    type: 'CHECKUP',
+    title: 'Check-up anual',
+    description: 'Avaliação geral de saúde e exames de rotina.',
+    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+    completed: false,
+  },
+  {
     id: '3',
     petId: '3',
     petName: 'Luna',

@@ -1,38 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, SPACING, FONT_SIZES, FONT_WEIGHTS } from '../../styles/theme';
+import { View, Text } from 'react-native';
 
 const SectionHeader = ({ title, subtitle, action, style }) => {
-  const styles = StyleSheet.create({
-    container: {
-      marginBottom: SPACING.lg,
-      marginTop: SPACING.lg,
-    },
-    titleContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    title: {
-      fontSize: FONT_SIZES.lg,
-      fontWeight: FONT_WEIGHTS.bold,
-      color: COLORS.text,
-    },
-    subtitle: {
-      fontSize: FONT_SIZES.sm,
-      color: COLORS.textLight,
-      fontWeight: FONT_WEIGHTS.regular,
-      marginTop: SPACING.xs,
-    },
-  });
-
   return (
-    <View style={[styles.container, style]}>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>{title}</Text>
+    <View className="mb-4 mt-4" style={style}>
+      <View className="flex-row items-center justify-between">
+        <Text className="text-lg font-bold text-slate-900">{title}</Text>
         {action && action}
       </View>
-      {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+      {subtitle && <Text className="mt-1 text-sm text-slate-500">{subtitle}</Text>}
     </View>
   );
 };

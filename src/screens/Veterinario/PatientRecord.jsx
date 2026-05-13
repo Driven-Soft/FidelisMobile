@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MOCK_VET_PATIENTS, MOCK_VET_PATIENT_RECORDS } from '../../data/fidelisData';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '../../styles/theme';
 import Card from '../../components/common/Card';
-import SectionHeader from '../../components/common/SectionHeader';
 import Button from '../../components/common/Button';
 import AvatarBadge from '../../components/common/AvatarBadge';
 import Badge from '../../components/common/Badge';
@@ -35,217 +27,66 @@ const PatientRecord = ({ route, navigation }) => {
 
   const currentItems = tabData[activeTab] || [];
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: COLORS.background,
-    },
-    content: {
-      paddingHorizontal: SPACING.lg,
-      paddingBottom: SPACING.xl,
-    },
-    hero: {
-      borderRadius: BORDER_RADIUS.xl,
-      padding: SPACING.xl,
-      marginTop: SPACING.lg,
-      marginBottom: SPACING.lg,
-      overflow: 'hidden',
-      ...SHADOWS.md,
-    },
-    petName: {
-      fontSize: FONT_SIZES.xxxl,
-      fontWeight: FONT_WEIGHTS.bold,
-      color: COLORS.white,
-      marginBottom: SPACING.xs,
-    },
-    petInfo: {
-      fontSize: FONT_SIZES.sm,
-      color: 'rgba(255,255,255,0.9)',
-      marginBottom: SPACING.xs,
-    },
-    topRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.md,
-    },
-    backButton: {
-      alignSelf: 'flex-start',
-      marginBottom: SPACING.sm,
-    },
-    infoGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: SPACING.md,
-      marginBottom: SPACING.lg,
-    },
-    infoCard: {
-      flex: 1,
-      minWidth: '48%',
-    },
-    infoLabel: {
-      fontSize: FONT_SIZES.xs,
-      color: COLORS.textLight,
-      fontWeight: FONT_WEIGHTS.regular,
-      marginBottom: SPACING.xs,
-    },
-    infoValue: {
-      fontSize: FONT_SIZES.base,
-      fontWeight: FONT_WEIGHTS.semibold,
-      color: COLORS.text,
-    },
-    tutorCard: {
-      marginBottom: SPACING.lg,
-    },
-    tutorTop: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      gap: SPACING.md,
-      marginBottom: SPACING.md,
-    },
-    tutorLabel: {
-      fontSize: FONT_SIZES.xs,
-      color: COLORS.textLight,
-      fontWeight: FONT_WEIGHTS.regular,
-      marginBottom: SPACING.sm,
-    },
-    tutorName: {
-      fontSize: FONT_SIZES.base,
-      fontWeight: FONT_WEIGHTS.bold,
-      color: COLORS.text,
-      marginBottom: SPACING.sm,
-    },
-    contactInfo: {
-      fontSize: FONT_SIZES.xs,
-      color: COLORS.textLight,
-      marginBottom: SPACING.xs,
-    },
-    contactRow: {
-      flexDirection: 'row',
-      gap: SPACING.sm,
-      marginTop: SPACING.md,
-    },
-    tabsContainer: {
-      flexDirection: 'row',
-      gap: SPACING.sm,
-      marginBottom: SPACING.lg,
-      borderBottomWidth: 1,
-      borderBottomColor: COLORS.border,
-    },
-    tab: {
-      paddingVertical: SPACING.md,
-      paddingHorizontal: SPACING.md,
-      borderBottomWidth: 3,
-      borderBottomColor: 'transparent',
-    },
-    activeTab: {
-      borderBottomColor: COLORS.primary,
-    },
-    tabText: {
-      fontSize: FONT_SIZES.sm,
-      fontWeight: FONT_WEIGHTS.medium,
-      color: COLORS.textLight,
-    },
-    activeTabText: {
-      color: COLORS.primary,
-      fontWeight: FONT_WEIGHTS.semibold,
-    },
-    contentContainer: {
-      paddingBottom: SPACING.xl,
-    },
-    emptyState: {
-      padding: SPACING.lg,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    emptyText: {
-      color: COLORS.textLight,
-      fontSize: FONT_SIZES.sm,
-    },
-    actionButton: {
-      marginBottom: SPACING.lg,
-    },
-    timelineCard: {
-      marginBottom: SPACING.md,
-    },
-    timelineDate: {
-      fontSize: FONT_SIZES.xs,
-      color: COLORS.textLight,
-      marginBottom: SPACING.xs,
-    },
-    timelineTitle: {
-      fontSize: FONT_SIZES.base,
-      fontWeight: FONT_WEIGHTS.bold,
-      color: COLORS.text,
-    },
-    timelineNotes: {
-      fontSize: FONT_SIZES.sm,
-      color: COLORS.textLight,
-      marginTop: SPACING.sm,
-      lineHeight: 20,
-    },
-  });
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Text style={{ color: COLORS.accent, fontWeight: FONT_WEIGHTS.semibold }}>← Voltar</Text>
+        <View className="px-4 pb-6">
+          <TouchableOpacity className="mb-3 self-start" onPress={() => navigation.goBack()}>
+            <Text className="font-semibold text-cyan-600">← Voltar</Text>
           </TouchableOpacity>
 
           <LinearGradient
             colors={['#1E6FAE', '#163A6F']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={styles.hero}
+            className="mb-4 rounded-3xl p-6 shadow-sm"
           >
-            <View style={styles.topRow}>
+            <View className="flex-row items-center space-x-4">
               <AvatarBadge emoji={patient.avatar} size={92} backgroundColor={patient.color} />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.petName}>{patient.petName}</Text>
-                <Text style={styles.petInfo}>{record.species} • {record.breed}</Text>
-                <Text style={styles.petInfo}>{record.sex} • {record.age} • {record.weight}</Text>
+              <View className="flex-1">
+                <Text className="mb-1 text-4xl font-bold text-white">{patient.petName}</Text>
+                <Text className="mb-1 text-sm text-white/90">{record.species} • {record.breed}</Text>
+                <Text className="text-sm text-white/90">{record.sex} • {record.age} • {record.weight}</Text>
               </View>
             </View>
           </LinearGradient>
 
-          <View style={styles.infoGrid}>
-            <Card style={styles.infoCard} padding={true}>
-              <Text style={styles.infoLabel}>Espécie</Text>
-              <Text style={styles.infoValue}>{record.species}</Text>
+          <View className="mb-4 flex-row flex-wrap gap-3">
+            <Card style={{ flex: 1, minWidth: '48%' }}>
+              <Text className="mb-1 text-xs text-slate-500">Espécie</Text>
+              <Text className="text-base font-semibold text-slate-900">{record.species}</Text>
             </Card>
-            <Card style={styles.infoCard} padding={true}>
-              <Text style={styles.infoLabel}>Raça</Text>
-              <Text style={styles.infoValue}>{record.breed}</Text>
+            <Card style={{ flex: 1, minWidth: '48%' }}>
+              <Text className="mb-1 text-xs text-slate-500">Raça</Text>
+              <Text className="text-base font-semibold text-slate-900">{record.breed}</Text>
             </Card>
-            <Card style={styles.infoCard} padding={true}>
-              <Text style={styles.infoLabel}>Sexo</Text>
-              <Text style={styles.infoValue}>{record.sex}</Text>
+            <Card style={{ flex: 1, minWidth: '48%' }}>
+              <Text className="mb-1 text-xs text-slate-500">Sexo</Text>
+              <Text className="text-base font-semibold text-slate-900">{record.sex}</Text>
             </Card>
-            <Card style={styles.infoCard} padding={true}>
-              <Text style={styles.infoLabel}>Idade</Text>
-              <Text style={styles.infoValue}>{record.age}</Text>
+            <Card style={{ flex: 1, minWidth: '48%' }}>
+              <Text className="mb-1 text-xs text-slate-500">Idade</Text>
+              <Text className="text-base font-semibold text-slate-900">{record.age}</Text>
             </Card>
           </View>
 
-          <Card style={styles.tutorCard}>
-            <View style={styles.tutorTop}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.tutorLabel}>Tutor</Text>
-                <Text style={styles.tutorName}>{record.tutorName}</Text>
-                <Text style={styles.contactInfo}>Última consulta: {patient.lastConsultation.toLocaleDateString('pt-BR')}</Text>
-                <Text style={styles.contactInfo}>{record.clinic}</Text>
+          <Card className="mb-4 border-l-4 border-slate-900">
+            <View className="flex-row items-start justify-between space-x-4">
+              <View className="flex-1">
+                <Text className="mb-1 text-xs text-slate-500">Tutor</Text>
+                <Text className="mb-1 text-base font-bold text-slate-900">{record.tutorName}</Text>
+                <Text className="text-xs text-slate-500">Última consulta: {patient.lastConsultation.toLocaleDateString('pt-BR')}</Text>
+                <Text className="mt-1 text-xs text-slate-500">{record.clinic}</Text>
               </View>
               <Badge type="Preventiva" label="Paciente ativo" />
             </View>
-            <View style={styles.contactRow}>
+            <View className="mt-4 flex-row space-x-3">
               <Button title="Ligar" variant="outline" size="sm" style={{ flex: 1 }} onPress={() => {}} />
               <Button title="Email" variant="outline" size="sm" style={{ flex: 1 }} onPress={() => {}} />
             </View>
           </Card>
 
-          <View style={styles.actionButton}>
+          <View className="mb-4">
             <Button
               title="+ Nova Consulta"
               variant="primary"
@@ -253,45 +94,40 @@ const PatientRecord = ({ route, navigation }) => {
             />
           </View>
 
-          <View style={styles.tabsContainer}>
+          <View className="mb-4 flex-row border-b border-slate-200">
             {tabs.map((tab) => (
               <TouchableOpacity
                 key={tab}
-                style={[styles.tab, activeTab === tab && styles.activeTab]}
+                className={`border-b-4 px-4 py-3 ${activeTab === tab ? 'border-slate-900' : 'border-transparent'}`}
                 onPress={() => setActiveTab(tab)}
               >
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeTab === tab && styles.activeTabText,
-                  ]}
-                >
+                <Text className={`text-sm font-medium ${activeTab === tab ? 'text-slate-900' : 'text-slate-500'}`}>
                   {tab}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <View style={styles.contentContainer}>
+          <View className="pb-6">
             {currentItems.length > 0 ? currentItems.map((item) => {
               const expanded = expandedId === item.id;
               return (
                 <TouchableOpacity key={item.id} onPress={() => setExpandedId(expanded ? null : item.id)}>
-                  <Card style={styles.timelineCard}>
-                    <Text style={styles.timelineDate}>{item.date.toLocaleDateString('pt-BR')}</Text>
-                    <Text style={styles.timelineTitle}>{item.title}</Text>
-                    <Text style={styles.timelineNotes} numberOfLines={expanded ? undefined : 2}>
+                  <Card className="mb-3">
+                    <Text className="mb-1 text-xs text-slate-500">{item.date.toLocaleDateString('pt-BR')}</Text>
+                    <Text className="text-base font-bold text-slate-900">{item.title}</Text>
+                    <Text className="mt-2 text-sm leading-5 text-slate-500" numberOfLines={expanded ? undefined : 2}>
                       {item.observations}
                     </Text>
-                    <Text style={{ marginTop: SPACING.sm, color: COLORS.accent, fontWeight: FONT_WEIGHTS.semibold }}>
+                    <Text className="mt-3 font-semibold text-cyan-600">
                       {expanded ? 'Recolher detalhes' : 'Expandir detalhes'}
                     </Text>
                   </Card>
                 </TouchableOpacity>
               );
             }) : (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>Nenhum registro em {activeTab}</Text>
+              <View className="items-center justify-center p-6">
+                <Text className="text-sm text-slate-500">Nenhum registro em {activeTab}</Text>
               </View>
             )}
           </View>

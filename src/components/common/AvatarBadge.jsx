@@ -1,32 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '../../styles/theme';
+import { View, Text } from 'react-native';
 
-const AvatarBadge = ({ emoji, initials, size = 72, backgroundColor = COLORS.lightGray, textColor = COLORS.text, style }) => {
-  const styles = StyleSheet.create({
-    avatar: {
-      width: size,
-      height: size,
-      borderRadius: size / 2,
-      backgroundColor,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 1,
-      borderColor: COLORS.border,
-    },
-    emoji: {
-      fontSize: size * 0.42,
-    },
-    initials: {
-      fontSize: size * 0.28,
-      fontWeight: FONT_WEIGHTS.bold,
-      color: textColor,
-    },
-  });
-
+const AvatarBadge = ({ emoji, initials, size = 72, backgroundColor = '#f1f5f9', textColor = '#0f172a', style }) => {
   return (
-    <View style={[styles.avatar, style]}>
-      {emoji ? <Text style={styles.emoji}>{emoji}</Text> : <Text style={styles.initials}>{initials}</Text>}
+    <View
+      className="items-center justify-center rounded-full border border-slate-200"
+      style={[{ width: size, height: size, backgroundColor }, style]}
+    >
+      {emoji ? (
+        <Text style={{ fontSize: size * 0.42 }}>{emoji}</Text>
+      ) : (
+        <Text style={{ fontSize: size * 0.28, fontWeight: '700', color: textColor }}>{initials}</Text>
+      )}
     </View>
   );
 };

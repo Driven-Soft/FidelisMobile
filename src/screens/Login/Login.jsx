@@ -1,16 +1,9 @@
 import React, { useContext, useState } from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, ScrollView, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { UserContext } from '../../context/UserContext';
 import { MOCK_TUTOR_PROFILE, MOCK_VET_PROFILE } from '../../data/fidelisData';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '../../styles/theme';
 import PortalToggle from '../../components/common/PortalToggle';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
@@ -36,137 +29,37 @@ export default function Login({ navigation }) {
     });
   };
 
-  const getAccentColor = () => {
-    return portalType === 'TUTOR' ? COLORS.accent : COLORS.primary;
-  };
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: COLORS.background,
-    },
-    content: {
-      flexGrow: 1,
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.xl,
-    },
-    headerContainer: {
-      marginBottom: SPACING.xl,
-    },
-    hero: {
-      borderRadius: BORDER_RADIUS.xl,
-      padding: SPACING.xl,
-      marginBottom: SPACING.xl,
-      overflow: 'hidden',
-      ...SHADOWS.md,
-    },
-    heroTop: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.md,
-      marginBottom: SPACING.md,
-    },
-    logoBubble: {
-      width: 56,
-      height: 56,
-      borderRadius: 18,
-      backgroundColor: 'rgba(255,255,255,0.18)',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    appName: {
-      fontSize: FONT_SIZES.xxxl,
-      fontWeight: FONT_WEIGHTS.bold,
-      color: COLORS.white,
-    },
-    tagline: {
-      fontSize: FONT_SIZES.base,
-      color: 'rgba(255,255,255,0.92)',
-      marginTop: SPACING.sm,
-      lineHeight: 22,
-    },
-    heroCaption: {
-      color: 'rgba(255,255,255,0.7)',
-      fontSize: FONT_SIZES.sm,
-      marginTop: SPACING.sm,
-    },
-    cardContainer: {
-      marginBottom: SPACING.xl,
-    },
-    card: {
-      ...SHADOWS.md,
-    },
-    portalToggleContainer: {
-      marginBottom: SPACING.xl,
-    },
-    forgotPasswordLink: {
-      textAlign: 'center',
-      fontSize: FONT_SIZES.sm,
-      color: getAccentColor(),
-      fontWeight: FONT_WEIGHTS.semibold,
-      marginTop: SPACING.md,
-      marginBottom: SPACING.lg,
-    },
-    signupContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      gap: SPACING.sm,
-      marginTop: SPACING.lg,
-    },
-    signupText: {
-      fontSize: FONT_SIZES.sm,
-      color: COLORS.textLight,
-    },
-    signupLink: {
-      fontSize: FONT_SIZES.sm,
-      color: getAccentColor(),
-      fontWeight: FONT_WEIGHTS.bold,
-    },
-    helperRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginTop: SPACING.md,
-      gap: SPACING.md,
-    },
-    helperText: {
-      color: COLORS.textLight,
-      fontSize: FONT_SIZES.xs,
-      flex: 1,
-      lineHeight: 18,
-    },
-  });
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerClassName="flex-grow px-4 py-6"
         showsVerticalScrollIndicator={false}
       >
         <LinearGradient
           colors={portalType === 'TUTOR' ? ['#0FA3B1', '#163A6F'] : ['#163A6F', '#0F274A']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={styles.hero}
+          className="mb-6 overflow-hidden rounded-3xl p-6 shadow-sm"
         >
-          <View style={styles.heroTop}>
-            <View style={styles.logoBubble}>
-              <Text style={{ fontSize: 28 }}>🐾</Text>
+          <View className="mb-4 flex-row items-center space-x-4">
+            <View className="h-14 w-14 items-center justify-center rounded-2xl bg-white/20">
+              <Text className="text-[28px]">🐾</Text>
             </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.appName}>Fidelis</Text>
-              <Text style={styles.heroCaption}>
+            <View className="flex-1">
+              <Text className="text-4xl font-bold text-white">Fidelis</Text>
+              <Text className="mt-2 text-sm text-white/70">
                 Portal {portalType === 'TUTOR' ? 'do Tutor' : 'do Veterinário'}
               </Text>
             </View>
           </View>
-          <Text style={styles.tagline}>
+          <Text className="mt-2 text-base leading-6 text-white/90">
             Cuide de quem você ama com informações claras, lembretes e histórico clínico sempre à mão.
           </Text>
         </LinearGradient>
 
-        <View style={styles.cardContainer}>
-          <Card style={styles.card}>
-            <View style={styles.portalToggleContainer}>
+        <View className="mb-6">
+          <Card>
+            <View className="mb-6">
               <PortalToggle
                 selected={portalType}
                 onToggle={(value) => {
@@ -197,23 +90,25 @@ export default function Login({ navigation }) {
               title="Entrar"
               variant="primary"
               onPress={handleLogin}
-              style={{ marginTop: SPACING.lg }}
+              style={{ marginTop: 16 }}
             />
 
-            <Text style={styles.forgotPasswordLink}>Esqueci minha senha</Text>
+            <Text className={`mt-4 mb-4 text-center text-sm font-semibold ${portalType === 'TUTOR' ? 'text-cyan-600' : 'text-slate-900'}`}>
+              Esqueci minha senha
+            </Text>
 
-            <View style={styles.helperRow}>
-              <Text style={styles.helperText}>
+            <View className="mt-4 flex-row gap-3">
+              <Text className="flex-1 text-xs leading-5 text-slate-500">
                 Acesso mockado para demonstração. Não há autenticação real.
               </Text>
             </View>
           </Card>
         </View>
 
-        <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Não tem conta?</Text>
+        <View className="mt-4 flex-row justify-center gap-2">
+          <Text className="text-sm text-slate-500">Não tem conta?</Text>
           <Text
-            style={styles.signupLink}
+            className={`text-sm font-bold ${portalType === 'TUTOR' ? 'text-cyan-600' : 'text-slate-900'}`}
             onPress={() => {
               if (portalType === 'TUTOR') {
                 navigation.navigate('CadastroTutor');

@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-} from 'react-native';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '../../styles/theme';
+import { View, ScrollView, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Card from '../../components/common/Card';
@@ -46,73 +40,6 @@ export default function CadastroVet({ navigation }) {
     navigation.replace('Login');
   };
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: COLORS.background,
-    },
-    content: {
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.xl,
-    },
-    progressContainer: {
-      flexDirection: 'row',
-      gap: SPACING.md,
-      marginBottom: SPACING.xl,
-      alignItems: 'center',
-    },
-    progressDot: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: COLORS.lightGray,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    progressDotActive: {
-      backgroundColor: COLORS.primary,
-    },
-    progressDotText: {
-      color: COLORS.textLight,
-      fontSize: FONT_SIZES.sm,
-      fontWeight: FONT_WEIGHTS.bold,
-    },
-    progressDotTextActive: {
-      color: COLORS.white,
-    },
-    progressLine: {
-      height: 2,
-      backgroundColor: COLORS.lightGray,
-      flex: 1,
-    },
-    progressLineActive: {
-      backgroundColor: COLORS.primary,
-    },
-    title: {
-      fontSize: FONT_SIZES.xxl,
-      fontWeight: FONT_WEIGHTS.bold,
-      color: COLORS.text,
-      marginBottom: SPACING.lg,
-    },
-    subtitle: {
-      fontSize: FONT_SIZES.sm,
-      color: COLORS.textLight,
-      marginBottom: SPACING.lg,
-    },
-    buttonContainer: {
-      flexDirection: 'row',
-      gap: SPACING.md,
-      marginTop: SPACING.xl,
-      paddingBottom: SPACING.xl,
-    },
-    backButton: {
-      flex: 1,
-    },
-    nextButton: {
-      flex: 1,
-    },
-  });
-
   const progressSteps = [
     { number: 1, title: 'Informações Básicas', subtitle: 'Nome, email e telefone' },
     { number: 2, title: 'Dados Profissionais', subtitle: 'CRMV, especialidade e clínica' },
@@ -122,42 +49,27 @@ export default function CadastroVet({ navigation }) {
   const currentStep = progressSteps[step - 1];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
+        <View className="px-4 py-6">
           {/* Progress Bar */}
-          <View style={styles.progressContainer}>
+          <View className="mb-6 flex-row items-center space-x-3">
             {[1, 2, 3].map((num) => (
-              <View key={num} style={{ flex: 1, alignItems: 'center' }}>
-                <View
-                  style={[
-                    styles.progressDot,
-                    num <= step && styles.progressDotActive,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.progressDotText,
-                      num <= step && styles.progressDotTextActive,
-                    ]}
-                  >
+              <View key={num} className="flex-1 items-center">
+                <View className={`h-10 w-10 items-center justify-center rounded-full ${num <= step ? 'bg-slate-900' : 'bg-slate-200'}`}>
+                  <Text className={`text-sm font-bold ${num <= step ? 'text-white' : 'text-slate-500'}`}>
                     {num}
                   </Text>
                 </View>
                 {num < 3 && (
-                  <View
-                    style={[
-                      styles.progressLine,
-                      num < step && styles.progressLineActive,
-                    ]}
-                  />
+                  <View className={`h-0.5 w-full ${num < step ? 'bg-slate-900' : 'bg-slate-200'}`} />
                 )}
               </View>
             ))}
           </View>
 
-          <Text style={styles.title}>{currentStep.title}</Text>
-          <Text style={styles.subtitle}>{currentStep.subtitle}</Text>
+          <Text className="mb-2 text-2xl font-bold text-slate-900">{currentStep.title}</Text>
+          <Text className="mb-4 text-sm text-slate-500">{currentStep.subtitle}</Text>
 
           <Card>
             {step === 1 && (
@@ -226,28 +138,28 @@ export default function CadastroVet({ navigation }) {
             )}
           </Card>
 
-          <View style={styles.buttonContainer}>
+          <View className="mt-6 flex-row space-x-3 pb-6">
             {step > 1 && (
               <Button
                 title="Voltar"
                 variant="outline"
                 onPress={handleBack}
-                style={styles.backButton}
+                style={{ flex: 1 }}
               />
             )}
             <Button
               title={step === 3 ? 'Cadastrar' : 'Próximo'}
               variant="primary"
               onPress={handleNext}
-              style={styles.nextButton}
+              style={{ flex: 1 }}
             />
           </View>
 
-          <View style={{ alignItems: 'center', marginTop: SPACING.lg }}>
-            <Text style={{ color: COLORS.textLight, fontSize: FONT_SIZES.sm }}>
+          <View className="mt-4 items-center">
+            <Text className="text-sm text-slate-500">
               Já tem conta?{' '}
               <Text
-                style={{ color: COLORS.primary, fontWeight: FONT_WEIGHTS.bold }}
+                className="font-bold text-slate-900"
                 onPress={() => navigation.replace('Login')}
               >
                 Faça login

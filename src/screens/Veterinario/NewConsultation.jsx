@@ -1,13 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-} from 'react-native';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '../../styles/theme';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MOCK_NEW_CONSULTATION_PATIENTS } from '../../data/fidelisData';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
@@ -42,45 +35,45 @@ const NewConsultation = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.screen}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+    <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="px-4 pb-6">
         <SectionHeader title="Nova Consulta" subtitle="Registre motivo, anamnese, diagnóstico e itens adicionais" />
 
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>Paciente</Text>
-          <View style={styles.chipGrid}>
+        <Card className="mb-4">
+          <Text className="mb-4 text-lg font-bold text-slate-900">Paciente</Text>
+          <View className="mb-4 flex-row flex-wrap gap-2">
             {MOCK_NEW_CONSULTATION_PATIENTS.map((patient) => (
               <TouchableOpacity
                 key={patient.id}
-                style={[styles.chip, patientId === patient.id && styles.chipActive]}
+                className={`rounded-full px-4 py-2 ${patientId === patient.id ? 'bg-slate-900' : 'bg-slate-200'}`}
                 onPress={() => setPatientId(patient.id)}
               >
-                <Text style={[styles.chipText, patientId === patient.id && styles.chipTextActive]}>{patient.label}</Text>
+                <Text className={`text-xs font-medium ${patientId === patient.id ? 'text-white' : 'text-slate-500'}`}>{patient.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
-          <View style={styles.rowInputs}>
+          <View className="flex-row space-x-3">
             <Input label="Data" value={date} onChangeText={setDate} style={{ flex: 1 }} />
             <Input label="Hora" value={time} onChangeText={setTime} style={{ flex: 1 }} />
           </View>
         </Card>
 
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>Detalhes da consulta</Text>
+        <Card className="mb-4">
+          <Text className="mb-4 text-lg font-bold text-slate-900">Detalhes da consulta</Text>
           <Input label="Motivo" placeholder="Ex.: retorno dermatológico" value={reason} onChangeText={setReason} />
           <Input label="Anamnese" placeholder="Relato do tutor e histórico clínico" value={anamnesis} onChangeText={setAnamnesis} multiline numberOfLines={4} />
           <Input label="Diagnóstico" placeholder="Conclusão clínica" value={diagnosis} onChangeText={setDiagnosis} multiline numberOfLines={3} />
           <Input label="Anotações clínicas" placeholder="Detalhes e orientações finais" value={notes} onChangeText={setNotes} multiline numberOfLines={4} />
         </Card>
 
-        <Card style={styles.card}>
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Prescrições</Text>
-            <Text style={styles.link} onPress={() => addItem(setPrescriptions)}>+ Adicionar</Text>
+        <Card className="mb-4">
+          <View className="mb-4 flex-row items-center justify-between">
+            <Text className="text-lg font-bold text-slate-900">Prescrições</Text>
+            <Text className="font-semibold text-cyan-600" onPress={() => addItem(setPrescriptions)}>+ Adicionar</Text>
           </View>
-          <View style={{ gap: SPACING.md }}>
+          <View className="space-y-3">
             {prescriptions.map((item, index) => (
-              <View key={item.id} style={styles.dynamicRow}>
+              <View key={item.id} className="border-b border-slate-200 pb-3">
                 <Input
                   label={`Item ${index + 1}`}
                   placeholder="Medicamento, dosagem, frequência"
@@ -88,20 +81,20 @@ const NewConsultation = ({ route, navigation }) => {
                   onChangeText={(value) => updateItem(setPrescriptions, item.id, value)}
                   style={{ flex: 1 }}
                 />
-                <Text style={styles.removeLink} onPress={() => removeItem(setPrescriptions, item.id)}>Remover</Text>
+                <Text className="-mt-2 mb-1 text-xs font-semibold text-red-500" onPress={() => removeItem(setPrescriptions, item.id)}>Remover</Text>
               </View>
             ))}
           </View>
         </Card>
 
-        <Card style={styles.card}>
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Exames</Text>
-            <Text style={styles.link} onPress={() => addItem(setExams)}>+ Adicionar</Text>
+        <Card className="mb-4">
+          <View className="mb-4 flex-row items-center justify-between">
+            <Text className="text-lg font-bold text-slate-900">Exames</Text>
+            <Text className="font-semibold text-cyan-600" onPress={() => addItem(setExams)}>+ Adicionar</Text>
           </View>
-          <View style={{ gap: SPACING.md }}>
+          <View className="space-y-3">
             {exams.map((item, index) => (
-              <View key={item.id} style={styles.dynamicRow}>
+              <View key={item.id} className="border-b border-slate-200 pb-3">
                 <Input
                   label={`Exame ${index + 1}`}
                   placeholder="Tipo, solicitação ou resultado"
@@ -109,101 +102,21 @@ const NewConsultation = ({ route, navigation }) => {
                   onChangeText={(value) => updateItem(setExams, item.id, value)}
                   style={{ flex: 1 }}
                 />
-                <Text style={styles.removeLink} onPress={() => removeItem(setExams, item.id)}>Remover</Text>
+                <Text className="-mt-2 mb-1 text-xs font-semibold text-red-500" onPress={() => removeItem(setExams, item.id)}>Remover</Text>
               </View>
             ))}
           </View>
         </Card>
 
-        <View style={styles.actions}>
+        <View className="mb-4 flex-row space-x-3">
           <Button title="Cancelar" variant="outline" onPress={() => navigation.goBack()} style={{ flex: 1 }} />
           <Button title="Salvar consulta" variant="primary" onPress={handleSave} style={{ flex: 1 }} />
         </View>
 
-        <Text style={styles.helperText}>Consulta salva em modo mock. Você pode expandir para persistência depois.</Text>
+        <Text className="text-center text-xs leading-5 text-slate-500">Consulta salva em modo mock. Você pode expandir para persistência depois.</Text>
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  content: {
-    paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.xl,
-  },
-  card: {
-    marginBottom: SPACING.lg,
-  },
-  sectionTitle: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.text,
-    marginBottom: SPACING.md,
-  },
-  chipGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.sm,
-    marginBottom: SPACING.lg,
-  },
-  chip: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: BORDER_RADIUS.full,
-    backgroundColor: COLORS.lightGray,
-  },
-  chipActive: {
-    backgroundColor: COLORS.primary,
-  },
-  chipText: {
-    color: COLORS.text,
-    fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.medium,
-  },
-  chipTextActive: {
-    color: COLORS.white,
-  },
-  rowInputs: {
-    flexDirection: 'row',
-    gap: SPACING.md,
-  },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SPACING.md,
-  },
-  link: {
-    color: COLORS.accent,
-    fontWeight: FONT_WEIGHTS.semibold,
-  },
-  dynamicRow: {
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    paddingBottom: SPACING.md,
-  },
-  removeLink: {
-    color: COLORS.danger,
-    fontWeight: FONT_WEIGHTS.semibold,
-    fontSize: FONT_SIZES.xs,
-    marginTop: -SPACING.sm,
-    marginBottom: SPACING.xs,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: SPACING.md,
-    marginBottom: SPACING.md,
-  },
-  helperText: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textLight,
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-});
 
 export default NewConsultation;

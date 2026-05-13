@@ -1,6 +1,6 @@
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 
 const STORAGE_KEY_CADASTRO_TUTOR = "@fidelis:cadastro_tutor";
 
@@ -28,62 +28,34 @@ export default function FormCadastroTutor({ onSuccess }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Cadastro Tutor</Text>
+    <View className="gap-3 rounded-3xl bg-white p-5 shadow-sm">
+      <Text className="mb-1 text-xl font-bold text-slate-900">Cadastro Tutor</Text>
       <TextInput
         value={nomeTutor}
         onChangeText={setNomeTutor}
         placeholder="Nome do tutor"
-        style={styles.input}
+        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900"
+        placeholderTextColor="#94a3b8"
       />
       <TextInput
         value={contato}
         onChangeText={setContato}
         placeholder="Contato"
-        style={styles.input}
+        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900"
+        placeholderTextColor="#94a3b8"
       />
       <TextInput
         value={senha}
         onChangeText={setSenha}
         placeholder="Senha"
         secureTextEntry
-        style={styles.input}
+        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900"
+        placeholderTextColor="#94a3b8"
       />
 
-      <Pressable style={styles.buttonPrimary} onPress={handleCadastro}>
-        <Text style={styles.buttonText}>Cadastrar tutor</Text>
+      <Pressable className="items-center rounded-2xl bg-cyan-600 py-3" onPress={handleCadastro}>
+        <Text className="font-semibold text-white">Cadastrar tutor</Text>
       </Pressable>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    gap: 10,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#233955",
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#cdd5e1",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    backgroundColor: "#fff",
-  },
-  buttonPrimary: {
-    marginTop: 8,
-    backgroundColor: "#2f8f83",
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-});

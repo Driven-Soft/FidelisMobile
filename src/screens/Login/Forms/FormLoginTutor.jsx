@@ -1,6 +1,6 @@
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Alert, Text, StyleSheet, View, Pressable, TextInput } from "react-native";
+import { Alert, Text, View, Pressable, TextInput } from "react-native";
 
 const STORAGE_KEY_CADASTRO_TUTOR = "@fidelis:cadastro_tutor";
 
@@ -46,9 +46,9 @@ export default function FormLoginTutor({ onContinue }) {
 	};
 
 	return (
-		<View style={styles.container}>
-			<Text style={styles.title}>Login Tutor</Text>
-			<Text style={styles.description}>
+		<View className="gap-3 rounded-3xl bg-white p-5 shadow-sm">
+			<Text className="text-lg font-bold text-slate-900">Login Tutor</Text>
+			<Text className="text-slate-500">
 				Entre com os mesmos dados cadastrados no perfil.
 			</Text>
 
@@ -56,89 +56,39 @@ export default function FormLoginTutor({ onContinue }) {
 				value={nomeTutor}
 				onChangeText={setNomeTutor}
 				placeholder="Nome do tutor"
-				style={styles.input}
+				className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900"
+				placeholderTextColor="#94a3b8"
 			/>
 			<TextInput
 				value={contato}
 				onChangeText={setContato}
 				placeholder="Contato"
-				style={styles.input}
+				className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900"
+				placeholderTextColor="#94a3b8"
 			/>
 			<TextInput
 				value={senha}
 				onChangeText={setSenha}
 				placeholder="Senha"
 				secureTextEntry
-				style={styles.input}
+				className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900"
+				placeholderTextColor="#94a3b8"
 			/>
 
-			<View style={styles.previewBox}>
-				<Text style={styles.previewTitle}>Pré-visualização</Text>
-				<Text style={styles.previewText}>Tutor: {nomeTutor || "-"}</Text>
-				<Text style={styles.previewText}>Contato: {contato || "-"}</Text>
-				<Text style={styles.previewText}>Senha: {senha ? "••••••" : "-"}</Text>
+			<View className="mt-1 gap-1 rounded-2xl bg-slate-100 p-4">
+				<Text className="font-bold text-slate-900">Pré-visualização</Text>
+				<Text className="text-slate-600">Tutor: {nomeTutor || "-"}</Text>
+				<Text className="text-slate-600">Contato: {contato || "-"}</Text>
+				<Text className="text-slate-600">Senha: {senha ? "••••••" : "-"}</Text>
 			</View>
 
-			<Pressable style={styles.buttonSecondary} onPress={handleClear}>
-				<Text style={styles.buttonText}>Limpar campos</Text>
+			<Pressable className="items-center rounded-2xl bg-slate-700 py-3" onPress={handleClear}>
+				<Text className="font-semibold text-white">Limpar campos</Text>
 			</Pressable>
 
-			<Pressable style={styles.buttonPrimary} onPress={handleLogin}>
-				<Text style={styles.buttonText}>Entrar como tutor</Text>
+			<Pressable className="items-center rounded-2xl bg-cyan-600 py-3" onPress={handleLogin}>
+				<Text className="font-semibold text-white">Entrar como tutor</Text>
 			</Pressable>
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		gap: 10,
-	},
-	title: {
-		fontSize: 18,
-		fontWeight: "700",
-		color: "#233955",
-	},
-	description: {
-		color: "#57667f",
-	},
-	input: {
-		borderWidth: 1,
-		borderColor: "#cdd5e1",
-		borderRadius: 8,
-		paddingHorizontal: 10,
-		paddingVertical: 8,
-		backgroundColor: "#fff",
-	},
-	previewBox: {
-		marginTop: 6,
-		padding: 10,
-		borderRadius: 8,
-		backgroundColor: "#edf2f7",
-		gap: 2,
-	},
-	previewTitle: {
-		fontWeight: "700",
-		color: "#233955",
-	},
-	previewText: {
-		color: "#44526b",
-	},
-	buttonPrimary: {
-		marginTop: 8,
-		backgroundColor: "#2f8f83",
-		paddingVertical: 10,
-		borderRadius: 8,
-		alignItems: "center",
-	},
-	buttonSecondary: {
-		backgroundColor: "#4a6fa5",
-		paddingVertical: 10,
-		borderRadius: 8,
-		alignItems: "center",
-	},
-	buttonText: {
-		color: "#fff",
-		fontWeight: "600",
-	},
-});
