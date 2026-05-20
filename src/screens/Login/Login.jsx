@@ -11,6 +11,7 @@ import Button from "../../components/common/Button";
 import Card from "../../components/common/Card";
 
 const STORAGE_KEY_CADASTRO_TUTOR = "@fidelis:cadastro_tutor";
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login({ navigation }) {
   const { portalToggle, setPortalToggle, loginTutor, loginVet } =
@@ -18,6 +19,25 @@ export default function Login({ navigation }) {
   const [portalType, setPortalType] = useState(portalToggle ?? "TUTOR");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [touched, setTouched] = useState({
+    email: false,
+    password: false,
+  });
+
+  const handleBlur = (field) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
+  const isEmailValid = emailRegex.test(email.trim());
+  const isPasswordValid = password.length >= 6;
+
+  const errors = {
+    email: touched.email && !isEmailValid ? "Informe um email válido." : null,
+    password:
+      touched.password && !isPasswordValid
+        ? "A senha deve ter ao menos 6 caracteres."
+        : null,
+  };
 
   const handleLogin = async () => {
     const trimmedEmail = email.trim().toLowerCase();
@@ -39,8 +59,13 @@ export default function Login({ navigation }) {
       return;
     }
 
-    if (!trimmedEmail || !trimmedPassword) {
-      Alert.alert("Campos obrigatorios", "Informe email e senha para entrar.");
+    setTouched({ email: true, password: true });
+
+    if (!isEmailValid || !isPasswordValid) {
+      Alert.alert(
+        "Campos inválidos",
+        "Informe email e senha válidos para entrar.",
+      );
       return;
     }
 
@@ -108,12 +133,12 @@ export default function Login({ navigation }) {
             </View>
             <View className="flex-1">
               <Text className="text-4xl font-bold text-white">Fidelis</Text>
-              <Text className="mt-2 text-sm text-white/70">
+              <Text className="mt-2 text-sm font-medium text-white">
                 Portal {portalType === "TUTOR" ? "do Tutor" : "do Veterinário"}
               </Text>
             </View>
           </View>
-          <Text className="mt-2 text-base leading-6 text-white/90">
+          <Text className="mt-2 text-base leading-6 text-white">
             {portalType === "TUTOR"
               ? "Cuide de quem você ama com informações claras, lembretes e histórico clínico sempre à mão."
               : "Gerencie seus pacientes, consultas e histórico clínico de forma simples e eficiente."}
@@ -137,6 +162,9 @@ export default function Login({ navigation }) {
               placeholder="seu.email@exemplo.com"
               value={email}
               onChangeText={setEmail}
+              onBlur={() => handleBlur("email")}
+              error={errors.email}
+              isValid={touched.email && isEmailValid}
               icon={<Text>✉️</Text>}
             />
 
@@ -145,6 +173,9 @@ export default function Login({ navigation }) {
               placeholder="••••••••"
               value={password}
               onChangeText={setPassword}
+              onBlur={() => handleBlur("password")}
+              error={errors.password}
+              isValid={touched.password && isPasswordValid}
               type="password"
               icon={<Text>🔒</Text>}
             />

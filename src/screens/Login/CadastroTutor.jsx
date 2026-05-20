@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Alert, ScrollView, Text, View, TextInput } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
-import MaskInput, { Masks } from "react-native-mask-input";
+import MaskInput, { Masks } from "react-native-mask-input"
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
 import Card from "../../components/common/Card";
@@ -10,7 +10,6 @@ import Card from "../../components/common/Card";
 const STORAGE_KEY_CADASTRO_TUTOR = "@fidelis:cadastro_tutor";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Função para validar CPF matematicamente
 const validateCPF = (cpf) => {
   const cleanCPF = cpf.replace(/[^\d]+/g, "");
   if (
@@ -35,7 +34,6 @@ const validateCPF = (cpf) => {
 
 export default function CadastroTutor({ navigation }) {
   const [step, setStep] = useState(1);
-  const [emailTouched, setEmailTouched] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -45,12 +43,57 @@ export default function CadastroTutor({ navigation }) {
     confirmPassword: "",
   });
 
+  const [touched, setTouched] = useState({
+    name: false,
+    email: false,
+    phone: false,
+    cpf: false,
+    password: false,
+    confirmPassword: false,
+  });
+
   const handleInputChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
   };
 
+  const handleBlur = (field) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
+  const isNameValid =
+    formData.name.trim().length > 0 &&
+    formData.name.trim().split(" ").length >= 2;
   const isEmailValid = emailRegex.test(formData.email.trim());
-  const showEmailError = emailTouched && !isEmailValid;
+  const isPhoneValid = (() => {
+    const phoneDigits = formData.phone.replace(/\D/g, "");
+    return phoneDigits.length >= 10 && phoneDigits.length <= 11;
+  })();
+  const isCpfValid = validateCPF(formData.cpf);
+  const isPasswordValid = formData.password.length >= 6;
+  const isConfirmPasswordValid =
+    formData.confirmPassword === formData.password &&
+    formData.confirmPassword.length >= 6;
+
+  const errors = {
+    name:
+      touched.name && !isNameValid
+        ? "Por favor, informe seu nome e sobrenome."
+        : null,
+    email: touched.email && !isEmailValid ? "Informe um email válido." : null,
+    phone:
+      touched.phone && !isPhoneValid
+        ? "Informe um telefone válido com DDD de 10 ou 11 dígitos."
+        : null,
+    cpf: touched.cpf && !isCpfValid ? "Informe um CPF válido." : null,
+    password:
+      touched.password && !isPasswordValid
+        ? "A senha deve ter ao menos 6 caracteres."
+        : null,
+    confirmPassword:
+      touched.confirmPassword && !isConfirmPasswordValid
+        ? "As senhas não conferem."
+        : null,
+  };
 
   const handleNext = () => {
     if (!validateStep(step)) return;
@@ -86,9 +129,8 @@ export default function CadastroTutor({ navigation }) {
   };
 
   const validateStep = (currentStep) => {
-    const digitsOnly = (value) => value.replace(/\D/g, "");
-
     if (currentStep === 1) {
+      setTouched({ ...touched, name: true, email: true, phone: true });
       if (
         !formData.name.trim() ||
         !formData.email.trim() ||
@@ -98,8 +140,7 @@ export default function CadastroTutor({ navigation }) {
         return false;
       }
 
-      // Valida se o usuário digitou nome E sobrenome
-      if (formData.name.trim().split(" ").length < 2) {
+      if (!isNameValid) {
         Alert.alert(
           "Nome incompleto",
           "Por favor, informe seu nome e sobrenome.",
@@ -112,31 +153,31 @@ export default function CadastroTutor({ navigation }) {
         return false;
       }
 
-      // Valida telefone (fixo 10 digitos ou celular 11 digitos)
-      const phoneDigits = digitsOnly(formData.phone);
-      if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+      if (!isPhoneValid) {
         Alert.alert("Telefone inválido", "Informe um telefone válido com DDD.");
         return false;
       }
     }
 
     if (currentStep === 2) {
-      if (!validateCPF(formData.cpf)) {
+      setTouched({ ...touched, cpf: true });
+      if (!isCpfValid) {
         Alert.alert("CPF inválido", "Informe um CPF válido.");
         return false;
       }
     }
 
     if (currentStep === 3) {
+      setTouched({ ...touched, password: true, confirmPassword: true });
       if (!formData.password || !formData.confirmPassword) {
         Alert.alert("Campos obrigatórios", "Preencha a senha e a confirmação.");
         return false;
       }
-      if (formData.password.length < 6) {
+      if (!isPasswordValid) {
         Alert.alert("Senha fraca", "A senha deve ter ao menos 6 caracteres.");
         return false;
       }
-      if (formData.password !== formData.confirmPassword) {
+      if (!isConfirmPasswordValid) {
         Alert.alert("Senhas incompatíveis", "As senhas não conferem.");
         return false;
       }
@@ -161,24 +202,31 @@ export default function CadastroTutor({ navigation }) {
     <SafeAreaView className="flex-1 bg-slate-100" edges={["top"]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="px-4 py-6">
-          <View className="mb-6 flex-row items-center space-x-3">
+          <View className="mb-6 flex-row items-center">
             {[1, 2, 3].map((num) => (
-              <View key={num} className="flex-1 items-center">
+              <React.Fragment key={num}>
                 <View
-                  className={`h-10 w-10 items-center justify-center rounded-full ${num <= step ? "bg-cyan-600" : "bg-slate-200"}`}
+                  className={`h-10 w-10 items-center justify-center rounded-full ${
+                    num <= step ? "bg-cyan-600" : "bg-slate-200"
+                  }`}
                 >
                   <Text
-                    className={`text-sm font-bold ${num <= step ? "text-white" : "text-slate-500"}`}
+                    className={`text-sm font-bold ${
+                      num <= step ? "text-white" : "text-slate-500"
+                    }`}
                   >
                     {num}
                   </Text>
                 </View>
+
                 {num < 3 && (
                   <View
-                    className={`h-0.5 w-full ${num < step ? "bg-cyan-600" : "bg-slate-200"}`}
+                    className={`h-0.5 flex-1 mx-2 ${
+                      num < step ? "bg-cyan-600" : "bg-slate-200"
+                    }`}
                   />
                 )}
-              </View>
+              </React.Fragment>
             ))}
           </View>
 
@@ -197,31 +245,23 @@ export default function CadastroTutor({ navigation }) {
                   placeholder="João Silva"
                   value={formData.name}
                   onChangeText={(value) => handleInputChange("name", value)}
+                  onBlur={() => handleBlur("name")}
+                  error={errors.name}
+                  isValid={touched.name && isNameValid}
                   autoCapitalize="words"
                 />
 
-                <View className="mb-4">
-                  <Text className="mb-1 text-sm font-medium text-slate-700">
-                    Email
-                  </Text>
-                  <TextInput
-                    value={formData.email}
-                    onChangeText={(value) => handleInputChange("email", value)}
-                    onBlur={() => setEmailTouched(true)}
-                    placeholder="joao@exemplo.com"
-                    placeholderTextColor="#94a3b8"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    className={`rounded-2xl border px-4 py-3 text-slate-900 bg-white ${
-                      showEmailError ? "border-red-400" : "border-slate-200"
-                    }`}
-                  />
-                  {showEmailError && (
-                    <Text className="mt-1 text-xs text-red-400">
-                      Informe um email válido
-                    </Text>
-                  )}
-                </View>
+                <Input
+                  label="Email"
+                  placeholder="joao@exemplo.com"
+                  value={formData.email}
+                  onChangeText={(value) => handleInputChange("email", value)}
+                  onBlur={() => handleBlur("email")}
+                  error={errors.email}
+                  isValid={touched.email && isEmailValid}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
 
                 <View className="mb-4">
                   <Text className="mb-1 text-sm font-medium text-slate-700">
@@ -229,15 +269,19 @@ export default function CadastroTutor({ navigation }) {
                   </Text>
                   <MaskInput
                     value={formData.phone}
-                    onChangeText={(masked) =>
-                      handleInputChange("phone", masked)
-                    }
+                    onChangeText={(masked) => handleInputChange("phone", masked)}
+                    onBlur={() => handleBlur("phone")}
                     mask={Masks.BRL_PHONE}
                     placeholder="(11) 98765-4321"
                     placeholderTextColor="#94a3b8"
                     keyboardType="phone-pad"
-                    className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900"
+                    className={`rounded-2xl border px-4 py-3 text-slate-900 bg-white ${
+                      errors.phone ? "border-red-400" : "border-slate-200"
+                    }`}
                   />
+                  {errors.phone && (
+                    <Text className="mt-1 text-xs text-red-400">{errors.phone}</Text>
+                  )}
                 </View>
               </>
             )}
@@ -251,16 +295,22 @@ export default function CadastroTutor({ navigation }) {
                   <MaskInput
                     value={formData.cpf}
                     onChangeText={(masked) => handleInputChange("cpf", masked)}
+                    onBlur={() => handleBlur("cpf")}
                     mask={Masks.BRL_CPF}
                     placeholder="123.456.789-10"
                     placeholderTextColor="#94a3b8"
                     keyboardType="numeric"
-                    className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900"
+                    className={`rounded-2xl border px-4 py-3 text-slate-900 bg-white ${
+                      errors.cpf ? "border-red-400" : "border-slate-200"
+                    }`}
                   />
+                  {errors.cpf && (
+                    <Text className="mt-1 text-xs text-red-400">{errors.cpf}</Text>
+                  )}
+                  <Text className="mt-2 text-xs text-slate-500">
+                    Seu CPF será usado para verificação de identidade
+                  </Text>
                 </View>
-                <Text className="mt-2 text-xs text-slate-500">
-                  Seu CPF será usado para verificação de identidade
-                </Text>
               </>
             )}
 
@@ -271,6 +321,9 @@ export default function CadastroTutor({ navigation }) {
                   placeholder="••••••••"
                   value={formData.password}
                   onChangeText={(value) => handleInputChange("password", value)}
+                  onBlur={() => handleBlur("password")}
+                  error={errors.password}
+                  isValid={touched.password && isPasswordValid}
                   type="password"
                 />
                 <Input
@@ -280,6 +333,9 @@ export default function CadastroTutor({ navigation }) {
                   onChangeText={(value) =>
                     handleInputChange("confirmPassword", value)
                   }
+                  onBlur={() => handleBlur("confirmPassword")}
+                  error={errors.confirmPassword}
+                  isValid={touched.confirmPassword && isConfirmPasswordValid}
                   type="password"
                 />
               </>
