@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Badge from '../common/Badge';
 
-const ReminderCard = ({ reminder, onComplete, horizontal = false }) => {
+const ReminderCard = ({ reminder, onComplete, onIgnore, horizontal = false }) => {
   const getTypeIcon = (type) => {
     switch (type) {
       case 'VACINA':
@@ -57,8 +57,7 @@ const ReminderCard = ({ reminder, onComplete, horizontal = false }) => {
           <TouchableOpacity
             className="items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2"
             onPress={() => {
-              if (typeof reminder.onIgnore === 'function') return reminder.onIgnore(reminder.id);
-              if (typeof reminder.onIgnore === 'undefined' && typeof onComplete === 'function') return onComplete(reminder.id);
+              if (typeof onIgnore === 'function') return onIgnore(reminder.id);
             }}
           >
             <Text className="font-semibold text-slate-900">✕ Ignorar</Text>

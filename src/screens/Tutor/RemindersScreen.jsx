@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useRef, useContext, useEffect } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, Animated } from 'react-native';
+import { Alert, View, ScrollView, Text, TouchableOpacity, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MOCK_TUTOR_REMINDERS, MOCK_TUTOR_PETS } from '../../data/fidelisData';
@@ -13,7 +13,9 @@ const RemindersScreen = () => {
   const [reminders, setReminders] = useState(MOCK_TUTOR_REMINDERS);
   const [filterType, setFilterType] = useState('Todos');
   const [modalVisible, setModalVisible] = useState(false);
+  const [cardHeights, setCardHeights] = useState({});
   const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
+  const animationMap = useRef(new Map()).current;
 
   const storageKey = useMemo(() => {
     const owner = user?.email ?? 'guest';
@@ -56,7 +58,10 @@ const RemindersScreen = () => {
   }, [reminders, storageKey]);
 
   const filteredReminders = useMemo(() => {
-    return reminders.filter((item) => (filterType === 'Todos' ? true : item.type === filterType));
+    return reminders.filter((item) => {
+      if (item.dismissed) return false;
+      return filterType === 'Todos' ? true : item.type === filterType;
+    });
   }, [filterType, reminders]);
 
   const buckets = useMemo(() => {
@@ -66,13 +71,52 @@ const RemindersScreen = () => {
     return { pending, delayed, completed };
   }, [filteredReminders]);
 
+  const getCardAnimation = (reminderId) => {
+    const existing = animationMap.get(reminderId);
+    if (existing) return existing;
+    const next = new Animated.Value(1);
+    animationMap.set(reminderId, next);
+    return next;
+  };
+
+  const handleCardLayout = (reminderId, event) => {
+    if (cardHeights[reminderId]) return;
+    const { height } = event.nativeEvent.layout;
+    setCardHeights((current) => ({ ...current, [reminderId]: height }));
+  };
+
+  const dismissReminder = (reminderId, updates) => {
+    const animation = getCardAnimation(reminderId);
+    Animated.timing(animation, {
+      toValue: 0,
+      duration: 240,
+      useNativeDriver: false,
+    }).start(() => {
+      setReminders((current) =>
+        current.map((item) => (item.id === reminderId ? { ...item, ...updates, dismissed: true } : item))
+      );
+    });
+  };
+
   const markAsComplete = (reminderId) => {
-    setReminders((current) => current.map((item) => (item.id === reminderId ? { ...item, completed: true } : item)));
+    dismissReminder(reminderId, { completed: true });
   };
 
   const ignoreReminder = (reminderId) => {
-    // mark as completed (ignored) for now
-    setReminders((current) => current.map((item) => (item.id === reminderId ? { ...item, completed: true, ignored: true } : item)));
+    Alert.alert(
+      'Cancelar lembrete',
+      'Tem certeza que deseja cancelar esse lembrete?',
+      [
+        { text: 'Nao', style: 'cancel' },
+        {
+          text: 'Sim',
+          style: 'destructive',
+          onPress: () => {
+            dismissReminder(reminderId, { completed: true, ignored: true });
+          },
+        },
+      ]
+    );
   };
 
   const handleCreate = (newReminder) => {
@@ -112,9 +156,23 @@ const RemindersScreen = () => {
             <View className="mb-8">
               <SectionHeader title="Atrasados" subtitle={`${buckets.delayed.length} lembretes`} />
               <View className="pb-6">
-                {buckets.delayed.map((reminder) => (
-                  <ReminderCard key={reminder.id} reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} onComplete={markAsComplete} />
-                ))}
+                {buckets.delayed.map((reminder) => {
+                  const animation = getCardAnimation(reminder.id);
+                  const height = cardHeights[reminder.id];
+                  const animatedStyle = height
+                    ? { height: animation.interpolate({ inputRange: [0, 1], outputRange: [0, height] }), opacity: animation }
+                    : { opacity: animation };
+
+                  return (
+                    <Animated.View
+                      key={reminder.id}
+                      style={[{ overflow: 'hidden' }, animatedStyle]}
+                      onLayout={(event) => handleCardLayout(reminder.id, event)}
+                    >
+                      <ReminderCard reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} onComplete={markAsComplete} onIgnore={ignoreReminder} />
+                    </Animated.View>
+                  );
+                })}
               </View>
             </View>
           )}
@@ -123,9 +181,23 @@ const RemindersScreen = () => {
             <View className="mb-8">
               <SectionHeader title="Pendentes" subtitle={`${buckets.pending.length} lembretes`} />
               <View className="pb-6">
-                {buckets.pending.map((reminder) => (
-                  <ReminderCard key={reminder.id} reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} onComplete={markAsComplete} onIgnore={ignoreReminder} />
-                ))}
+                {buckets.pending.map((reminder) => {
+                  const animation = getCardAnimation(reminder.id);
+                  const height = cardHeights[reminder.id];
+                  const animatedStyle = height
+                    ? { height: animation.interpolate({ inputRange: [0, 1], outputRange: [0, height] }), opacity: animation }
+                    : { opacity: animation };
+
+                  return (
+                    <Animated.View
+                      key={reminder.id}
+                      style={[{ overflow: 'hidden' }, animatedStyle]}
+                      onLayout={(event) => handleCardLayout(reminder.id, event)}
+                    >
+                      <ReminderCard reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} onComplete={markAsComplete} onIgnore={ignoreReminder} />
+                    </Animated.View>
+                  );
+                })}
               </View>
             </View>
           )}
@@ -134,9 +206,23 @@ const RemindersScreen = () => {
             <View className="mb-8">
               <SectionHeader title="Concluídos" subtitle={`${buckets.completed.length} lembretes`} />
               <View className="pb-6">
-                {buckets.completed.map((reminder) => (
-                  <ReminderCard key={reminder.id} reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} />
-                ))}
+                {buckets.completed.map((reminder) => {
+                  const animation = getCardAnimation(reminder.id);
+                  const height = cardHeights[reminder.id];
+                  const animatedStyle = height
+                    ? { height: animation.interpolate({ inputRange: [0, 1], outputRange: [0, height] }), opacity: animation }
+                    : { opacity: animation };
+
+                  return (
+                    <Animated.View
+                      key={reminder.id}
+                      style={[{ overflow: 'hidden' }, animatedStyle]}
+                      onLayout={(event) => handleCardLayout(reminder.id, event)}
+                    >
+                      <ReminderCard reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} />
+                    </Animated.View>
+                  );
+                })}
               </View>
             </View>
           )}
