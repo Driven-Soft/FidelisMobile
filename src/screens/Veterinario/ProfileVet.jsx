@@ -30,7 +30,7 @@ const ProfileVet = ({ navigation }) => {
           </View>
 
           <SectionHeader title="Informações Profissionais" />
-          <Card className="mb-4 border-l-4 border-slate-900">
+          <Card className="mb-4 border-l-4 border-slate-900 pl-2">
             <Text className="mb-1 text-xs text-slate-500">Email</Text>
             <Text className="mb-3 text-base font-semibold text-slate-900">{MOCK_VET_PROFILE.email}</Text>
 
@@ -45,7 +45,7 @@ const ProfileVet = ({ navigation }) => {
           </Card>
 
           <SectionHeader title="Clínica Vinculada" />
-          <Card className="mb-4 border-l-4 border-slate-900">
+          <Card className="mb-4 border-l-4 border-slate-900 pl-2">
             <Text className="mb-1 text-base font-bold text-cyan-600">{MOCK_VET_PROFILE.clinic.name}</Text>
             <Text className="text-sm text-slate-500">{MOCK_VET_PROFILE.clinic.address}</Text>
           </Card>

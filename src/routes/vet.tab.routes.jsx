@@ -7,7 +7,6 @@ import HomeVet from '../screens/Veterinario/HomeVet';
 import PatientsVet from '../screens/Veterinario/PatientsVet';
 import PatientRecord from '../screens/Veterinario/PatientRecord';
 import AgendaVet from '../screens/Veterinario/AgendaVet';
-import NewConsultation from '../screens/Veterinario/NewConsultation';
 import ProfileVet from '../screens/Veterinario/ProfileVet';
 
 const Stack = createNativeStackNavigator();
@@ -23,7 +22,6 @@ const HomeStack = () => {
       <Stack.Screen name="HomeVetScreen" component={HomeVet} />
       <Stack.Screen name="AgendaVet" component={AgendaVet} />
       <Stack.Screen name="PatientRecord" component={PatientRecord} />
-      <Stack.Screen name="NewConsultation" component={NewConsultation} />
     </Stack.Navigator>
   );
 };
@@ -37,7 +35,6 @@ const PatientsStack = () => {
     >
       <Stack.Screen name="PatientsScreen" component={PatientsVet} />
       <Stack.Screen name="PatientRecord" component={PatientRecord} />
-      <Stack.Screen name="NewConsultation" component={NewConsultation} />
     </Stack.Navigator>
   );
 };
@@ -50,7 +47,6 @@ const AgendaStack = () => {
       }}
     >
       <Stack.Screen name="AgendaVetScreen" component={AgendaVet} />
-      <Stack.Screen name="NewConsultation" component={NewConsultation} />
       <Stack.Screen name="PatientRecord" component={PatientRecord} />
     </Stack.Navigator>
   );

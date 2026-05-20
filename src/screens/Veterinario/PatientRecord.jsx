@@ -70,7 +70,7 @@ const PatientRecord = ({ route, navigation }) => {
             </Card>
           </View>
 
-          <Card className="mb-4 border-l-4 border-slate-900">
+          <Card className="pl-2 mb-4 border-l-4 border-slate-900">
             <View className="flex-row items-start justify-between space-x-4">
               <View className="flex-1">
                 <Text className="mb-1 text-xs text-slate-500">Tutor</Text>
@@ -85,14 +85,6 @@ const PatientRecord = ({ route, navigation }) => {
               <Button title="Email" variant="outline" size="sm" style={{ flex: 1 }} onPress={() => {}} />
             </View>
           </Card>
-
-          <View className="mb-4">
-            <Button
-              title="+ Nova Consulta"
-              variant="primary"
-              onPress={() => navigation.navigate('NewConsultation', { patientId })}
-            />
-          </View>
 
           <View className="mb-4 flex-row border-b border-slate-200">
             {tabs.map((tab) => (
