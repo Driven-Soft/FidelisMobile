@@ -42,7 +42,7 @@ export default function HomeVet({ navigation }) {
         <View className="space-y-3">
           {MOCK_VET_APPOINTMENTS.map((appointment) => (
             <TouchableOpacity key={appointment.id} onPress={() => navigation.navigate('PatientRecord', { patientId: appointment.petId })}>
-              <Card className="border-l-4 border-cyan-600">
+              <Card className="border-l-4 pl-2 border-cyan-600">
                 <View className="flex-row items-center justify-between space-x-4">
                   <View>
                     <Text className="text-2xl font-bold text-slate-900">{appointment.time}</Text>
@@ -60,7 +60,7 @@ export default function HomeVet({ navigation }) {
         <View className="space-y-3">
           {MOCK_VET_ALERTS.map((alert) => (
             <TouchableOpacity key={alert.id} onPress={() => navigation.navigate('PatientRecord', { patientId: alert.petId })}>
-              <Card className="border-l-4 border-red-500">
+              <Card className="border-l-4 border-red-500 pl-2">
                 <View className="flex-row items-start justify-between space-x-4">
                   <View className="flex-1">
                     <Text className="text-base font-bold text-slate-900">{alert.petName}</Text>

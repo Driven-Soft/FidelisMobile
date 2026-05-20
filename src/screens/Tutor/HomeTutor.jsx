@@ -47,7 +47,7 @@ export default function HomeTutor({ navigation }) {
         <View className="space-y-3">
           {upcomingReminders.map((reminder) => (
             <TouchableOpacity key={reminder.id} onPress={() => navigation.navigate('RemindersTutorScreen')}>
-              <Card className="border-l-4 border-cyan-600">
+              <Card className="border-l-4 border-cyan-600 pl-2">
                 <View className="flex-row items-start justify-between space-x-4">
                   <View className="flex-1">
                     <Text className="text-base font-bold text-slate-900">{reminder.title}</Text>
@@ -64,7 +64,7 @@ export default function HomeTutor({ navigation }) {
         <SectionHeader title="Histórico recente" subtitle="Os últimos eventos clínicos dos seus pets" />
         <View className="space-y-3">
           {MOCK_TUTOR_HISTORY.map((event) => (
-            <Card key={event.id} className="border-l-4 border-slate-900">
+            <Card key={event.id} className="border-l-4 border-slate-900 pl-2">
               <View className="flex-row items-start justify-between space-x-4">
                 <View className="flex-1">
                   <Text className="text-base font-bold text-slate-900">{event.title}</Text>

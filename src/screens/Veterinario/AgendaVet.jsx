@@ -20,16 +20,14 @@ export default function AgendaVet({ navigation }) {
         <SectionHeader
           title="Agenda"
           subtitle={`Consultas de ${todayLabel}`}
-          action={<Button title="Nova" variant="primary" size="sm" onPress={() => navigation.navigate('NewConsultation')} />}
         />
-
         <View className="space-y-3">
           {MOCK_VET_APPOINTMENTS.map((appointment) => (
             <TouchableOpacity
               key={appointment.id}
               onPress={() => navigation.navigate('PatientRecord', { patientId: appointment.petId })}
             >
-              <Card className="border-l-4 border-slate-900">
+              <Card className="border-l-4 pl-2 border-slate-900">
                 <View className="flex-row items-center justify-between space-x-4">
                   <View>
                     <Text className="text-4xl font-bold text-slate-900">{appointment.time}</Text>

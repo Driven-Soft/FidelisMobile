@@ -599,11 +599,6 @@ export const MOCK_VET_PATIENT_RECORDS = {
   },
 };
 
-export const MOCK_NEW_CONSULTATION_PATIENTS = MOCK_VET_PATIENTS.map((patient) => ({
-  id: patient.id,
-  label: `${patient.petName} • ${patient.tutorName}`,
-}));
-
 export const formatPtDate = (date) => {
   const value = date instanceof Date ? date : new Date(date);
   return value.toLocaleDateString('pt-BR', {
