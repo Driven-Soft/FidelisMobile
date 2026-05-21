@@ -56,8 +56,8 @@ Fidelis é um aplicativo móvel de gestão de saúde pet criado para o Challenge
 
 ## Estrutura do Projeto
 
-<details>
 <summary>Árvore de diretórios</summary>
+<br>
 
 ```
 FidelisMobile/
@@ -157,6 +157,8 @@ npm run web
 ```
 
 ---
+
+## Equipe Driven Soft
 
 ## Integrantes
 
