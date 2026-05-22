@@ -125,8 +125,6 @@ FidelisMobile/
          └─ ProfileVet.jsx
 ```
 
-</details>
-
 ---
 
 ## Como Executar
@@ -140,7 +138,7 @@ FidelisMobile/
 ### Passo a passo
 
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
+git clone https://github.com/Driven-Soft/FidelisMobile.git
 cd FidelisMobile
 npm install
 npm start
@@ -167,3 +165,11 @@ npm run web
 | Felipe Bezerra Beatrici | RM 564723 |
 | Max Hayashi Batista | RM 563717 |
 | Henrique Cunha Torres | RM 565119 |
+
+## Link do Vídeo Pitch:
+
+* [https://youtu.be/oG82EtRA0-g](https://youtu.be/oG82EtRA0-g)
+
+## Link do Repositório no Github:
+
+* [https://github.com/Driven-Soft/FidelisMobile](https://github.com/Driven-Soft/FidelisMobile)
