@@ -162,9 +162,9 @@ npm run web
 
 | Nome | RM |
 | --- | --- |
-| Felipe Bezerra Beatrici | RM 564723 |
-| Max Hayashi Batista | RM 563717 |
-| Henrique Cunha Torres | RM 565119 |
+| Felipe Bezerra Beatrici | 564723 |
+| Max Hayashi Batista | 563717 |
+| Henrique Cunha Torres | 565119 |
 
 ## Link do Vídeo Pitch:
 
