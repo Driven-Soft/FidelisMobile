@@ -21,11 +21,14 @@ const TYPE_OPTIONS = [
 const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
   const [type, setType] = useState("VACINA");
   const [petId, setPetId] = useState(pets?.[0]?.id || null);
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [touched, setTouched] = useState(false);
 
+  const isTitleValid = title.trim().length > 0;
+  const titleError = touched && !isTitleValid ? "O título é obrigatório" : null;
   const isDescriptionValid = description.trim().length > 0;
   const error =
     touched && !isDescriptionValid ? "A descrição é obrigatória" : null;
@@ -33,6 +36,7 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
   const reset = () => {
     setType("VACINA");
     setPetId(pets?.[0]?.id || null);
+    setTitle("");
     setDescription("");
     setDate(new Date());
     setShowDatePicker(false);
@@ -46,7 +50,7 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
 
   const handleSave = () => {
     setTouched(true);
-    if (!petId || !description || !date) return;
+    if (!petId || !isTitleValid || !description || !date) return;
     const pet = pets.find((p) => p.id === petId) || {};
     const payload = {
       id: String(Date.now()),
@@ -55,6 +59,7 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
       petAvatar: pet.avatar || "🐾",
       petColor: pet.color || "#EEE",
       type,
+      title: title.trim(),
       description,
       dueDate: date,
       completed: false,
@@ -137,6 +142,16 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
           </View>
 
           <Input
+            label="Título"
+            placeholder="Ex: Vacina V10"
+            value={title}
+            onChangeText={setTitle}
+            onBlur={() => setTouched(true)}
+            error={titleError}
+            isValid={touched && isTitleValid}
+          />
+
+          <Input
             label="Descrição"
             placeholder="Ex: Reforço da V10"
             value={description}
@@ -173,9 +188,9 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
               <Text>Cancelar</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`rounded-2xl px-4 py-3 ${!petId || !description || !date ? "bg-cyan-600/50" : "bg-cyan-600"}`}
+              className={`rounded-2xl px-4 py-3 ${!petId || !title.trim() || !description || !date ? "bg-cyan-600/50" : "bg-cyan-600"}`}
               onPress={handleSave}
-              disabled={!petId || !description || !date}
+              disabled={!petId || !title.trim() || !description || !date}
             >
               <Text className="font-semibold text-white">Salvar</Text>
             </TouchableOpacity>

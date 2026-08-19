@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MOCK_TUTOR_PROFILE, MOCK_TUTOR_PETS, MOCK_TUTOR_REMINDERS, MOCK_TUTOR_HISTORY, formatPtDate, getPetAgeLabel } from '../../data/fidelisData';
+import { MOCK_TUTOR_PROFILE, MOCK_TUTOR_PETS, MOCK_TUTOR_HISTORY, formatPtDate, getPetAgeLabel } from '../../data/fidelisData';
 import { UserContext } from '../../context/UserContext';
 import AvatarBadge from '../../components/common/AvatarBadge';
 import Card from '../../components/common/Card';
@@ -10,11 +10,12 @@ import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 
 export default function HomeTutor({ navigation }) {
-  const { user, tutorPets } = useContext(UserContext);
+  const { user, tutorPets, tutorReminders } = useContext(UserContext);
   const tutorName = user?.name ?? MOCK_TUTOR_PROFILE.name;
   const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
-  const upcomingReminders = [...MOCK_TUTOR_REMINDERS]
-    .sort((left, right) => left.dueDate - right.dueDate)
+  const upcomingReminders = tutorReminders
+    .filter((reminder) => !reminder.completed && !reminder.dismissed)
+    .sort((left, right) => new Date(left.dueDate) - new Date(right.dueDate))
     .slice(0, 3);
 
   return (
@@ -50,12 +51,14 @@ export default function HomeTutor({ navigation }) {
               <Card className="border-l-4 border-cyan-600 pl-2">
                 <View className="flex-row items-start justify-between space-x-4">
                   <View className="flex-1">
-                    <Text className="text-base font-bold text-slate-900">{reminder.title}</Text>
+                    <Text className="text-base font-bold text-slate-900">{reminder.title || reminder.description}</Text>
                     <Text className="mt-1 text-xs text-slate-500">{reminder.petName} • {formatPtDate(reminder.dueDate)}</Text>
                   </View>
                   <Badge type={reminder.type} label={reminder.type} />
                 </View>
-                <Text className="mt-3 text-sm leading-5 text-slate-500">{reminder.description}</Text>
+                {reminder.title ? (
+                  <Text className="mt-3 text-sm leading-5 text-slate-500">{reminder.description}</Text>
+                ) : null}
               </Card>
             </TouchableOpacity>
           ))}

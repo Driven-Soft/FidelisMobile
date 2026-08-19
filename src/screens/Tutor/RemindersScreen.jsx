@@ -1,68 +1,31 @@
-import React, { useMemo, useState, useRef, useContext, useEffect } from 'react';
+import React, { useMemo, useState, useRef, useContext } from 'react';
 import { Alert, View, ScrollView, Text, TouchableOpacity, Animated } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MOCK_TUTOR_REMINDERS, MOCK_TUTOR_PETS } from '../../data/fidelisData';
+import { MOCK_TUTOR_PETS } from '../../data/fidelisData';
 import { UserContext } from '../../context/UserContext';
 import SectionHeader from '../../components/common/SectionHeader';
 import ReminderCard from '../../components/Tutor/ReminderCard';
 import NewReminderModal from '../../components/Tutor/NewReminderModal';
 
 const RemindersScreen = () => {
-  const { user, userType, tutorPets } = useContext(UserContext);
-  const [reminders, setReminders] = useState(MOCK_TUTOR_REMINDERS);
+  const { tutorPets, tutorReminders, addTutorReminder, updateTutorReminder } =
+    useContext(UserContext);
   const [filterType, setFilterType] = useState('Todos');
   const [modalVisible, setModalVisible] = useState(false);
   const [cardHeights, setCardHeights] = useState({});
   const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
   const animationMap = useRef(new Map()).current;
 
-  const storageKey = useMemo(() => {
-    const owner = user?.email ?? 'guest';
-    const portal = userType ?? 'TUTOR';
-    return `@fidelis:reminders:${portal}:${owner}`;
-  }, [user?.email, userType]);
-
   const filterOptions = ['Todos', 'VACINA', 'RETORNO', 'MEDICAMENTO', 'CHECKUP', 'VERMÍFUGO'];
 
   const scale = useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    const loadReminders = async () => {
-      try {
-        const saved = await AsyncStorage.getItem(storageKey);
-        if (!saved) {
-          setReminders(MOCK_TUTOR_REMINDERS);
-          return;
-        }
-
-        const parsed = JSON.parse(saved);
-        setReminders(Array.isArray(parsed) ? parsed : MOCK_TUTOR_REMINDERS);
-      } catch (error) {
-        setReminders(MOCK_TUTOR_REMINDERS);
-      }
-    };
-
-    loadReminders();
-  }, [storageKey]);
-
-  useEffect(() => {
-    const persistReminders = async () => {
-      try {
-        await AsyncStorage.setItem(storageKey, JSON.stringify(reminders));
-      } catch (error) {
-      }
-    };
-
-    persistReminders();
-  }, [reminders, storageKey]);
-
   const filteredReminders = useMemo(() => {
-    return reminders.filter((item) => {
+    return tutorReminders.filter((item) => {
       if (item.dismissed) return false;
       return filterType === 'Todos' ? true : item.type === filterType;
     });
-  }, [filterType, reminders]);
+  }, [filterType, tutorReminders]);
 
   const buckets = useMemo(() => {
     const pending = filteredReminders.filter((item) => !item.completed && new Date(item.dueDate) >= new Date());
@@ -70,6 +33,16 @@ const RemindersScreen = () => {
     const completed = filteredReminders.filter((item) => item.completed);
     return { pending, delayed, completed };
   }, [filteredReminders]);
+
+  const withPetInfo = (reminder) => {
+    const pet = pets.find((item) => item.id === reminder.petId);
+    return {
+      ...reminder,
+      petName: reminder.petName ?? pet?.name,
+      petAvatar: reminder.petAvatar ?? pet?.avatar,
+      petColor: reminder.petColor ?? pet?.color,
+    };
+  };
 
   const getCardAnimation = (reminderId) => {
     const existing = animationMap.get(reminderId);
@@ -92,9 +65,13 @@ const RemindersScreen = () => {
       duration: 240,
       useNativeDriver: false,
     }).start(() => {
-      setReminders((current) =>
-        current.map((item) => (item.id === reminderId ? { ...item, ...updates, dismissed: true } : item))
-      );
+      animationMap.delete(reminderId);
+      setCardHeights((current) => {
+        const next = { ...current };
+        delete next[reminderId];
+        return next;
+      });
+      updateTutorReminder(reminderId, updates);
     });
   };
 
@@ -112,7 +89,7 @@ const RemindersScreen = () => {
           text: 'Sim',
           style: 'destructive',
           onPress: () => {
-            dismissReminder(reminderId, { completed: true, ignored: true });
+            dismissReminder(reminderId, { completed: true, ignored: true, dismissed: true });
           },
         },
       ]
@@ -120,7 +97,7 @@ const RemindersScreen = () => {
   };
 
   const handleCreate = (newReminder) => {
-    setReminders((current) => [newReminder, ...current]);
+    addTutorReminder(newReminder);
     setModalVisible(false);
   };
 
@@ -169,7 +146,7 @@ const RemindersScreen = () => {
                       style={[{ overflow: 'hidden' }, animatedStyle]}
                       onLayout={(event) => handleCardLayout(reminder.id, event)}
                     >
-                      <ReminderCard reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} onComplete={markAsComplete} onIgnore={ignoreReminder} />
+                      <ReminderCard reminder={withPetInfo(reminder)} onComplete={markAsComplete} onIgnore={ignoreReminder} />
                     </Animated.View>
                   );
                 })}
@@ -194,7 +171,7 @@ const RemindersScreen = () => {
                       style={[{ overflow: 'hidden' }, animatedStyle]}
                       onLayout={(event) => handleCardLayout(reminder.id, event)}
                     >
-                      <ReminderCard reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} onComplete={markAsComplete} onIgnore={ignoreReminder} />
+                      <ReminderCard reminder={withPetInfo(reminder)} onComplete={markAsComplete} onIgnore={ignoreReminder} />
                     </Animated.View>
                   );
                 })}
@@ -219,7 +196,7 @@ const RemindersScreen = () => {
                       style={[{ overflow: 'hidden' }, animatedStyle]}
                       onLayout={(event) => handleCardLayout(reminder.id, event)}
                     >
-                      <ReminderCard reminder={{ ...reminder, ...(pets.find((p) => p.id === reminder.petId) || {}) }} />
+                      <ReminderCard reminder={withPetInfo(reminder)} />
                     </Animated.View>
                   );
                 })}

@@ -69,11 +69,23 @@ export default function Login({ navigation }) {
       return;
     }
 
-    if (portalType === "VETERINARIO") {
-      Alert.alert(
-        "Acesso restrito",
-        "O cadastro de veterinários é realizado pela clínica.",
-      );
+    if (portalType === "VET") {
+      const isVetEmail = trimmedEmail === MOCK_VET_PROFILE.email.toLowerCase();
+
+      if (!isVetEmail) {
+        Alert.alert(
+          "Acesso restrito",
+          "Use o email cadastrado pela clínica. O cadastro de veterinários não é feito pelo app.",
+        );
+        return;
+      }
+
+      loginVet(MOCK_VET_PROFILE);
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Tabs", params: { userType: portalType } }],
+      });
       return;
     }
 

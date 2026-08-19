@@ -3,6 +3,7 @@ import { View } from 'react-native';
 
 const Card = ({
   children,
+  className = '',
   style,
   shadow = true,
   padding = true,
@@ -10,7 +11,7 @@ const Card = ({
 }) => {
   return (
     <View
-      className={`rounded-2xl bg-white ${padding ? 'p-4' : ''} ${shadow ? 'shadow-sm' : ''}`}
+      className={`rounded-2xl bg-white ${padding ? 'p-4' : ''} ${shadow ? 'shadow-sm' : ''} ${className}`}
       style={style}
       {...props}
     >

@@ -37,6 +37,7 @@ const PatientsVet = ({ navigation }) => {
           setSelectedFilter(parsed.selectedFilter);
         }
       } catch (error) {
+        console.warn('[Fidelis] Nao foi possivel carregar os filtros salvos:', error);
       }
     };
 
@@ -51,6 +52,7 @@ const PatientsVet = ({ navigation }) => {
           JSON.stringify({ searchText, selectedFilter })
         );
       } catch (error) {
+        console.warn('[Fidelis] Nao foi possivel salvar os filtros:', error);
       }
     };
 
