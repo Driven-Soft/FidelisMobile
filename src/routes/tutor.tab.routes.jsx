@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Feather from '@expo/vector-icons/Feather';
 
 import HomeTutor from '../screens/Tutor/HomeTutor';
 import PetsTutor from '../screens/Tutor/PetsTutor';
@@ -67,60 +68,47 @@ const ProfileStack = () => {
 
 export default function TutorTabRoutes() {
   const insets = useSafeAreaInsets();
-  const bottomInset = Math.max(insets.bottom, 8);
+  const bottomInset = Math.max(insets.bottom, 22);
+
+  // Icone/label da tab: cor clinic quando ativo, icon-off/text-off quando inativo.
+  const tabOptions = (label, icon) => ({
+    tabBarIcon: ({ focused }) => (
+      <Feather name={icon} size={20} color={focused ? '#0E7A63' : '#D3DEDB'} />
+    ),
+    tabBarLabel: ({ focused }) => (
+      <Text
+        className={`mt-[5px] text-badge ${
+          focused ? 'font-sans-semibold text-clinic' : 'font-sans text-text-off'
+        }`}
+      >
+        {label}
+      </Text>
+    ),
+  });
 
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#06b6d4',
-        tabBarInactiveTintColor: '#64748b',
         tabBarStyle: {
-          backgroundColor: '#ffffff',
-          borderTopColor: '#e2e8f0',
+          backgroundColor: '#FFFFFF',
+          borderTopColor: '#E2E9E7',
           borderTopWidth: 1,
+          paddingTop: 10,
+          paddingHorizontal: 10,
           paddingBottom: bottomInset,
-          paddingTop: 8,
-          height: 52 + bottomInset,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
+          height: 49 + bottomInset,
         },
       }}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeStack}
-        options={{
-          tabBarLabel: 'Início',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🏠</Text>,
-        }}
-      />
-      <Tab.Screen
-        name="Pets"
-        component={PetsStack}
-        options={{
-          tabBarLabel: 'Meus Pets',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🐾</Text>,
-        }}
-      />
+      <Tab.Screen name="Home" component={HomeStack} options={tabOptions('Início', 'home')} />
+      <Tab.Screen name="Pets" component={PetsStack} options={tabOptions('Meus Pets', 'heart')} />
       <Tab.Screen
         name="Reminders"
         component={RemindersStack}
-        options={{
-          tabBarLabel: 'Lembretes',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🔔</Text>,
-        }}
+        options={tabOptions('Lembretes', 'bell')}
       />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileStack}
-        options={{
-          tabBarLabel: 'Perfil',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>👤</Text>,
-        }}
-      />
+      <Tab.Screen name="Profile" component={ProfileStack} options={tabOptions('Perfil', 'user')} />
     </Tab.Navigator>
   );
 }

@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaskInput, { Masks } from "react-native-mask-input"
-import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
-import Card from "../../components/common/Card";
 
 const STORAGE_KEY_CADASTRO_TUTOR = "@fidelis:cadastro_tutor";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -199,20 +197,20 @@ export default function CadastroTutor({ navigation }) {
   const currentStep = progressSteps[step - 1];
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-100" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-mist" edges={["top"]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="px-4 py-6">
           <View className="mb-6 flex-row items-center">
             {[1, 2, 3].map((num) => (
               <React.Fragment key={num}>
                 <View
-                  className={`h-10 w-10 items-center justify-center rounded-full ${
-                    num <= step ? "bg-cyan-600" : "bg-slate-200"
+                  className={`h-9 w-9 items-center justify-center rounded-full ${
+                    num <= step ? "bg-clinic" : "bg-hairline"
                   }`}
                 >
                   <Text
-                    className={`text-sm font-bold ${
-                      num <= step ? "text-white" : "text-slate-500"
+                    className={`font-mono-medium text-badge ${
+                      num <= step ? "text-white" : "text-slate"
                     }`}
                   >
                     {num}
@@ -221,8 +219,8 @@ export default function CadastroTutor({ navigation }) {
 
                 {num < 3 && (
                   <View
-                    className={`h-0.5 flex-1 mx-2 ${
-                      num < step ? "bg-cyan-600" : "bg-slate-200"
+                    className={`mx-2 h-px flex-1 ${
+                      num < step ? "bg-clinic" : "bg-line"
                     }`}
                   />
                 )}
@@ -230,14 +228,14 @@ export default function CadastroTutor({ navigation }) {
             ))}
           </View>
 
-          <Text className="mb-2 text-2xl font-bold text-slate-900">
+          <Text className="mb-1 font-sans-semibold text-screen tracking-screen text-ink">
             {currentStep.title}
           </Text>
-          <Text className="mb-4 text-sm text-slate-500">
+          <Text className="mb-4 font-sans text-body text-slate">
             {currentStep.subtitle}
           </Text>
 
-          <Card>
+          <View className="rounded-card border border-line bg-card p-[14px]">
             {step === 1 && (
               <>
                 <Input
@@ -263,8 +261,8 @@ export default function CadastroTutor({ navigation }) {
                   autoCapitalize="none"
                 />
 
-                <View className="mb-4">
-                  <Text className="mb-1 text-sm font-medium text-slate-700">
+                <View className="mb-3">
+                  <Text className="mb-[6px] font-sans text-label text-slate">
                     Telefone
                   </Text>
                   <MaskInput
@@ -273,14 +271,14 @@ export default function CadastroTutor({ navigation }) {
                     onBlur={() => handleBlur("phone")}
                     mask={Masks.BRL_PHONE}
                     placeholder="(11) 98765-4321"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor="#8A9A95"
                     keyboardType="phone-pad"
-                    className={`rounded-2xl border px-4 py-3 text-slate-900 bg-white ${
-                      errors.phone ? "border-red-400" : "border-slate-200"
+                    className={`rounded-control border bg-card px-3 py-[10px] font-mono text-body text-ink ${
+                      errors.phone ? "border-alert" : "border-line-strong"
                     }`}
                   />
                   {errors.phone && (
-                    <Text className="mt-1 text-xs text-red-400">{errors.phone}</Text>
+                    <Text className="mt-1 font-sans text-label text-alert">{errors.phone}</Text>
                   )}
                 </View>
               </>
@@ -288,8 +286,8 @@ export default function CadastroTutor({ navigation }) {
 
             {step === 2 && (
               <>
-                <View className="mb-4">
-                  <Text className="mb-1 text-sm font-medium text-slate-700">
+                <View className="mb-3">
+                  <Text className="mb-[6px] font-sans text-label text-slate">
                     CPF
                   </Text>
                   <MaskInput
@@ -298,16 +296,16 @@ export default function CadastroTutor({ navigation }) {
                     onBlur={() => handleBlur("cpf")}
                     mask={Masks.BRL_CPF}
                     placeholder="123.456.789-10"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor="#8A9A95"
                     keyboardType="numeric"
-                    className={`rounded-2xl border px-4 py-3 text-slate-900 bg-white ${
-                      errors.cpf ? "border-red-400" : "border-slate-200"
+                    className={`rounded-control border bg-card px-3 py-[10px] font-mono text-body text-ink ${
+                      errors.cpf ? "border-alert" : "border-line-strong"
                     }`}
                   />
                   {errors.cpf && (
-                    <Text className="mt-1 text-xs text-red-400">{errors.cpf}</Text>
+                    <Text className="mt-1 font-sans text-label text-alert">{errors.cpf}</Text>
                   )}
-                  <Text className="mt-2 text-xs text-slate-500">
+                  <Text className="mt-2 font-sans text-label text-slate">
                     Seu CPF será usado para verificação de identidade
                   </Text>
                 </View>
@@ -340,30 +338,32 @@ export default function CadastroTutor({ navigation }) {
                 />
               </>
             )}
-          </Card>
+          </View>
 
-          <View className="mt-6 flex-row space-x-3 pb-6">
+          <View className="mt-6 flex-row gap-[10px] pb-6">
             {step > 1 && (
-              <Button
-                title="Voltar"
-                variant="outline"
+              <TouchableOpacity
                 onPress={handleBack}
-                style={{ flex: 1 }}
-              />
+                className="flex-1 items-center justify-center rounded-control border border-line-strong bg-card px-[18px] py-[11px]"
+              >
+                <Text className="font-sans-medium text-xs text-ink">Voltar</Text>
+              </TouchableOpacity>
             )}
-            <Button
-              title={step === 3 ? "Cadastrar" : "Próximo"}
-              variant="primary"
+            <TouchableOpacity
               onPress={handleNext}
-              style={{ flex: 1 }}
-            />
+              className="flex-1 items-center justify-center rounded-control bg-clinic px-5 py-3"
+            >
+              <Text className="font-sans-semibold text-title text-white">
+                {step === 3 ? "Cadastrar" : "Próximo"}
+              </Text>
+            </TouchableOpacity>
           </View>
 
           <View className="mt-4 items-center">
-            <Text className="text-sm text-slate-500">
+            <Text className="font-sans text-body text-slate">
               Já tem conta?{" "}
               <Text
-                className="font-bold text-cyan-600"
+                className="font-sans-medium text-body text-clinic"
                 onPress={() => navigation.replace("Login")}
               >
                 Faça login

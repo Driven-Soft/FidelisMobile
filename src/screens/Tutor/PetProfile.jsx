@@ -1,10 +1,9 @@
 import React, { useContext, useState } from 'react';
-import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, ScrollView, Text, Pressable } from 'react-native';
 import { MOCK_TUTOR_PETS, parsePtDate } from '../../data/fidelisData';
 import { UserContext } from '../../context/UserContext';
-import Card from '../../components/common/Card';
-import AvatarBadge from '../../components/common/AvatarBadge';
+import TutorHeader from '../../components/Tutor/TutorHeader';
+import Avatar from '../../components/common/Avatar';
 
 const PetProfile = ({ route, navigation }) => {
   const { petId } = route.params;
@@ -29,71 +28,85 @@ const PetProfile = ({ route, navigation }) => {
 
   if (!pet) {
     return (
-      <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
+      <View className="flex-1 bg-mist">
+        <TutorHeader title="Pet" onBack={() => navigation.goBack()} />
         <View className="flex-1 items-center justify-center px-4">
-          <Text className="text-base font-semibold text-slate-900">Pet nao encontrado</Text>
-          <TouchableOpacity className="mt-4" onPress={() => navigation.goBack()}>
-            <Text className="font-semibold text-cyan-600">Voltar</Text>
-          </TouchableOpacity>
+          <Text className="font-sans-medium text-body text-ink">Pet nao encontrado</Text>
+          <Pressable
+            className="mt-3"
+            onPress={() => navigation.goBack()}
+            style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
+          >
+            <Text className="font-sans-medium text-eyebrow text-clinic">Voltar</Text>
+          </Pressable>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="px-4 pb-6">
-          <View className="mb-4 items-center rounded-2xl bg-white p-6 shadow-sm">
-            <AvatarBadge emoji={pet.avatar} size={120} backgroundColor={pet.color} />
+    <View className="flex-1 bg-mist">
+      <TutorHeader title={pet.name} onBack={() => navigation.goBack()} />
+
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]">
+        <View className="items-center rounded-card border border-line bg-card p-[14px]">
+          <Avatar emoji={pet.avatar} name={pet.name} size={96} radius={12} />
+        </View>
+
+        <View className="flex-row flex-wrap gap-[10px]">
+          <View className="min-w-[48%] flex-1 rounded-card border border-line bg-card p-[13px]">
+            <Text className="font-sans text-label text-slate">ESPÉCIE</Text>
+            <Text className="mt-[3px] font-sans-medium text-body text-ink">{pet.species}</Text>
           </View>
-
-          <Text className="mb-4 text-4xl font-bold text-slate-900">{pet.name}</Text>
-
-          <View className="mb-4 flex-row flex-wrap gap-3">
-            <Card style={{ flex: 1, minWidth: '48%' }}>
-              <Text className="mb-1 text-xs text-slate-500">Espécie</Text>
-              <Text className="text-base font-semibold text-slate-900">{pet.species}</Text>
-            </Card>
-            <Card style={{ flex: 1, minWidth: '48%' }}>
-              <Text className="mb-1 text-xs text-slate-500">Raça</Text>
-              <Text className="text-base font-semibold text-slate-900">{pet.breed}</Text>
-            </Card>
-            <Card style={{ flex: 1, minWidth: '48%' }}>
-              <Text className="mb-1 text-xs text-slate-500">Sexo</Text>
-              <Text className="text-base font-semibold text-slate-900">{pet.sex}</Text>
-            </Card>
-            <Card style={{ flex: 1, minWidth: '48%' }}>
-              <Text className="mb-1 text-xs text-slate-500">Idade</Text>
-              <Text className="text-base font-semibold text-slate-900">{calculateAge(pet.birthDate)} anos</Text>
-            </Card>
+          <View className="min-w-[48%] flex-1 rounded-card border border-line bg-card p-[13px]">
+            <Text className="font-sans text-label text-slate">RAÇA</Text>
+            <Text className="mt-[3px] font-sans-medium text-body text-ink">{pet.breed}</Text>
           </View>
-
-          <Card className="mb-4">
-            <Text className="mb-1 text-xs text-slate-500">Clínica Vinculada</Text>
-            <Text className="text-base font-semibold text-slate-900">{pet.clinic ?? pet.clinicAssociated ?? '-'}</Text>
-          </Card>
-
-          <View className="mb-4 flex-row border-b-2 border-slate-200">
-            {tabs.map((tab) => (
-              <TouchableOpacity
-                key={tab}
-                className={`px-4 py-3 border-b-4 ${activeTab === tab ? 'border-cyan-600' : 'border-transparent'}`}
-                onPress={() => setActiveTab(tab)}
-              >
-                <Text className={`text-sm font-medium ${activeTab === tab ? 'text-cyan-600' : 'text-slate-500'}`}>
-                  {tab}
-                </Text>
-              </TouchableOpacity>
-            ))}
+          <View className="min-w-[48%] flex-1 rounded-card border border-line bg-card p-[13px]">
+            <Text className="font-sans text-label text-slate">SEXO</Text>
+            <Text className="mt-[3px] font-sans-medium text-body text-ink">{pet.sex}</Text>
           </View>
-
-          <View className="items-center justify-center p-6">
-            <Text className="text-sm text-slate-500">Nenhum registro em {activeTab}</Text>
+          <View className="min-w-[48%] flex-1 rounded-card border border-line bg-card p-[13px]">
+            <Text className="font-sans text-label text-slate">IDADE</Text>
+            <Text className="mt-[3px] font-mono-medium text-body text-ink">
+              {calculateAge(pet.birthDate)} anos
+            </Text>
           </View>
         </View>
+
+        <View className="rounded-card border border-line bg-card p-[13px]">
+          <Text className="font-sans text-label text-slate">CLÍNICA VINCULADA</Text>
+          <Text className="mt-[3px] font-sans-medium text-body text-ink">
+            {pet.clinic ?? pet.clinicAssociated ?? '-'}
+          </Text>
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-1">
+          {tabs.map((tab) => (
+            <Pressable
+              key={tab}
+              accessibilityRole="button"
+              accessibilityState={{ selected: activeTab === tab }}
+              onPress={() => setActiveTab(tab)}
+              style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
+              className={`rounded-badge px-[10px] py-[5px] ${activeTab === tab ? 'bg-clinic-50' : ''}`}
+            >
+              <Text
+                className={`font-sans-medium text-eyebrow ${
+                  activeTab === tab ? 'text-clinic-ink' : 'text-slate'
+                }`}
+              >
+                {tab}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+
+        <View className="items-center rounded-card border border-line bg-card px-[14px] py-8">
+          <Text className="font-sans text-body text-slate">Nenhum registro em {activeTab}</Text>
+        </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

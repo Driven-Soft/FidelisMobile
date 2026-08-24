@@ -1,59 +1,68 @@
 import React, { useContext } from 'react';
-import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, ScrollView, Text, Pressable } from 'react-native';
+import Feather from '@expo/vector-icons/Feather';
 import { MOCK_TUTOR_PETS, getPetAgeLabel } from '../../data/fidelisData';
 import { UserContext } from '../../context/UserContext';
-import Card from '../../components/common/Card';
-import SectionHeader from '../../components/common/SectionHeader';
-import AvatarBadge from '../../components/common/AvatarBadge';
-import Button from '../../components/common/Button';
+import TutorHeader from '../../components/Tutor/TutorHeader';
+import Avatar from '../../components/common/Avatar';
 
 const PetsTutor = ({ navigation }) => {
   const { tutorPets } = useContext(UserContext);
   const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="px-4 pb-6">
-        <SectionHeader
-          title="Meus Pets"
-          subtitle="Gerencie os perfis, consultas e cuidados dos seus animais"
-        />
+    <View className="flex-1 bg-mist">
+      <TutorHeader title="Meus Pets" />
 
-        <TouchableOpacity onPress={() => navigation.navigate('NewPet')} className="mb-4 items-center rounded-3xl border-2 border-dashed border-cyan-600 bg-cyan-50 p-6 shadow-sm">
-          <Text className="text-[30px] font-bold text-cyan-600">＋</Text>
-          <Text className="mt-2 text-lg font-bold text-slate-900">Adicionar novo pet</Text>
-          <Text className="mt-1 text-center text-sm leading-5 text-slate-500">Cadastro em 3 etapas com dados básicos, físicos e observações.</Text>
-        </TouchableOpacity>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]">
+        <Text className="font-sans text-body text-slate">
+          Gerencie os perfis, consultas e cuidados dos seus animais.
+        </Text>
 
-        <View className="mt-3 space-y-3">
-          {pets.map((pet) => (
-            <TouchableOpacity
-              key={pet.id}
-              onPress={() => navigation.navigate('PetProfile', { petId: pet.id })}
-            >
-              <Card className="p-4">
-                <View className="flex-row items-center">
-                  <AvatarBadge
-                    emoji={pet.avatar}
-                    size={72}
-                    backgroundColor={pet.color}
-                    style={{ marginRight: 16 }}
-                  />
-                  <View className="flex-1">
-                    <Text className="mb-1 text-xl font-bold text-slate-900">{pet.name}</Text>
-                    <Text className="mb-1 text-sm text-slate-500">{pet.breed}</Text>
-                    <Text className="mb-1 text-sm text-slate-500">{getPetAgeLabel(pet.birthDate)} • {pet.sex}</Text>
-                    <Text className="mt-1 text-xs font-semibold text-cyan-600">{pet.clinic}</Text>
-                  </View>
-                </View>
-                <Button title="Abrir perfil" variant="outline" size="sm" style={{ marginTop: 16 }} onPress={() => navigation.navigate('PetProfile', { petId: pet.id })} />
-              </Card>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => navigation.navigate('NewPet')}
+          style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
+          className="flex-row items-center gap-[11px] rounded-card border border-line bg-card px-[14px] py-[13px]"
+        >
+          <View className="h-[30px] w-[30px] items-center justify-center rounded-control bg-clinic-50">
+            <Feather name="plus" size={16} color="#0E7A63" />
+          </View>
+          <View className="flex-1">
+            <Text className="font-sans-medium text-body text-ink">Adicionar novo pet</Text>
+            <Text className="font-sans text-label text-slate">
+              Cadastro em 3 etapas com dados básicos, físicos e observações.
+            </Text>
+          </View>
+        </Pressable>
+
+        {pets.map((pet) => (
+          <Pressable
+            key={pet.id}
+            accessibilityRole="button"
+            onPress={() => navigation.navigate('PetProfile', { petId: pet.id })}
+            style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
+            className="rounded-card border border-line bg-card p-[14px]"
+          >
+            <View className="flex-row items-center gap-3">
+              <Avatar emoji={pet.avatar} name={pet.name} size={56} radius={12} />
+              <View className="flex-1">
+                <Text className="font-sans-semibold text-title text-ink">{pet.name}</Text>
+                <Text className="mt-[2px] font-sans text-label text-slate">{pet.breed}</Text>
+                <Text className="mt-[2px] font-mono text-label text-slate">
+                  {getPetAgeLabel(pet.birthDate)} · {pet.sex}
+                </Text>
+                <Text className="mt-1 font-sans-medium text-label text-clinic">{pet.clinic}</Text>
+              </View>
+            </View>
+
+            <View className="mt-[14px] items-center justify-center rounded-control border border-line-strong bg-card px-[18px] py-[11px]">
+              <Text className="font-sans-medium text-xs text-ink">Abrir perfil</Text>
+            </View>
+          </Pressable>
+        ))}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

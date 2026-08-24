@@ -1,10 +1,8 @@
 import React, { useContext, useMemo, useState } from "react";
-import { View, ScrollView, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, ScrollView, Text, Pressable } from "react-native";
+import TutorHeader from "../../components/Tutor/TutorHeader";
 import Input from "../../components/common/Input";
-import Button from "../../components/common/Button";
-import Card from "../../components/common/Card";
-import AvatarBadge from "../../components/common/AvatarBadge";
+import Avatar from "../../components/common/Avatar";
 import { UserContext } from "../../context/UserContext";
 import { Masks } from "react-native-mask-input";
 
@@ -176,61 +174,62 @@ const NewPet = ({ navigation }) => {
   const currentStep = stepLabels[step - 1];
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-100" edges={["top"]}>
+    <View className="flex-1 bg-mist">
+      <TutorHeader title="Cadastrar Pet" onBack={() => navigation.goBack()} />
+
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="px-4 pb-6 pt-4"
+        contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]"
       >
-        <Text className="text-4xl font-bold text-slate-900">Cadastrar Pet</Text>
-        <Text className="mt-2 mb-6 text-sm text-slate-500">
+        <Text className="font-sans text-body text-slate">
           Preencha o cadastro em 3 etapas e salve o perfil do animal.
         </Text>
 
-        <View className="mb-6 flex-row items-start">
+        <View className="flex-row items-start">
           {stepLabels.map((item, index) => (
             <View key={item.number} className="flex-1 items-center">
-              <View className="flex-row items-center w-full">
+              <View className="w-full flex-row items-center">
                 <View
-                  className={`flex-1 h-0.5 ${
+                  className={`h-px flex-1 ${
                     index === 0
                       ? "bg-transparent"
                       : item.number <= step
-                        ? "bg-cyan-600"
-                        : "bg-slate-200"
+                        ? "bg-clinic"
+                        : "bg-line"
                   }`}
                 />
                 <View
-                  className={`h-9 w-9 items-center justify-center rounded-full ${
-                    item.number <= step ? "bg-cyan-600" : "bg-slate-200"
+                  className={`h-7 w-7 items-center justify-center rounded-full ${
+                    item.number <= step ? "bg-clinic" : "bg-hairline"
                   }`}
                 >
                   <Text
-                    className={`text-sm font-bold ${
-                      item.number <= step ? "text-white" : "text-slate-500"
+                    className={`font-mono-medium text-badge ${
+                      item.number <= step ? "text-white" : "text-slate"
                     }`}
                   >
                     {item.number}
                   </Text>
                 </View>
                 <View
-                  className={`flex-1 h-0.5 ${
+                  className={`h-px flex-1 ${
                     index === stepLabels.length - 1
                       ? "bg-transparent"
                       : item.number < step
-                        ? "bg-cyan-600"
-                        : "bg-slate-200"
+                        ? "bg-clinic"
+                        : "bg-line"
                   }`}
                 />
               </View>
-              <Text className="mt-2 px-1 text-center text-xs text-slate-500 leading-tight">
+              <Text className="mt-2 px-1 text-center font-sans text-label text-slate">
                 {item.label}
               </Text>
             </View>
           ))}
         </View>
 
-        <Card className="mb-4">
-          <Text className="mb-4 text-lg font-bold text-slate-900">
+        <View className="rounded-card border border-line bg-card p-[14px]">
+          <Text className="mb-[14px] font-sans-semibold text-title text-ink">
             {currentStep.label}
           </Text>
           {step === 1 && (
@@ -281,6 +280,7 @@ const NewPet = ({ navigation }) => {
                 error={fieldErrors.weight}
                 isValid={touched.weight && isWeightValid}
                 keyboardType="numeric"
+                mono
               />
               <Input
                 label="Sexo"
@@ -302,18 +302,15 @@ const NewPet = ({ navigation }) => {
                 isValid={touched.birthDate && isBirthDateValid}
                 mask={Masks.DATE_DDMMYYYY}
                 keyboardType="numeric"
+                mono
               />
             </>
           )}
 
           {step === 3 && (
             <>
-              <View className="mb-4 flex-row items-center space-x-4">
-                <AvatarBadge
-                  emoji={form.emoji || "🐾"}
-                  size={96}
-                  backgroundColor="#F3F7FB"
-                />
+              <View className="mb-3 flex-row items-center gap-3">
+                <Avatar emoji={form.emoji || "🐾"} size={72} radius={12} />
                 <View className="flex-1">
                   <Input
                     label="Emoji da foto"
@@ -321,7 +318,7 @@ const NewPet = ({ navigation }) => {
                     value={form.emoji}
                     onChangeText={(value) => setField("emoji", value)}
                   />
-                  <Text className="mt-2 text-xs leading-5 text-slate-500">
+                  <Text className="font-sans text-label text-slate">
                     No mock atual usamos emoji/foto ilustrativa. Em produção
                     aqui entraria upload real.
                   </Text>
@@ -334,30 +331,35 @@ const NewPet = ({ navigation }) => {
                 onChangeText={(value) => setField("observations", value)}
                 multiline
                 numberOfLines={4}
-                style={{ marginTop: 16 }}
               />
             </>
           )}
-        </Card>
+        </View>
 
-        <View className="flex-row space-x-3">
+        <View className="flex-row gap-[10px]">
           {step > 1 && (
-            <Button
-              title="Voltar"
-              variant="outline"
+            <Pressable
+              accessibilityRole="button"
               onPress={() => setStep((current) => current - 1)}
-              style={{ flex: 1 }}
-            />
+              style={({ pressed }) => [{ flex: 1 }, pressed ? { opacity: 0.7 } : null]}
+              className="items-center justify-center rounded-control border border-line-strong bg-card px-[18px] py-[11px]"
+            >
+              <Text className="font-sans-medium text-xs text-ink">Voltar</Text>
+            </Pressable>
           )}
-          <Button
-            title={step === 3 ? "Salvar pet" : "Próximo"}
-            variant="primary"
+          <Pressable
+            accessibilityRole="button"
             onPress={handleNext}
-            style={{ flex: 1 }}
-          />
+            style={({ pressed }) => [{ flex: 1 }, pressed ? { opacity: 0.7 } : null]}
+            className="items-center justify-center rounded-control bg-clinic px-5 py-3"
+          >
+            <Text className="font-sans-semibold text-title text-white">
+              {step === 3 ? "Salvar pet" : "Próximo"}
+            </Text>
+          </Pressable>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

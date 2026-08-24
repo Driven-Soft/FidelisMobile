@@ -20,14 +20,22 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "androidNavigationBar": {
-        "visible": "sticky-immersive"
-      }
+      "edgeToEdgeEnabled": true
     },
     "web": {
       "bundler": "metro",
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-navigation-bar",
+        {
+          "visibility": "hidden",
+          "behavior": "overlay-swipe"
+        }
+      ]
+    ]
   }
 }

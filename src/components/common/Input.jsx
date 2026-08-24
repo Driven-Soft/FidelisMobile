@@ -1,6 +1,6 @@
-import React from "react";
-import { TextInput, View, Text, TouchableOpacity } from "react-native";
-import MaskInput from "react-native-mask-input";
+import { TextInput, View, Text, Pressable } from 'react-native';
+import MaskInput from 'react-native-mask-input';
+import Feather from '@expo/vector-icons/Feather';
 
 const Input = ({
   label,
@@ -10,60 +10,55 @@ const Input = ({
   error,
   isValid,
   icon,
-  type = "text",
+  mono = false,
   editable = true,
-  onRightIconPress,
+  type = 'text',
   rightIcon,
+  onRightIconPress,
+  multiline = false,
   style,
   mask,
   ...props
 }) => {
   const Component = mask ? MaskInput : TextInput;
 
-  let borderClass = "border-slate-200";
-  if (error) {
-    borderClass = "border-red-500";
-  } else if (isValid) {
-    borderClass = "border-emerald-500";
-  }
-
   return (
-    <View className="mb-4" style={style}>
-      {label && (
-        <Text className="mb-2 text-sm font-semibold text-slate-900">
-          {label}
-        </Text>
-      )}
+    <View className="mb-3" style={style}>
+      {label ? <Text className="mb-[6px] font-sans text-label text-slate">{label}</Text> : null}
+
       <View
-        className={`flex-row items-center rounded-2xl border-2 bg-white px-4 py-3 ${borderClass}`}
+        className={`flex-row items-center rounded-control border bg-card px-3 py-[10px] ${
+          multiline ? 'min-h-[76px]' : ''
+        } ${error ? 'border-alert' : isValid ? 'border-clinic' : 'border-line-strong'}`}
       >
-        {icon && <View className="mr-3">{icon}</View>}
+        {icon ? <View className="mr-2">{icon}</View> : null}
+
         <Component
-          className="flex-1 text-base text-slate-900"
+          className={`flex-1 text-body text-ink ${mono ? 'font-mono' : 'font-sans'}`}
           placeholder={placeholder}
-          placeholderTextColor="#64748b"
+          placeholderTextColor="#8A9A95"
           value={value}
           onChangeText={onChangeText}
           editable={editable}
-          secureTextEntry={type === "password"}
+          secureTextEntry={type === 'password'}
+          multiline={multiline}
+          style={multiline ? { textAlignVertical: 'top' } : null}
           mask={mask}
           {...props}
         />
+
         {rightIcon ? (
-          <TouchableOpacity className="ml-3" onPress={onRightIconPress}>
+          <Pressable className="ml-3" onPress={onRightIconPress} hitSlop={8}>
             {rightIcon}
-          </TouchableOpacity>
-        ) : (
-          <>
-            {error ? (
-              <Text className="ml-2 text-base text-red-500">⚠️</Text>
-            ) : isValid ? (
-              <Text className="ml-2 text-base text-emerald-500">✓</Text>
-            ) : null}
-          </>
-        )}
+          </Pressable>
+        ) : error ? (
+          <Feather name="alert-circle" size={15} color="#C2513A" style={{ marginLeft: 8 }} />
+        ) : isValid ? (
+          <Feather name="check" size={15} color="#0E7A63" style={{ marginLeft: 8 }} />
+        ) : null}
       </View>
-      {error && <Text className="mt-1 text-xs text-red-500">{error}</Text>}
+
+      {error ? <Text className="mt-1 font-sans text-label text-alert">{error}</Text> : null}
     </View>
   );
 };

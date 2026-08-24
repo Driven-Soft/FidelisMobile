@@ -39,3 +39,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# extra
+design_handoff_tutor_clinico
+CLAUDE.md

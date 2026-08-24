@@ -34,12 +34,15 @@ Fidelis é um aplicativo móvel de gestão de saúde pet criado para o Challenge
 
 | Tecnologia | Versão | Finalidade |
 | --- | --- | --- |
-| Expo | ~54.0.33 | Plataforma de desenvolvimento mobile React Native |
+| Expo | ~54.0.37 | Plataforma de desenvolvimento mobile React Native |
 | React | 19.1.0 | Biblioteca de interface de usuário |
 | React Native | 0.81.5 | Framework para apps móveis nativos |
 | React Navigation | 7.x | Navegação entre telas e abas |
 | @react-native-async-storage/async-storage | 2.2.0 | Armazenamento local de dados |
-| expo-linear-gradient | ~15.0.8 | Gradientes visuais e interface estilizada |
+| @expo/vector-icons | ^15.0.3 | Ícones Feather usados na interface |
+| expo-font | ~14.0.12 | Carregamento das fontes do app |
+| @expo-google-fonts/ibm-plex-sans | ^0.4.1 | Tipografia de interface (IBM Plex Sans) |
+| @expo-google-fonts/ibm-plex-mono | ^0.4.1 | Tipografia de números e datas (IBM Plex Mono) |
 | expo-navigation-bar | ~5.0.10 | Personalização da barra de navegação no Android |
 | expo-status-bar | ~3.0.9 | Controle da barra de status do sistema |
 | nativewind | ^4.2.3 | Estilização Tailwind para React Native |
@@ -73,25 +76,20 @@ FidelisMobile/
 ├─ assets/                # Recursos estáticos do app
 └─ src/                   # Código-fonte principal
    ├─ components/         # Componentes reutilizáveis de interface
-   │  ├─ common/          # UI genérica e elementos comuns
-   │  │  ├─ AvatarBadge.jsx
-   │  │  ├─ Badge.jsx
-   │  │  ├─ Button.jsx
-   │  │  ├─ Card.jsx
-   │  │  ├─ ImagePlaceholder.jsx
-   │  │  ├─ Input.jsx
-   │  │  ├─ PortalToggle.jsx
-   │  │  └─ SectionHeader.jsx
-   │  ├─ Tutor/           # Componentes específicos do portal tutor
+   │  ├─ common/          # UI usada pelos dois portais
+   │  │  ├─ Avatar.jsx
+   │  │  └─ Input.jsx
+   │  ├─ Tutor/           # Componentes específicos do portal do tutor
    │  │  ├─ NewReminderModal.jsx
-   │  │  ├─ PetCard.jsx
-   │  │  └─ ReminderCard.jsx
+   │  │  ├─ ReminderCard.jsx
+   │  │  └─ TutorHeader.jsx
+   │  ├─ Veterinario/     # Componentes específicos do portal do veterinário
+   │  │  └─ Badge.jsx
    │  └─ index.js
    ├─ context/            # Contexto global de aplicação
    │  └─ UserContext.jsx
    ├─ data/               # Dados simulados e mocks
-   │  ├─ fidelisData.js
-   │  └─ mockData.js
+   │  └─ fidelisData.js
    ├─ routes/             # Configuração de navegação
    │  ├─ stack.routes.jsx
    │  ├─ tab.routes.jsx
@@ -100,25 +98,16 @@ FidelisMobile/
    └─ screens/            # Telas do aplicativo
       ├─ Login/           # Fluxo de autenticação
       │  ├─ CadastroTutor.jsx
-      │  ├─ Login.jsx
-      │  ├─ LoginTutor.jsx
-      │  ├─ LoginVet.jsx
-      │  └─ Forms/
-      │     ├─ FormCadastroTutor.jsx
-      │     ├─ FormLoginTutor.jsx
-      │     └─ FormLoginVet.jsx
+      │  └─ Login.jsx
       ├─ Tutor/           # Telas do portal do tutor
-      │  ├─ ConsultasTutor.jsx
       │  ├─ HomeTutor.jsx
       │  ├─ NewPet.jsx
-      │  ├─ PerfilTutor.jsx
       │  ├─ PetProfile.jsx
       │  ├─ PetsTutor.jsx
       │  ├─ ProfileTutor.jsx
       │  └─ RemindersScreen.jsx
       └─ Veterinario/     # Telas do portal do veterinário
          ├─ AgendaVet.jsx
-         ├─ ClientesVet.jsx
          ├─ HomeVet.jsx
          ├─ PatientRecord.jsx
          ├─ PatientsVet.jsx

@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useRef, useContext } from 'react';
-import { Alert, View, ScrollView, Text, TouchableOpacity, Animated } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, View, ScrollView, Text, Pressable, Animated } from 'react-native';
+import Feather from '@expo/vector-icons/Feather';
 import { MOCK_TUTOR_PETS } from '../../data/fidelisData';
 import { UserContext } from '../../context/UserContext';
-import SectionHeader from '../../components/common/SectionHeader';
+import TutorHeader from '../../components/Tutor/TutorHeader';
 import ReminderCard from '../../components/Tutor/ReminderCard';
 import NewReminderModal from '../../components/Tutor/NewReminderModal';
 
@@ -109,122 +109,119 @@ const RemindersScreen = () => {
     Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start();
   };
 
+  const renderBucket = (reminder, withActions = true) => {
+    const animation = getCardAnimation(reminder.id);
+    const height = cardHeights[reminder.id];
+    const animatedStyle = height
+      ? { height: animation.interpolate({ inputRange: [0, 1], outputRange: [0, height] }), opacity: animation }
+      : { opacity: animation };
+
+    return (
+      <Animated.View
+        key={reminder.id}
+        style={[{ overflow: 'hidden' }, animatedStyle]}
+        onLayout={(event) => handleCardLayout(reminder.id, event)}
+      >
+        <ReminderCard
+          reminder={withPetInfo(reminder)}
+          onComplete={withActions ? markAsComplete : undefined}
+          onIgnore={withActions ? ignoreReminder : undefined}
+        />
+      </Animated.View>
+    );
+  };
+
   return (
-    <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="px-4">
-          <SectionHeader title="Lembretes" subtitle="Vacinas, medicamentos e consultas organizados em um único lugar" />
+    <View className="flex-1 bg-mist">
+      <TutorHeader title="Lembretes" />
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4" contentContainerClassName="space-x-2">
-            {filterOptions.map((option) => (
-              <TouchableOpacity
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]">
+        <Text className="font-sans text-body text-slate">
+          Vacinas, medicamentos e consultas organizados em um único lugar.
+        </Text>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-1">
+          {filterOptions.map((option) => {
+            const isActive = filterType === option;
+
+            return (
+              <Pressable
                 key={option}
-                className={`rounded-full border px-4 py-2 ${filterType === option ? 'border-cyan-600 bg-cyan-600' : 'border-slate-200 bg-white'}`}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isActive }}
                 onPress={() => setFilterType(option)}
+                style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
+                className={`rounded-badge px-[10px] py-[5px] ${isActive ? 'bg-clinic-50' : ''}`}
               >
-                <Text className={`text-sm font-medium ${filterType === option ? 'text-white' : 'text-slate-500'}`}>
-                  {option === 'Todos' ? 'Todos' : option.charAt(0).toUpperCase() + option.slice(1).toLowerCase().replace('í', 'í')}
+                <Text
+                  className={`font-sans-medium text-eyebrow ${isActive ? 'text-clinic-ink' : 'text-slate'}`}
+                >
+                  {option === 'Todos' ? 'Todos' : option.charAt(0) + option.slice(1).toLowerCase()}
                 </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
 
-          {buckets.delayed.length > 0 && (
-            <View className="mb-8">
-              <SectionHeader title="Atrasados" subtitle={`${buckets.delayed.length} lembretes`} />
-              <View className="pb-6">
-                {buckets.delayed.map((reminder) => {
-                  const animation = getCardAnimation(reminder.id);
-                  const height = cardHeights[reminder.id];
-                  const animatedStyle = height
-                    ? { height: animation.interpolate({ inputRange: [0, 1], outputRange: [0, height] }), opacity: animation }
-                    : { opacity: animation };
-
-                  return (
-                    <Animated.View
-                      key={reminder.id}
-                      style={[{ overflow: 'hidden' }, animatedStyle]}
-                      onLayout={(event) => handleCardLayout(reminder.id, event)}
-                    >
-                      <ReminderCard reminder={withPetInfo(reminder)} onComplete={markAsComplete} onIgnore={ignoreReminder} />
-                    </Animated.View>
-                  );
-                })}
-              </View>
+        {buckets.delayed.length > 0 && (
+          <View className="gap-[10px]">
+            <View>
+              <Text className="font-sans-semibold text-title text-ink">Atrasados</Text>
+              <Text className="mt-[2px] font-sans text-label text-slate">
+                {buckets.delayed.length} lembretes
+              </Text>
             </View>
-          )}
+            <View>{buckets.delayed.map((reminder) => renderBucket(reminder))}</View>
+          </View>
+        )}
 
-          {buckets.pending.length > 0 && (
-            <View className="mb-8">
-              <SectionHeader title="Pendentes" subtitle={`${buckets.pending.length} lembretes`} />
-              <View className="pb-6">
-                {buckets.pending.map((reminder) => {
-                  const animation = getCardAnimation(reminder.id);
-                  const height = cardHeights[reminder.id];
-                  const animatedStyle = height
-                    ? { height: animation.interpolate({ inputRange: [0, 1], outputRange: [0, height] }), opacity: animation }
-                    : { opacity: animation };
-
-                  return (
-                    <Animated.View
-                      key={reminder.id}
-                      style={[{ overflow: 'hidden' }, animatedStyle]}
-                      onLayout={(event) => handleCardLayout(reminder.id, event)}
-                    >
-                      <ReminderCard reminder={withPetInfo(reminder)} onComplete={markAsComplete} onIgnore={ignoreReminder} />
-                    </Animated.View>
-                  );
-                })}
-              </View>
+        {buckets.pending.length > 0 && (
+          <View className="gap-[10px]">
+            <View>
+              <Text className="font-sans-semibold text-title text-ink">Pendentes</Text>
+              <Text className="mt-[2px] font-sans text-label text-slate">
+                {buckets.pending.length} lembretes
+              </Text>
             </View>
-          )}
+            <View>{buckets.pending.map((reminder) => renderBucket(reminder))}</View>
+          </View>
+        )}
 
-          {buckets.completed.length > 0 && (
-            <View className="mb-8">
-              <SectionHeader title="Concluídos" subtitle={`${buckets.completed.length} lembretes`} />
-              <View className="pb-6">
-                {buckets.completed.map((reminder) => {
-                  const animation = getCardAnimation(reminder.id);
-                  const height = cardHeights[reminder.id];
-                  const animatedStyle = height
-                    ? { height: animation.interpolate({ inputRange: [0, 1], outputRange: [0, height] }), opacity: animation }
-                    : { opacity: animation };
-
-                  return (
-                    <Animated.View
-                      key={reminder.id}
-                      style={[{ overflow: 'hidden' }, animatedStyle]}
-                      onLayout={(event) => handleCardLayout(reminder.id, event)}
-                    >
-                      <ReminderCard reminder={withPetInfo(reminder)} />
-                    </Animated.View>
-                  );
-                })}
-              </View>
+        {buckets.completed.length > 0 && (
+          <View className="gap-[10px]">
+            <View>
+              <Text className="font-sans-semibold text-title text-ink">Concluídos</Text>
+              <Text className="mt-[2px] font-sans text-label text-slate">
+                {buckets.completed.length} lembretes
+              </Text>
             </View>
-          )}
+            <View>{buckets.completed.map((reminder) => renderBucket(reminder, false))}</View>
+          </View>
+        )}
 
-          {filteredReminders.length === 0 && (
-            <View className="items-center py-10">
-              <Text className="text-base text-slate-500">Nenhum lembrete encontrado</Text>
-            </View>
-          )}
-        </View>
+        {filteredReminders.length === 0 && (
+          <View className="items-center py-10">
+            <Text className="font-sans text-body text-slate">Nenhum lembrete encontrado</Text>
+          </View>
+        )}
       </ScrollView>
+
       <NewReminderModal visible={modalVisible} onClose={() => setModalVisible(false)} onSave={handleCreate} pets={pets} />
 
       <Animated.View style={{ position: 'absolute', bottom: 24, right: 20, transform: [{ scale }] }}>
-        <TouchableOpacity
+        <Pressable
+          accessibilityRole="button"
           accessibilityLabel="Novo lembrete"
           onPressIn={onFabPressIn}
           onPressOut={onFabPressOut}
           onPress={() => setModalVisible(true)}
-          className="h-14 w-14 items-center justify-center rounded-full bg-cyan-600 shadow-sm"
+          className="h-12 w-12 items-center justify-center rounded-full bg-clinic"
+          style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
         >
-          <Text className="text-[28px] text-white">+</Text>
-        </TouchableOpacity>
+          <Feather name="plus" size={20} color="#FFFFFF" />
+        </Pressable>
       </Animated.View>
-    </SafeAreaView>
+    </View>
   );
 };
 

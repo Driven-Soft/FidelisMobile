@@ -1,14 +1,11 @@
 import React, { useContext, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
+import Feather from "@expo/vector-icons/Feather";
 import { UserContext } from "../../context/UserContext";
 import { MOCK_TUTOR_PROFILE, MOCK_VET_PROFILE } from "../../data/fidelisData";
-import PortalToggle from "../../components/common/PortalToggle";
 import Input from "../../components/common/Input";
-import Button from "../../components/common/Button";
-import Card from "../../components/common/Card";
 
 const STORAGE_KEY_CADASTRO_TUTOR = "@fidelis:cadastro_tutor";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -124,49 +121,61 @@ export default function Login({ navigation }) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-100" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-mist" edges={["top"]}>
       <ScrollView
         contentContainerClassName="flex-grow px-4 py-6"
         showsVerticalScrollIndicator={false}
       >
-        <LinearGradient
-          colors={
-            portalType === "TUTOR"
-              ? ["#0FA3B1", "#163A6F"]
-              : ["#163A6F", "#0F274A"]
-          }
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          className="mb-6 overflow-hidden rounded-3xl p-6 shadow-sm"
-        >
-          <View className="mb-4 flex-row items-center space-x-4">
-            <View className="h-14 w-14 items-center justify-center rounded-2xl bg-white/20">
-              <Text className="text-[28px]">🐾</Text>
+        <View className="mb-6 rounded-card border border-line bg-card p-[18px]">
+          <View className="mb-4 flex-row items-center gap-3">
+            <View className="h-14 w-14 items-center justify-center rounded-control bg-clinic-50">
+              <Text className="text-[26px]">🐾</Text>
             </View>
             <View className="flex-1">
-              <Text className="text-4xl font-bold text-white">Fidelis</Text>
-              <Text className="mt-2 text-sm font-medium text-white">
+              <Text className="font-sans-semibold text-screen tracking-screen text-ink">
+                Fidelis
+              </Text>
+              <Text className="mt-[2px] font-sans text-eyebrow text-slate">
                 Portal {portalType === "TUTOR" ? "do Tutor" : "do Veterinário"}
               </Text>
             </View>
           </View>
-          <Text className="mt-2 text-base leading-6 text-white">
+          <Text className="font-sans text-body text-slate">
             {portalType === "TUTOR"
               ? "Cuide de quem você ama com informações claras, lembretes e histórico clínico sempre à mão."
               : "Gerencie seus pacientes, consultas e histórico clínico de forma simples e eficiente."}
           </Text>
-        </LinearGradient>
+        </View>
 
         <View className="mb-6">
-          <Card>
-            <View className="mb-6">
-              <PortalToggle
-                selected={portalType}
-                onToggle={(value) => {
-                  setPortalType(value);
-                  setPortalToggle(value);
+          <View className="rounded-card border border-line bg-card p-[14px]">
+            <View className="mb-5 flex-row rounded-control bg-hairline p-1">
+              <TouchableOpacity
+                className={`flex-1 items-center rounded-badge py-[9px] ${portalType === "TUTOR" ? "bg-clinic" : "bg-transparent"}`}
+                onPress={() => {
+                  setPortalType("TUTOR");
+                  setPortalToggle("TUTOR");
                 }}
-              />
+              >
+                <Text
+                  className={`font-sans-semibold text-eyebrow ${portalType === "TUTOR" ? "text-white" : "text-slate"}`}
+                >
+                  Tutor
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className={`flex-1 items-center rounded-badge py-[9px] ${portalType === "VET" ? "bg-clinic" : "bg-transparent"}`}
+                onPress={() => {
+                  setPortalType("VET");
+                  setPortalToggle("VET");
+                }}
+              >
+                <Text
+                  className={`font-sans-semibold text-eyebrow ${portalType === "VET" ? "text-white" : "text-slate"}`}
+                >
+                  Veterinário
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <Input
@@ -177,7 +186,7 @@ export default function Login({ navigation }) {
               onBlur={() => handleBlur("email")}
               error={errors.email}
               isValid={touched.email && isEmailValid}
-              icon={<Text>✉️</Text>}
+              icon={<Feather name="mail" size={15} color="#5D706B" />}
             />
 
             <Input
@@ -189,35 +198,31 @@ export default function Login({ navigation }) {
               error={errors.password}
               isValid={touched.password && isPasswordValid}
               type="password"
-              icon={<Text>🔒</Text>}
+              icon={<Feather name="lock" size={15} color="#5D706B" />}
             />
 
-            <Button
-              title="Entrar"
-              variant="primary"
+            <TouchableOpacity
               onPress={handleLogin}
-              style={{ marginTop: 16 }}
-            />
-
-            <Text
-              className={`mt-4 mb-4 text-center text-sm font-semibold ${portalType === "TUTOR" ? "text-cyan-600" : "text-slate-900"}`}
+              className="mt-1 items-center justify-center rounded-control bg-clinic px-5 py-3"
             >
+              <Text className="font-sans-semibold text-title text-white">Entrar</Text>
+            </TouchableOpacity>
+
+            <Text className="mb-4 mt-4 text-center font-sans-medium text-eyebrow text-clinic">
               Esqueci minha senha
             </Text>
 
-            <View className="mt-4">
-              <Text className="flex-1 text-xs leading-5 text-slate-500">
-                Acesso mockado para demonstração. Não há autenticação real.
-              </Text>
-            </View>
-          </Card>
+            <Text className="font-sans text-label text-slate">
+              Acesso mockado para demonstração. Não há autenticação real.
+            </Text>
+          </View>
         </View>
 
         {portalType === "TUTOR" && (
           <View className="mt-4 flex-row justify-center gap-2">
-            <Text className="text-sm text-slate-500">Não tem conta?</Text>
+            <Text className="font-sans text-body text-slate">Não tem conta?</Text>
             <Text
-              className="text-sm font-bold text-cyan-600"
+              className="font-sans-medium text-body text-clinic"
               onPress={() => navigation.navigate("CadastroTutor")}
             >
               Cadastre-se

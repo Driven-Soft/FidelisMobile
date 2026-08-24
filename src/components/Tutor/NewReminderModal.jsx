@@ -1,21 +1,16 @@
 import React, { useState } from "react";
-import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-} from "react-native";
-import Badge from "../common/Badge";
+import { Modal, View, Text, Pressable, ScrollView } from "react-native";
+import Feather from "@expo/vector-icons/Feather";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import Input from "../common/Input";
+import Avatar from "../common/Avatar";
 
 const TYPE_OPTIONS = [
-  { key: "VACINA", label: "Vacina", emoji: "💉" },
-  { key: "RETORNO", label: "Retorno", emoji: "🔄" },
-  { key: "MEDICAMENTO", label: "Medicamento", emoji: "💊" },
-  { key: "CHECKUP", label: "Checkup", emoji: "🩺" },
-  { key: "VERMÍFUGO", label: "Vermífugo", emoji: "🪱" },
+  { key: "VACINA", label: "Vacina" },
+  { key: "RETORNO", label: "Retorno" },
+  { key: "MEDICAMENTO", label: "Medicamento" },
+  { key: "CHECKUP", label: "Checkup" },
+  { key: "VERMÍFUGO", label: "Vermífugo" },
 ];
 
 const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
@@ -68,18 +63,14 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
     reset();
   };
 
+  // O seletor e um dialog: fecha ao escolher a data ou ao cancelar.
   const onChangeDate = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDatePicker(Platform.OS === "ios");
-    setDate(currentDate);
+    setShowDatePicker(false);
+    if (event.type === "dismissed") return;
+    if (selectedDate) setDate(selectedDate);
   };
 
-  let DateTimePicker = null;
-  try {
-    DateTimePicker = require("@react-native-community/datetimepicker").default;
-  } catch (e) {
-    DateTimePicker = null;
-  }
+  const isSaveDisabled = !petId || !title.trim() || !description || !date;
 
   return (
     <Modal
@@ -89,54 +80,63 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
       onRequestClose={closeAndReset}
     >
       <View className="flex-1 justify-center bg-black/40 p-4">
-        <View className="rounded-3xl bg-white p-4">
-          <Text className="mb-4 text-lg font-bold text-slate-900">
+        <View className="rounded-card border border-line bg-card p-[14px]">
+          <Text className="mb-[14px] font-sans-semibold text-title text-ink">
             Novo lembrete
           </Text>
 
-          <Text className="mb-1 text-xs text-slate-500">Tipo</Text>
+          <Text className="mb-[6px] font-sans text-label text-slate">Tipo</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerClassName="mb-3 space-x-2"
+            contentContainerClassName="gap-1"
+            className="mb-3"
           >
-            {TYPE_OPTIONS.map((t) => (
-              <TouchableOpacity
-                key={t.key}
-                className={`rounded-full border px-4 py-2 ${type === t.key ? "border-cyan-600 bg-cyan-600" : "border-slate-200 bg-white"}`}
-                onPress={() => setType(t.key)}
-              >
-                <Text className="text-base">
-                  {t.emoji} {t.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {TYPE_OPTIONS.map((t) => {
+              const isActive = type === t.key;
+
+              return (
+                <Pressable
+                  key={t.key}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: isActive }}
+                  onPress={() => setType(t.key)}
+                  style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
+                  className={`rounded-badge px-[10px] py-[5px] ${isActive ? "bg-clinic-50" : ""}`}
+                >
+                  <Text
+                    className={`font-sans-medium text-eyebrow ${isActive ? "text-clinic-ink" : "text-slate"}`}
+                  >
+                    {t.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </ScrollView>
 
-          <Text className="mb-1 text-xs text-slate-500">Pet</Text>
+          <Text className="mb-[6px] font-sans text-label text-slate">Pet</Text>
           <View className="mb-3 max-h-36">
             <ScrollView>
               {pets.map((p) => (
-                <TouchableOpacity
+                <Pressable
                   key={p.id}
-                  className="flex-row items-center space-x-3 py-2"
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: petId === p.id }}
+                  className="flex-row items-center gap-3 py-2"
+                  style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
                   onPress={() => setPetId(p.id)}
                 >
-                  <View
-                    className="h-9 w-9 items-center justify-center rounded-full"
-                    style={{ backgroundColor: p.color || "#EEE" }}
-                  >
-                    <Text className="text-lg">{p.avatar || "🐾"}</Text>
-                  </View>
-                  <View>
-                    <Text className="font-semibold text-slate-900">
+                  <Avatar emoji={p.avatar} name={p.name || p.petName} size={32} radius={8} />
+                  <View className="flex-1">
+                    <Text className="font-sans-medium text-body text-ink">
                       {p.name || p.petName}
                     </Text>
-                    <Text className="text-xs text-slate-500">
+                    <Text className="font-sans text-label text-slate">
                       {p.breed || p.species || ""}
                     </Text>
                   </View>
-                </TouchableOpacity>
+                  {petId === p.id ? <Feather name="check" size={16} color="#0E7A63" /> : null}
+                </Pressable>
               ))}
             </ScrollView>
           </View>
@@ -161,17 +161,19 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
             isValid={touched && isDescriptionValid}
           />
 
-          <Text className="mb-1 text-xs text-slate-500">Data</Text>
-          <TouchableOpacity
+          <Text className="mb-[6px] font-sans text-label text-slate">Data</Text>
+          <Pressable
+            accessibilityRole="button"
             onPress={() => setShowDatePicker(true)}
-            className="mb-3 justify-center rounded-2xl border border-slate-200 px-4 py-3"
+            style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
+            className="mb-3 justify-center rounded-control border border-line-strong bg-card px-3 py-[10px]"
           >
-            <Text>
+            <Text className="font-mono text-body text-ink">
               {date ? date.toLocaleDateString("pt-BR") : "Selecionar data"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          {showDatePicker && DateTimePicker && (
+          {showDatePicker && (
             <DateTimePicker
               value={date}
               mode="date"
@@ -180,20 +182,28 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
             />
           )}
 
-          <View className="mt-4 flex-row justify-end space-x-3">
-            <TouchableOpacity
-              className="rounded-2xl px-4 py-3"
+          <View className="mt-[14px] flex-row justify-end gap-[10px]">
+            <Pressable
+              accessibilityRole="button"
               onPress={closeAndReset}
+              style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
+              className="items-center justify-center rounded-control border border-line-strong bg-card px-[18px] py-[11px]"
             >
-              <Text>Cancelar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className={`rounded-2xl px-4 py-3 ${!petId || !title.trim() || !description || !date ? "bg-cyan-600/50" : "bg-cyan-600"}`}
+              <Text className="font-sans-medium text-xs text-ink">Cancelar</Text>
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="button"
               onPress={handleSave}
-              disabled={!petId || !title.trim() || !description || !date}
+              disabled={isSaveDisabled}
+              style={({ pressed }) => [
+                isSaveDisabled ? { opacity: 0.4 } : null,
+                pressed ? { opacity: 0.7 } : null,
+              ]}
+              className="items-center justify-center rounded-control bg-clinic px-5 py-3"
             >
-              <Text className="font-semibold text-white">Salvar</Text>
-            </TouchableOpacity>
+              <Text className="font-sans-semibold text-title text-white">Salvar</Text>
+            </Pressable>
           </View>
         </View>
       </View>

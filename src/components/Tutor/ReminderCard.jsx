@@ -1,67 +1,68 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import Badge from '../common/Badge';
+import { View, Text, Pressable } from 'react-native';
+import Avatar from '../common/Avatar';
 
 const ReminderCard = ({ reminder, onComplete, onIgnore, horizontal = false }) => {
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'VACINA':
-        return '💉';
-      case 'RETORNO':
-        return '🔄';
-      case 'MEDICAMENTO':
-        return '💊';
-      case 'CHECKUP':
-        return '🩺';
-      case 'VERMÍFUGO':
-        return '🪱';
-      default:
-        return '📋';
-    }
-  };
-
   const daysUntilDue = Math.ceil((reminder.dueDate - new Date()) / (1000 * 60 * 60 * 24));
   const status = reminder.completed ? 'CONCLUÍDO' : daysUntilDue < 0 ? 'ATRASADO' : 'PENDENTE';
+  const dueLabel = new Date(reminder.dueDate)
+    .toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+    .replace('.', '');
 
   return (
-    <View className={`mb-4 rounded-2xl bg-white p-4 shadow-sm ${horizontal ? 'mr-4 min-w-[280px]' : ''}`}>
-      <View className="mb-4 flex-row items-center justify-between">
-        <View className="flex-1 flex-row items-center space-x-4">
-          <View className="h-11 w-11 items-center justify-center rounded-full" style={{ backgroundColor: reminder.petColor || '#EEE' }}>
-            <Text className="text-lg">{reminder.petAvatar || '🐾'}</Text>
+    <View
+      className={`mb-[10px] rounded-card border border-line bg-card p-[14px] ${
+        horizontal ? 'mr-[10px] min-w-[280px]' : ''
+      }`}
+    >
+      <View className="flex-row items-center gap-3">
+        <Avatar emoji={reminder.petAvatar} name={reminder.petName} size={32} radius={8} />
+
+        <View className="flex-1">
+          <Text className="font-sans-medium text-body text-ink">{reminder.petName}</Text>
+          <Text className="font-mono text-label text-slate">{dueLabel}</Text>
+        </View>
+
+        <View className="items-end gap-1">
+          <View className="rounded-badge bg-hairline px-2 py-1">
+            <Text className="font-sans-semibold text-badge text-slate">{reminder.type}</Text>
           </View>
-          <View className="flex-1">
-            <View className="mb-1 flex-row items-center space-x-2">
-              <Text className="text-base font-semibold text-slate-900">{reminder.petName}</Text>
-              <Text className="text-xs text-slate-500">{new Date(reminder.dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '')}</Text>
-            </View>
-            <Text className="text-sm font-semibold text-slate-900">{reminder.description}</Text>
+          <View
+            className={`rounded-badge px-2 py-1 ${
+              status === 'CONCLUÍDO' ? 'bg-clinic-50' : status === 'ATRASADO' ? 'bg-alert-50' : 'bg-hairline'
+            }`}
+          >
+            <Text
+              className={`font-sans-semibold text-badge ${
+                status === 'CONCLUÍDO' ? 'text-clinic-ink' : status === 'ATRASADO' ? 'text-alert-ink' : 'text-slate'
+              }`}
+            >
+              {status}
+            </Text>
           </View>
         </View>
-        <Text className="text-2xl">{getTypeIcon(reminder.type)}</Text>
       </View>
 
-      <View className="flex-row items-center justify-between gap-4">
-        <View />
-        <View className="items-end space-y-2">
-          <Badge type={reminder.type} label={reminder.type} />
-          <Badge type={status} label={status} />
-        </View>
-      </View>
+      <Text className="mt-3 font-sans text-body text-ink">{reminder.description}</Text>
 
       {!reminder.completed && (
-        <View className="mt-4 flex-row space-x-3">
-          <TouchableOpacity className="items-center justify-center rounded-2xl bg-cyan-600 px-4 py-2" onPress={() => onComplete && onComplete(reminder.id)}>
-            <Text className="font-semibold text-white">✓ Concluído</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2"
-            onPress={() => {
-              if (typeof onIgnore === 'function') return onIgnore(reminder.id);
-            }}
+        <View className="mt-[14px] flex-row gap-[10px]">
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => onComplete && onComplete(reminder.id)}
+            style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
+            className="items-center justify-center rounded-control bg-clinic px-[14px] py-2"
           >
-            <Text className="font-semibold text-slate-900">✕ Ignorar</Text>
-          </TouchableOpacity>
+            <Text className="font-sans-semibold text-title text-white">Concluído</Text>
+          </Pressable>
+
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => onIgnore && onIgnore(reminder.id)}
+            style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
+            className="items-center justify-center rounded-control border border-line-strong bg-card px-[14px] py-2"
+          >
+            <Text className="font-sans-medium text-xs text-ink">Ignorar</Text>
+          </Pressable>
         </View>
       )}
     </View>

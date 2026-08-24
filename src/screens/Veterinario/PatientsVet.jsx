@@ -1,15 +1,13 @@
 import React, { useMemo, useState, useContext, useEffect } from 'react';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Feather from '@expo/vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MOCK_VET_PATIENTS } from '../../data/fidelisData';
 import { UserContext } from '../../context/UserContext';
 import Input from '../../components/common/Input';
-import Card from '../../components/common/Card';
-import SectionHeader from '../../components/common/SectionHeader';
-import Button from '../../components/common/Button';
-import AvatarBadge from '../../components/common/AvatarBadge';
-import Badge from '../../components/common/Badge';
+import Avatar from '../../components/common/Avatar';
+import Badge from '../../components/Veterinario/Badge';
 
 const PatientsVet = ({ navigation }) => {
   const { user, userType } = useContext(UserContext);
@@ -71,26 +69,35 @@ const PatientsVet = ({ navigation }) => {
   }, [searchText, selectedFilter]);
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-100" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-mist" edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="px-4">
-          <SectionHeader title="Pacientes" subtitle="Busque, filtre e abra a ficha clínica rapidamente" />
+          <View className="mb-[10px] mt-4">
+            <Text className="font-sans-semibold text-screen tracking-screen text-ink">Pacientes</Text>
+            <Text className="mt-[2px] font-sans text-label text-slate">
+              Busque, filtre e abra a ficha clínica rapidamente
+            </Text>
+          </View>
 
           <Input
             placeholder="Buscar por nome ou tutor..."
             value={searchText}
             onChangeText={setSearchText}
-            icon={<Text>🔍</Text>}
+            icon={<Feather name="search" size={15} color="#5D706B" />}
           />
 
-          <View className="mt-4 flex-row flex-wrap gap-2">
+          <View className="mt-1 flex-row flex-wrap gap-1">
             {filterOptions.map((option) => (
               <TouchableOpacity
                 key={option}
-                className={`rounded-full border px-4 py-2 ${selectedFilter === option ? 'border-slate-900 bg-slate-900' : 'border-slate-200 bg-white'}`}
+                className={`rounded-badge px-[10px] py-[5px] ${selectedFilter === option ? 'bg-clinic-50' : ''}`}
                 onPress={() => setSelectedFilter(option)}
               >
-                <Text className={`text-sm font-medium ${selectedFilter === option ? 'text-white' : 'text-slate-500'}`}>
+                <Text
+                  className={`font-sans-medium text-eyebrow ${
+                    selectedFilter === option ? 'text-clinic-ink' : 'text-slate'
+                  }`}
+                >
                   {option}
                 </Text>
               </TouchableOpacity>
@@ -98,33 +105,38 @@ const PatientsVet = ({ navigation }) => {
           </View>
 
           {filteredPatients.length > 0 ? (
-            <View className="mt-4 flex-row flex-wrap gap-3 pb-6">
+            <View className="mt-3 flex-row flex-wrap gap-[10px] pb-6">
               {filteredPatients.map((patient) => (
                 <TouchableOpacity
                   key={patient.id}
-                  className="w-[48%]"
+                  className="w-[48%] overflow-hidden rounded-card border border-line bg-card"
                   onPress={() => navigation.navigate('PatientRecord', { patientId: patient.id })}
                 >
-                  <Card padding={false} className="overflow-hidden">
-                    <View className="items-center pt-4">
-                      <AvatarBadge emoji={patient.avatar} size={78} backgroundColor={patient.color} />
-                    </View>
-                    <View className="p-4">
-                      <Text className="mb-1 text-sm font-semibold text-slate-900">{patient.petName}</Text>
-                      <Text className="mb-1 text-xs text-slate-500">{patient.petSpecies}</Text>
-                      <Text className="mb-1 text-xs text-slate-500">{patient.breed}</Text>
-                      <Text className="mb-2 text-xs font-medium text-cyan-600">{patient.tutorName}</Text>
-                      <Text className="mb-3 text-xs text-slate-500">Última: {patient.lastConsultation.toLocaleDateString('pt-BR')}</Text>
-                      <Badge type="Retorno" label={patient.clinic} style={{ marginBottom: 12 }} />
-                      <Button title="Ver Ficha" variant="primary" size="sm" onPress={() => navigation.navigate('PatientRecord', { patientId: patient.id })} />
-                    </View>
-                  </Card>
+                  <View className="items-center pt-[14px]">
+                    <Avatar emoji={patient.avatar} name={patient.petName} size={72} radius={12} />
+                  </View>
+                  <View className="p-[14px]">
+                    <Text className="font-sans-semibold text-title text-ink">{patient.petName}</Text>
+                    <Text className="mt-[2px] font-sans text-label text-slate">{patient.petSpecies}</Text>
+                    <Text className="mt-[2px] font-sans text-label text-slate">{patient.breed}</Text>
+                    <Text className="mt-1 font-sans-medium text-label text-clinic">{patient.tutorName}</Text>
+                    <Text className="mt-[2px] font-mono text-label text-slate">
+                      Última: {patient.lastConsultation.toLocaleDateString('pt-BR')}
+                    </Text>
+                    <Badge type="Retorno" label={patient.clinic} style={{ marginTop: 10 }} />
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('PatientRecord', { patientId: patient.id })}
+                      className="mt-[14px] items-center justify-center rounded-control border border-line-strong bg-card px-[18px] py-[11px]"
+                    >
+                      <Text className="font-sans-medium text-xs text-ink">Ver Ficha</Text>
+                    </TouchableOpacity>
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>
           ) : (
             <View className="items-center py-10">
-              <Text className="text-base text-slate-500">Nenhum paciente encontrado</Text>
+              <Text className="font-sans text-body text-slate">Nenhum paciente encontrado</Text>
             </View>
           )}
         </View>
