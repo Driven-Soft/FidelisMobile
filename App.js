@@ -1,4 +1,6 @@
 import React from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./src/config/queryClient";
 import { NavigationContainer } from "@react-navigation/native";
 import { UserProvider } from "./src/context/UserContext";
 import StackRoutes from "./src/routes/stack.routes";
@@ -31,12 +33,14 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <UserProvider>
-        <NavigationContainer>
-          <StatusBar hidden />
-          <StackRoutes />
-        </NavigationContainer>
-      </UserProvider>
+      <QueryClientProvider client={queryClient}>
+        <UserProvider>
+          <NavigationContainer>
+            <StatusBar hidden />
+            <StackRoutes />
+          </NavigationContainer>
+        </UserProvider>
+      </QueryClientProvider>
     </SafeAreaProvider>
   );
 }
