@@ -1,9 +1,12 @@
-import React, { useState } from "react";
-import { Modal, View, Text, Pressable, ScrollView } from "react-native";
+import React, { useState, useRef } from "react";
+import { Modal, View, Text, Pressable, ScrollView, Platform } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Input from "../common/Input";
 import PetAvatar from "./PetAvatar";
+import { useCreateReminder, useUpdateReminder, useReminder } from "../../hooks/useReminders";
+import { formatReminderDate, getReminderErrorMessage, parseReminderDate, serializeReminderDate, validateReminderText } from "../../utils/reminderUtils";
+import ReminderQueryStatus from "./ReminderQueryStatus";
 
 const TYPE_OPTIONS = [
   { key: "VACINA", label: "Vacina" },
@@ -13,53 +16,62 @@ const TYPE_OPTIONS = [
   { key: "VERMÍFUGO", label: "Vermífugo" },
 ];
 
-const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
-  const [type, setType] = useState("VACINA");
+const EditReminder = ({ id, onClose, pets }) => {
+  const query = useReminder(id);
+  if (query.isPending || query.error || !query.data) return (
+    <Modal visible transparent onRequestClose={onClose}>
+      <View className="flex-1 justify-center bg-black/40 p-4"><View className="rounded-card bg-card p-4">
+        <ReminderQueryStatus query={query} />
+        {!query.isPending && !query.error && <Text>Lembrete não encontrado.</Text>}
+        <Pressable onPress={onClose}><Text className="text-clinic">Fechar</Text></Pressable>
+      </View></View>
+    </Modal>
+  );
+  return <ReminderForm key={id} onClose={onClose} pets={pets} reminder={query.data} />;
+};
+
+const NewReminderModal = ({ visible, onClose, pets = [], reminderId = null }) => {
+  if (!visible) return null;
+  return reminderId === null ? <ReminderForm onClose={onClose} pets={pets} /> : <EditReminder id={reminderId} onClose={onClose} pets={pets} />;
+};
+
+const ReminderForm = ({ onClose, pets, reminder = null }) => {
+  const create = useCreateReminder();
+  const update = useUpdateReminder();
+  const mutation = reminder ? update : create;
+  const submitting = useRef(false);
+  const [type, setType] = useState(reminder?.tipo ?? "VACINA");
   const [petId, setPetId] = useState(pets?.[0]?.id || null);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState(reminder?.descricao ?? "");
   const [date, setDate] = useState(new Date());
+  const [dateText, setDateText] = useState(() => serializeReminderDate(new Date()).slice(0, 10));
+  const selectedDate = Platform.OS === "web" ? parseReminderDate(dateText) : date;
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [touched, setTouched] = useState(false);
 
   const selectedPet = pets.find((pet) => pet.id === petId) ?? (petId === null ? pets[0] : undefined);
 
-  const isTitleValid = title.trim().length > 0;
-  const titleError = touched && !isTitleValid ? "O título é obrigatório" : null;
   const isDescriptionValid = description.trim().length > 0;
   const error =
     touched && !isDescriptionValid ? "A descrição é obrigatória" : null;
 
-  const reset = () => {
-    setType("VACINA");
-    setPetId(pets?.[0]?.id || null);
-    setTitle("");
-    setDescription("");
-    setDate(new Date());
-    setShowDatePicker(false);
-    setTouched(false);
-  };
-
   const closeAndReset = () => {
-    reset();
-    onClose && onClose();
+    if (!mutation.isPending) onClose();
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setTouched(true);
-    if (!selectedPet || !isTitleValid || !description || !date) return;
-    const payload = {
-      id: String(Date.now()),
-      petId: selectedPet.id,
-      petName: selectedPet.nome,
-      type,
-      title: title.trim(),
-      description,
-      dueDate: date,
-      completed: false,
-    };
-    onSave && onSave(payload);
-    reset();
+    if (isSaveDisabled || submitting.current) return;
+    submitting.current = true;
+    try {
+      if (reminder) await update.mutateAsync({ id: reminder.id, tipo: type, descricao: description });
+      else await create.mutateAsync({ tipo: type, descricao: description, date: selectedDate, petId: selectedPet.id });
+      onClose();
+    } catch {
+      // A mutation mantém o formulário aberto e fornece o erro visual.
+    } finally {
+      submitting.current = false;
+    }
   };
 
   // O seletor e um dialog: fecha ao escolher a data ou ao cancelar.
@@ -69,19 +81,19 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
     if (selectedDate) setDate(selectedDate);
   };
 
-  const isSaveDisabled = !selectedPet || !title.trim() || !description || !date;
+  const isSaveDisabled = mutation.isPending || !validateReminderText(type, description) || (!reminder && (!selectedPet || !Number.isFinite(selectedDate.getTime())));
 
   return (
     <Modal
-      visible={visible}
+      visible
       transparent
       animationType="fade"
       onRequestClose={closeAndReset}
     >
       <View className="flex-1 justify-center bg-black/40 p-4">
-        <View className="rounded-card border border-line bg-card p-[14px]">
+        <ScrollView className="max-h-[90%] rounded-card border border-line bg-card" contentContainerClassName="p-[14px]">
           <Text className="mb-[14px] font-sans-semibold text-title text-ink">
-            Novo lembrete
+            {reminder ? "Editar lembrete" : "Novo lembrete"}
           </Text>
 
           <Text className="mb-[6px] font-sans text-label text-slate">Tipo</Text>
@@ -97,6 +109,7 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
               return (
                 <Pressable
                   key={t.key}
+                  disabled={mutation.isPending}
                   accessibilityRole="button"
                   accessibilityState={{ selected: isActive }}
                   onPress={() => setType(t.key)}
@@ -113,12 +126,15 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
             })}
           </ScrollView>
 
+          <Input label="Tipo" value={type} onChangeText={setType} maxLength={50} editable={!mutation.isPending} />
+          {!reminder && <>
           <Text className="mb-[6px] font-sans text-label text-slate">Pet</Text>
           <View className="mb-3 max-h-36">
             <ScrollView>
               {pets.map((p) => (
                 <Pressable
                   key={p.id}
+                  disabled={mutation.isPending}
                   accessibilityRole="button"
                   accessibilityState={{ selected: selectedPet?.id === p.id }}
                   className="flex-row items-center gap-3 py-2"
@@ -139,29 +155,28 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
               ))}
             </ScrollView>
           </View>
-
-          <Input
-            label="Título"
-            placeholder="Ex: Vacina V10"
-            value={title}
-            onChangeText={setTitle}
-            onBlur={() => setTouched(true)}
-            error={titleError}
-            isValid={touched && isTitleValid}
-          />
+          </>}
 
           <Input
             label="Descrição"
             placeholder="Ex: Reforço da V10"
             value={description}
+            editable={!mutation.isPending}
             onChangeText={setDescription}
             onBlur={() => setTouched(true)}
             error={error}
             isValid={touched && isDescriptionValid}
           />
 
+          {reminder ? <Text className="font-sans text-label text-slate">
+            Pet #{reminder.petId} · {formatReminderDate(reminder.dataPrevista)}. Pet e data não podem ser alterados.
+          </Text> : <>
           <Text className="mb-[6px] font-sans text-label text-slate">Data</Text>
+          {Platform.OS === "web" ? <Input label="Data (AAAA-MM-DD)"
+            value={dateText} error={!Number.isFinite(selectedDate.getTime()) ? "Informe uma data válida em AAAA-MM-DD." : undefined}
+            editable={!mutation.isPending} onChangeText={setDateText} /> : <>
           <Pressable
+            disabled={mutation.isPending}
             accessibilityRole="button"
             onPress={() => setShowDatePicker(true)}
             style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
@@ -180,11 +195,16 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
               onChange={onChangeDate}
             />
           )}
+          </>}
+          </>}
+
+          {mutation.error && <Text accessibilityRole="alert" className="font-sans text-body text-alert">{getReminderErrorMessage(mutation.error)}</Text>}
 
           <View className="mt-[14px] flex-row justify-end gap-[10px]">
             <Pressable
               accessibilityRole="button"
               onPress={closeAndReset}
+              disabled={mutation.isPending}
               style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
               className="items-center justify-center rounded-control border border-line-strong bg-card px-[18px] py-[11px]"
             >
@@ -201,10 +221,10 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
               ]}
               className="items-center justify-center rounded-control bg-clinic px-5 py-3"
             >
-              <Text className="font-sans-semibold text-title text-white">Salvar</Text>
+              <Text className="font-sans-semibold text-title text-white">{mutation.isPending ? "Salvando..." : "Salvar"}</Text>
             </Pressable>
           </View>
-        </View>
+        </ScrollView>
       </View>
     </Modal>
   );

@@ -7,21 +7,17 @@ import PetAvatar from '../../components/Tutor/PetAvatar';
 import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
 import { usePets } from '../../hooks/usePets';
 import { petAgeLabel } from '../../utils/petUtils';
-
-const isUrgent = (dueDate) => {
-  const days = Math.ceil((new Date(dueDate) - new Date()) / (1000 * 60 * 60 * 24));
-  return days <= 3;
-};
+import { useReminders } from '../../hooks/useReminders';
+import { upcomingReminders as selectUpcomingReminders, formatReminderDate, isReminderUrgent } from '../../utils/reminderUtils';
+import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
 
 export default function HomeTutor({ navigation }) {
-  const { user, tutorReminders } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const tutorName = user?.name ?? MOCK_TUTOR_PROFILE.name;
   const petsQuery = usePets();
   const pets = petsQuery.isError ? [] : petsQuery.data ?? [];
-  const upcomingReminders = tutorReminders
-    .filter((reminder) => !reminder.completed && !reminder.dismissed)
-    .sort((left, right) => new Date(left.dueDate) - new Date(right.dueDate))
-    .slice(0, 3);
+  const remindersQuery = useReminders();
+  const upcomingReminders = selectUpcomingReminders(remindersQuery.isError ? [] : remindersQuery.data ?? []);
 
   const openReminders = () => navigation.navigate('RemindersTutorScreen');
 
@@ -86,7 +82,8 @@ export default function HomeTutor({ navigation }) {
           </View>
 
           <View className="overflow-hidden rounded-card border border-line bg-card">
-            {upcomingReminders.length === 0 ? (
+            <ReminderQueryStatus query={remindersQuery} />
+            {!remindersQuery.isPending && !remindersQuery.isError && upcomingReminders.length === 0 ? (
               <Text className="px-[14px] py-6 text-center font-sans text-body text-slate">
                 Nenhum cuidado pendente por aqui.
               </Text>
@@ -102,21 +99,18 @@ export default function HomeTutor({ navigation }) {
                   }`}
                 >
                   <View
-                    className={`h-[6px] w-[6px] rounded-full ${isUrgent(reminder.dueDate) ? 'bg-alert' : 'bg-clinic'}`}
+                    className={`h-[6px] w-[6px] rounded-full ${isReminderUrgent(reminder) ? 'bg-alert' : 'bg-clinic'}`}
                   />
                   <View className="flex-1">
                     <Text className="font-sans-medium text-body text-ink">
-                      {reminder.title || reminder.description}
+                      {reminder.descricao}
                     </Text>
                     <Text className="font-mono text-label text-slate">
-                      {reminder.petName} · {formatPtDate(reminder.dueDate)}
+                      {pets.find((pet) => pet.id === reminder.petId)?.nome ?? `Pet #${reminder.petId}`} · {formatReminderDate(reminder.dataPrevista)}
                     </Text>
-                    {reminder.title ? (
-                      <Text className="mt-1 font-sans text-label text-slate">{reminder.description}</Text>
-                    ) : null}
                   </View>
                   <View className="self-start rounded-badge bg-hairline px-2 py-1">
-                    <Text className="font-sans-semibold text-badge text-slate">{reminder.type}</Text>
+                    <Text className="font-sans-semibold text-badge text-slate">{reminder.tipo}</Text>
                   </View>
                 </Pressable>
               ))
