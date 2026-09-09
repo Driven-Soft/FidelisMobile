@@ -1,18 +1,17 @@
 import React, { useContext, useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Feather from "@expo/vector-icons/Feather";
 import { UserContext } from "../../context/UserContext";
-import { MOCK_TUTOR_PROFILE, MOCK_VET_PROFILE } from "../../data/fidelisData";
+import { useLogin, getLoginErrorMessage } from "../../hooks/useLogin";
 import Input from "../../components/common/Input";
 
-const STORAGE_KEY_CADASTRO_TUTOR = "@fidelis:cadastro_tutor";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login({ navigation }) {
-  const { portalToggle, setPortalToggle, loginTutor, loginVet } =
+  const { portalToggle, setPortalToggle, loginTutor } =
     useContext(UserContext);
+  const { mutateAsync, isPending, error: loginError } = useLogin();
   const [portalType, setPortalType] = useState(portalToggle ?? "TUTOR");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,22 +36,14 @@ export default function Login({ navigation }) {
   };
 
   const handleLogin = async () => {
+    if (isPending) return;
     const trimmedEmail = email.trim().toLowerCase();
-    const trimmedPassword = password.trim();
 
     setPortalToggle(portalType);
 
-    if (!trimmedEmail && !trimmedPassword) {
-      if (portalType === "TUTOR") {
-        loginTutor(MOCK_TUTOR_PROFILE);
-      } else {
-        loginVet(MOCK_VET_PROFILE);
-      }
-
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Tabs", params: { userType: portalType } }],
-      });
+    // A API atual autentica somente tutores; não simular login veterinário.
+    if (portalType === "VET") {
+      Alert.alert("Acesso indisponível", "A autenticação de veterinários ainda não está disponível.");
       return;
     }
 
@@ -66,57 +57,18 @@ export default function Login({ navigation }) {
       return;
     }
 
-    if (portalType === "VET") {
-      const isVetEmail = trimmedEmail === MOCK_VET_PROFILE.email.toLowerCase();
-
-      if (!isVetEmail) {
-        Alert.alert(
-          "Acesso restrito",
-          "Use o email cadastrado pela clínica. O cadastro de veterinários não é feito pelo app.",
-        );
-        return;
-      }
-
-      loginVet(MOCK_VET_PROFILE);
-
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Tabs", params: { userType: portalType } }],
-      });
-      return;
-    }
-
     try {
-      const savedCadastro = await AsyncStorage.getItem(
-        STORAGE_KEY_CADASTRO_TUTOR,
-      );
-
-      if (!savedCadastro) {
-        Alert.alert(
-          "Cadastro nao encontrado",
-          "Crie um cadastro antes de entrar.",
-        );
-        return;
-      }
-
-      const parsedCadastro = JSON.parse(savedCadastro);
-      const validCredentials =
-        parsedCadastro.email?.toLowerCase() === trimmedEmail &&
-        parsedCadastro.password === trimmedPassword;
-
-      if (!validCredentials) {
-        Alert.alert("Dados invalidos", "Email ou senha nao conferem.");
-        return;
-      }
-
-      loginTutor(parsedCadastro);
+      const result = await mutateAsync({ email: trimmedEmail, senha: password });
+      // Adaptação mínima para o Context legado; a sessão não é persistida aqui.
+      loginTutor({ id: result.tutorId, name: result.nome, email: trimmedEmail });
+      setPassword("");
 
       navigation.reset({
         index: 0,
         routes: [{ name: "Tabs", params: { userType: portalType } }],
       });
     } catch (error) {
-      Alert.alert("Erro", "Nao foi possivel validar o login.");
+      Alert.alert("Não foi possível entrar", getLoginErrorMessage(error));
     }
   };
 
@@ -151,6 +103,7 @@ export default function Login({ navigation }) {
           <View className="rounded-card border border-line bg-card p-[14px]">
             <View className="mb-5 flex-row rounded-control bg-hairline p-1">
               <TouchableOpacity
+                disabled={isPending}
                 className={`flex-1 items-center rounded-badge py-[9px] ${portalType === "TUTOR" ? "bg-clinic" : "bg-transparent"}`}
                 onPress={() => {
                   setPortalType("TUTOR");
@@ -164,6 +117,7 @@ export default function Login({ navigation }) {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
+                disabled={isPending}
                 className={`flex-1 items-center rounded-badge py-[9px] ${portalType === "VET" ? "bg-clinic" : "bg-transparent"}`}
                 onPress={() => {
                   setPortalType("VET");
@@ -182,6 +136,7 @@ export default function Login({ navigation }) {
               label="Email"
               placeholder="seu.email@exemplo.com"
               value={email}
+              editable={!isPending}
               onChangeText={setEmail}
               onBlur={() => handleBlur("email")}
               error={errors.email}
@@ -193,6 +148,7 @@ export default function Login({ navigation }) {
               label="Senha"
               placeholder="••••••••"
               value={password}
+              editable={!isPending}
               onChangeText={setPassword}
               onBlur={() => handleBlur("password")}
               error={errors.password}
@@ -203,17 +159,29 @@ export default function Login({ navigation }) {
 
             <TouchableOpacity
               onPress={handleLogin}
+              disabled={isPending}
+              accessibilityState={{ disabled: isPending, busy: isPending }}
               className="mt-1 items-center justify-center rounded-control bg-clinic px-5 py-3"
             >
-              <Text className="font-sans-semibold text-title text-white">Entrar</Text>
+              <Text className="font-sans-semibold text-title text-white">
+                {isPending ? "Entrando..." : "Entrar"}
+              </Text>
             </TouchableOpacity>
+
+            {portalType === "TUTOR" && loginError && (
+              <Text accessibilityRole="alert" accessibilityLiveRegion="polite" className="mt-2 font-sans text-label text-alert">
+                {getLoginErrorMessage(loginError)}
+              </Text>
+            )}
 
             <Text className="mb-4 mt-4 text-center font-sans-medium text-eyebrow text-clinic">
               Esqueci minha senha
             </Text>
 
             <Text className="font-sans text-label text-slate">
-              Acesso mockado para demonstração. Não há autenticação real.
+              {portalType === "TUTOR"
+                ? "Entre com uma conta já cadastrada na API. O cadastro pelo aplicativo ainda é local."
+                : "A autenticação de veterinários ainda não está disponível."}
             </Text>
           </View>
         </View>
@@ -223,7 +191,7 @@ export default function Login({ navigation }) {
             <Text className="font-sans text-body text-slate">Não tem conta?</Text>
             <Text
               className="font-sans-medium text-body text-clinic"
-              onPress={() => navigation.navigate("CadastroTutor")}
+              onPress={() => { if (!isPending) navigation.navigate("CadastroTutor"); }}
             >
               Cadastre-se
             </Text>
