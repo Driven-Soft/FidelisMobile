@@ -1,11 +1,9 @@
 import React, { createContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MOCK_TUTOR_PETS, MOCK_TUTOR_REMINDERS } from '../data/fidelisData';
+import { MOCK_TUTOR_REMINDERS } from '../data/fidelisData';
 import { useAuthSession } from '../hooks/useAuthSession';
 
 export const UserContext = createContext();
-
-const STORAGE_KEY_TUTOR_PETS = '@fidelis:tutor_pets';
 
 const buildRemindersStorageKey = (userType, tutorId) =>
   `@fidelis:reminders:${userType ?? 'TUTOR'}:${tutorId ? `tutor-${tutorId}` : 'guest'}`;
@@ -18,7 +16,6 @@ export const UserProvider = ({ children }) => {
   const user = useMemo(() => session ? { id: session.tutorId, name: session.nome } : null, [session]);
   const userType = session ? 'TUTOR' : null;
   const [portalToggle, setPortalToggle] = useState('TUTOR');
-  const [tutorPets, setTutorPets] = useState(MOCK_TUTOR_PETS);
   const [tutorReminders, setTutorReminders] = useState(MOCK_TUTOR_REMINDERS);
 
   const remindersStorageKey = useMemo(
@@ -26,21 +23,14 @@ export const UserProvider = ({ children }) => {
     [userType, user?.id]
   );
 
-  const petsHydrated = useRef(false);
   const hydratedRemindersKey = useRef(null);
 
   useEffect(() => {
     if (user) return;
     setPortalToggle('TUTOR');
-    petsHydrated.current = false;
     hydratedRemindersKey.current = null;
-    setTutorPets(MOCK_TUTOR_PETS);
     setTutorReminders(MOCK_TUTOR_REMINDERS);
   }, [user]);
-
-  const addTutorPet = (petData) => {
-    setTutorPets((current) => [petData, ...current]);
-  };
 
   const addTutorReminder = (reminderData) => {
     setTutorReminders((current) => [
@@ -56,45 +46,6 @@ export const UserProvider = ({ children }) => {
       )
     );
   };
-
-  useEffect(() => {
-    if (userType !== 'TUTOR') {
-      return undefined;
-    }
-
-    let active = true;
-    petsHydrated.current = false;
-
-    const loadTutorPets = async () => {
-      try {
-        const savedPets = await AsyncStorage.getItem(STORAGE_KEY_TUTOR_PETS);
-        const parsedPets = savedPets ? JSON.parse(savedPets) : null;
-        if (!active) return;
-        setTutorPets(Array.isArray(parsedPets) ? parsedPets : MOCK_TUTOR_PETS);
-      } catch (error) {
-        console.warn('[Fidelis] Nao foi possivel carregar os pets salvos:', error);
-        if (active) setTutorPets(MOCK_TUTOR_PETS);
-      } finally {
-        if (active) petsHydrated.current = true;
-      }
-    };
-
-    loadTutorPets();
-
-    return () => {
-      active = false;
-    };
-  }, [userType, user?.id]);
-
-  useEffect(() => {
-    if (userType !== 'TUTOR' || !petsHydrated.current) {
-      return;
-    }
-
-    AsyncStorage.setItem(STORAGE_KEY_TUTOR_PETS, JSON.stringify(tutorPets)).catch((error) =>
-      console.warn('[Fidelis] Nao foi possivel salvar os pets:', error)
-    );
-  }, [tutorPets, userType]);
 
   useEffect(() => {
     let active = true;
@@ -141,8 +92,6 @@ export const UserProvider = ({ children }) => {
         startSession,
         portalToggle,
         setPortalToggle,
-        tutorPets,
-        addTutorPet,
         tutorReminders,
         addTutorReminder,
         updateTutorReminder,

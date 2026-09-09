@@ -3,7 +3,7 @@ import { Modal, View, Text, Pressable, ScrollView } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Input from "../common/Input";
-import Avatar from "../common/Avatar";
+import PetAvatar from "./PetAvatar";
 
 const TYPE_OPTIONS = [
   { key: "VACINA", label: "Vacina" },
@@ -21,6 +21,8 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [touched, setTouched] = useState(false);
+
+  const selectedPet = pets.find((pet) => pet.id === petId) ?? (petId === null ? pets[0] : undefined);
 
   const isTitleValid = title.trim().length > 0;
   const titleError = touched && !isTitleValid ? "O título é obrigatório" : null;
@@ -45,14 +47,11 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
 
   const handleSave = () => {
     setTouched(true);
-    if (!petId || !isTitleValid || !description || !date) return;
-    const pet = pets.find((p) => p.id === petId) || {};
+    if (!selectedPet || !isTitleValid || !description || !date) return;
     const payload = {
       id: String(Date.now()),
-      petId,
-      petName: pet.name || pet.petName || "Pet",
-      petAvatar: pet.avatar || "🐾",
-      petColor: pet.color || "#EEE",
+      petId: selectedPet.id,
+      petName: selectedPet.nome,
       type,
       title: title.trim(),
       description,
@@ -70,7 +69,7 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
     if (selectedDate) setDate(selectedDate);
   };
 
-  const isSaveDisabled = !petId || !title.trim() || !description || !date;
+  const isSaveDisabled = !selectedPet || !title.trim() || !description || !date;
 
   return (
     <Modal
@@ -121,21 +120,21 @@ const NewReminderModal = ({ visible, onClose, onSave, pets = [] }) => {
                 <Pressable
                   key={p.id}
                   accessibilityRole="button"
-                  accessibilityState={{ selected: petId === p.id }}
+                  accessibilityState={{ selected: selectedPet?.id === p.id }}
                   className="flex-row items-center gap-3 py-2"
                   style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
                   onPress={() => setPetId(p.id)}
                 >
-                  <Avatar emoji={p.avatar} name={p.name || p.petName} size={32} radius={8} />
+                  <PetAvatar pet={p} size={32} />
                   <View className="flex-1">
                     <Text className="font-sans-medium text-body text-ink">
-                      {p.name || p.petName}
+                      {p.nome}
                     </Text>
                     <Text className="font-sans text-label text-slate">
-                      {p.breed || p.species || ""}
+                      {p.raca || p.especie}
                     </Text>
                   </View>
-                  {petId === p.id ? <Feather name="check" size={16} color="#0E7A63" /> : null}
+                  {selectedPet?.id === p.id ? <Feather name="check" size={16} color="#0E7A63" /> : null}
                 </Pressable>
               ))}
             </ScrollView>

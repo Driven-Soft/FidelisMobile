@@ -1,27 +1,29 @@
-import React, { useContext } from 'react';
-import { View, ScrollView, Text, Pressable } from 'react-native';
+import React from 'react';
+import { View, ScrollView, Text, Pressable, RefreshControl } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
-import { MOCK_TUTOR_PETS, getPetAgeLabel } from '../../data/fidelisData';
-import { UserContext } from '../../context/UserContext';
+import { usePets } from '../../hooks/usePets';
+import { petAgeLabel } from '../../utils/petUtils';
 import TutorHeader from '../../components/Tutor/TutorHeader';
-import Avatar from '../../components/common/Avatar';
+import PetAvatar from '../../components/Tutor/PetAvatar';
+import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
 
 const PetsTutor = ({ navigation }) => {
-  const { tutorPets } = useContext(UserContext);
-  const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
+  const query = usePets();
+  const pets = query.isError ? [] : query.data ?? [];
 
   return (
     <View className="flex-1 bg-mist">
       <TutorHeader title="Meus Pets" />
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]">
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]"
+        refreshControl={<RefreshControl refreshing={query.isFetching && !query.isPending} onRefresh={() => query.refetch()} />}>
         <Text className="font-sans text-body text-slate">
           Gerencie os perfis, consultas e cuidados dos seus animais.
         </Text>
 
         <Pressable
           accessibilityRole="button"
-          onPress={() => navigation.navigate('NewPet')}
+          onPress={() => navigation.navigate('NewPet', { petId: undefined })}
           style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
           className="flex-row items-center gap-[11px] rounded-card border border-line bg-card px-[14px] py-[13px]"
         >
@@ -31,11 +33,15 @@ const PetsTutor = ({ navigation }) => {
           <View className="flex-1">
             <Text className="font-sans-medium text-body text-ink">Adicionar novo pet</Text>
             <Text className="font-sans text-label text-slate">
-              Cadastro em 3 etapas com dados básicos, físicos e observações.
+              Cadastro em 3 etapas com dados básicos, nascimento e foto.
             </Text>
           </View>
         </Pressable>
 
+        <PetQueryStatus query={query} empty={pets.length === 0} />
+        <Pressable onPress={() => query.refetch()} disabled={query.isFetching} accessibilityRole="button">
+          <Text className="font-sans-medium text-body text-clinic">Atualizar lista</Text>
+        </Pressable>
         {pets.map((pet) => (
           <Pressable
             key={pet.id}
@@ -45,14 +51,14 @@ const PetsTutor = ({ navigation }) => {
             className="rounded-card border border-line bg-card p-[14px]"
           >
             <View className="flex-row items-center gap-3">
-              <Avatar emoji={pet.avatar} name={pet.name} size={56} radius={12} />
+              <PetAvatar pet={pet} />
               <View className="flex-1">
-                <Text className="font-sans-semibold text-title text-ink">{pet.name}</Text>
-                <Text className="mt-[2px] font-sans text-label text-slate">{pet.breed}</Text>
+                <Text className="font-sans-semibold text-title text-ink">{pet.nome}</Text>
+                <Text className="mt-[2px] font-sans text-label text-slate">{pet.raca}</Text>
                 <Text className="mt-[2px] font-mono text-label text-slate">
-                  {getPetAgeLabel(pet.birthDate)} · {pet.sex}
+                  {petAgeLabel(pet.dataNascimento)} · {pet.sexo === 'M' ? 'Macho' : 'Fêmea'}
                 </Text>
-                <Text className="mt-1 font-sans-medium text-label text-clinic">{pet.clinic}</Text>
+                <Text className="mt-1 font-sans-medium text-label text-clinic">{pet.especie}</Text>
               </View>
             </View>
 

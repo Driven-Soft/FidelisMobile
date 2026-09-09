@@ -1,9 +1,12 @@
 import React, { useContext } from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
-import { MOCK_TUTOR_PROFILE, MOCK_TUTOR_PETS, MOCK_TUTOR_HISTORY, formatPtDate, getPetAgeLabel } from '../../data/fidelisData';
+import { MOCK_TUTOR_PROFILE, MOCK_TUTOR_HISTORY, formatPtDate } from '../../data/fidelisData';
 import { UserContext } from '../../context/UserContext';
 import TutorHeader from '../../components/Tutor/TutorHeader';
-import Avatar from '../../components/common/Avatar';
+import PetAvatar from '../../components/Tutor/PetAvatar';
+import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
+import { usePets } from '../../hooks/usePets';
+import { petAgeLabel } from '../../utils/petUtils';
 
 const isUrgent = (dueDate) => {
   const days = Math.ceil((new Date(dueDate) - new Date()) / (1000 * 60 * 60 * 24));
@@ -11,9 +14,10 @@ const isUrgent = (dueDate) => {
 };
 
 export default function HomeTutor({ navigation }) {
-  const { user, tutorPets, tutorReminders } = useContext(UserContext);
+  const { user, tutorReminders } = useContext(UserContext);
   const tutorName = user?.name ?? MOCK_TUTOR_PROFILE.name;
-  const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
+  const petsQuery = usePets();
+  const pets = petsQuery.isError ? [] : petsQuery.data ?? [];
   const upcomingReminders = tutorReminders
     .filter((reminder) => !reminder.completed && !reminder.dismissed)
     .sort((left, right) => new Date(left.dueDate) - new Date(right.dueDate))
@@ -41,6 +45,7 @@ export default function HomeTutor({ navigation }) {
             </Text>
           </View>
 
+          <PetQueryStatus query={petsQuery} empty={pets.length === 0} />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-[10px] pr-4">
             {pets.map((pet) => (
               <Pressable
@@ -50,12 +55,12 @@ export default function HomeTutor({ navigation }) {
                 style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
                 className="w-[136px] items-center rounded-card border border-line bg-card p-[14px]"
               >
-                <Avatar emoji={pet.avatar} name={pet.name} size={56} radius={12} />
-                <Text className="mt-3 font-sans-medium text-body text-ink">{pet.name}</Text>
-                <Text className="mt-[2px] text-center font-sans text-label text-slate">{pet.breed}</Text>
-                <Text className="mt-[2px] font-mono text-label text-slate">{getPetAgeLabel(pet.birthDate)}</Text>
+                <PetAvatar pet={pet} size={56} />
+                <Text className="mt-3 font-sans-medium text-body text-ink">{pet.nome}</Text>
+                <Text className="mt-[2px] text-center font-sans text-label text-slate">{pet.raca}</Text>
+                <Text className="mt-[2px] font-mono text-label text-slate">{petAgeLabel(pet.dataNascimento)}</Text>
                 <View className="mt-[10px] rounded-badge bg-hairline px-2 py-1">
-                  <Text className="font-sans-semibold text-badge text-slate">{pet.species.toUpperCase()}</Text>
+                  <Text className="font-sans-semibold text-badge text-slate">{pet.especie.toUpperCase()}</Text>
                 </View>
               </Pressable>
             ))}

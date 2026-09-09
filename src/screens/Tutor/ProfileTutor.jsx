@@ -1,10 +1,14 @@
 import React, { useContext } from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import { UserContext } from '../../context/UserContext';
-import { MOCK_TUTOR_PROFILE, MOCK_TUTOR_PETS } from '../../data/fidelisData';
+import { MOCK_TUTOR_PROFILE } from '../../data/fidelisData';
 import TutorHeader from '../../components/Tutor/TutorHeader';
 
+import { usePets } from '../../hooks/usePets';
+import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
+
 const ProfileTutor = () => {
+  const petsQuery = usePets();
   const { logout } = useContext(UserContext);
 
   const handleLogout = () => {
@@ -26,6 +30,7 @@ const ProfileTutor = () => {
           <Text className="mt-[2px] font-sans text-label text-slate">{MOCK_TUTOR_PROFILE.email}</Text>
         </View>
 
+        <PetQueryStatus query={petsQuery} />
         <View className="gap-[10px]">
           <Text className="font-sans-semibold text-title text-ink">Informações pessoais</Text>
           <View className="gap-3 rounded-card border border-line bg-card p-[14px]">
@@ -49,7 +54,7 @@ const ProfileTutor = () => {
           <View className="flex-row gap-[10px]">
             <View className="flex-1 rounded-card border border-line bg-card p-[13px]">
               <Text className="font-sans text-label text-slate">PETS CADASTRADOS</Text>
-              <Text className="mt-[3px] font-mono-medium text-metric text-ink">{MOCK_TUTOR_PETS.length}</Text>
+              <Text className="mt-[3px] font-mono-medium text-metric text-ink">{petsQuery.isPending || petsQuery.isError ? '—' : petsQuery.data?.length ?? 0}</Text>
             </View>
             <View className="flex-1 rounded-card border border-line bg-card p-[13px]">
               <Text className="font-sans text-label text-slate">CLÍNICA VINCULADA</Text>

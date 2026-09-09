@@ -1,19 +1,21 @@
 import React, { useMemo, useState, useRef, useContext } from 'react';
 import { Alert, View, ScrollView, Text, Pressable, Animated } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
-import { MOCK_TUTOR_PETS } from '../../data/fidelisData';
+import { usePets } from '../../hooks/usePets';
+import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
 import { UserContext } from '../../context/UserContext';
 import TutorHeader from '../../components/Tutor/TutorHeader';
 import ReminderCard from '../../components/Tutor/ReminderCard';
 import NewReminderModal from '../../components/Tutor/NewReminderModal';
 
 const RemindersScreen = () => {
-  const { tutorPets, tutorReminders, addTutorReminder, updateTutorReminder } =
+  const { tutorReminders, addTutorReminder, updateTutorReminder } =
     useContext(UserContext);
   const [filterType, setFilterType] = useState('Todos');
   const [modalVisible, setModalVisible] = useState(false);
   const [cardHeights, setCardHeights] = useState({});
-  const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
+  const petsQuery = usePets();
+  const pets = petsQuery.isError ? [] : petsQuery.data ?? [];
   const animationMap = useRef(new Map()).current;
 
   const filterOptions = ['Todos', 'VACINA', 'RETORNO', 'MEDICAMENTO', 'CHECKUP', 'VERMÍFUGO'];
@@ -38,9 +40,7 @@ const RemindersScreen = () => {
     const pet = pets.find((item) => item.id === reminder.petId);
     return {
       ...reminder,
-      petName: reminder.petName ?? pet?.name,
-      petAvatar: reminder.petAvatar ?? pet?.avatar,
-      petColor: reminder.petColor ?? pet?.color,
+      petName: pet?.nome ?? reminder.petName,
     };
   };
 
@@ -140,6 +140,7 @@ const RemindersScreen = () => {
           Vacinas, medicamentos e consultas organizados em um único lugar.
         </Text>
 
+        <PetQueryStatus query={petsQuery} empty={pets.length === 0} />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-1">
           {filterOptions.map((option) => {
             const isActive = filterType === option;
@@ -212,6 +213,7 @@ const RemindersScreen = () => {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Novo lembrete"
+          disabled={petsQuery.isPending || petsQuery.isError || pets.length === 0}
           onPressIn={onFabPressIn}
           onPressOut={onFabPressOut}
           onPress={() => setModalVisible(true)}

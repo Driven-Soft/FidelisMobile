@@ -1,37 +1,37 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
-import { MOCK_TUTOR_PETS, parsePtDate } from '../../data/fidelisData';
-import { UserContext } from '../../context/UserContext';
+import { usePet, useDeletePet } from '../../hooks/usePets';
+import { petAgeLabel, getPetErrorMessage } from '../../utils/petUtils';
 import TutorHeader from '../../components/Tutor/TutorHeader';
-import Avatar from '../../components/common/Avatar';
+import PetAvatar from '../../components/Tutor/PetAvatar';
+import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
 
 const PetProfile = ({ route, navigation }) => {
-  const { petId } = route.params;
-  const { tutorPets } = useContext(UserContext);
-  const pets = tutorPets?.length ? tutorPets : MOCK_TUTOR_PETS;
-  const pet = pets.find((p) => p.id === petId);
+  const query = usePet(route.params?.petId);
+  const pet = query.data;
+  const deletion = useDeletePet();
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [activeTab, setActiveTab] = useState('Vacinas');
 
-  const calculateAge = (birthDate) => {
-    const today = new Date();
-    const birth = parsePtDate(birthDate);
-    if (!birth) return 0;
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
+  const handleDelete = async () => {
+    if (!pet || deletion.isPending) return;
+    try {
+      await deletion.mutateAsync(pet.id);
+      navigation.goBack();
+    } catch {
+      // O erro da mutation é apresentado abaixo; a sessão cuida de respostas 401.
     }
-    return age;
   };
 
   const tabs = ['Vacinas', 'Consultas', 'Medicamentos', 'Bem-estar'];
 
-  if (!pet) {
+  if (query.isPending || query.error || !pet) {
     return (
       <View className="flex-1 bg-mist">
         <TutorHeader title="Pet" onBack={() => navigation.goBack()} />
         <View className="flex-1 items-center justify-center px-4">
-          <Text className="font-sans-medium text-body text-ink">Pet nao encontrado</Text>
+          <PetQueryStatus query={query} />
+          {!query.isPending && !query.error && <Text className="font-sans-medium text-body text-ink">{deletion.isPending ? 'Excluindo...' : 'Pet não encontrado'}</Text>}
           <Pressable
             className="mt-3"
             onPress={() => navigation.goBack()}
@@ -46,30 +46,30 @@ const PetProfile = ({ route, navigation }) => {
 
   return (
     <View className="flex-1 bg-mist">
-      <TutorHeader title={pet.name} onBack={() => navigation.goBack()} />
+      <TutorHeader title={pet.nome} onBack={deletion.isPending ? undefined : () => navigation.goBack()} />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]">
         <View className="items-center rounded-card border border-line bg-card p-[14px]">
-          <Avatar emoji={pet.avatar} name={pet.name} size={96} radius={12} />
+          <PetAvatar pet={pet} size={96} />
         </View>
 
         <View className="flex-row flex-wrap gap-[10px]">
           <View className="min-w-[48%] flex-1 rounded-card border border-line bg-card p-[13px]">
             <Text className="font-sans text-label text-slate">ESPÉCIE</Text>
-            <Text className="mt-[3px] font-sans-medium text-body text-ink">{pet.species}</Text>
+            <Text className="mt-[3px] font-sans-medium text-body text-ink">{pet.especie}</Text>
           </View>
           <View className="min-w-[48%] flex-1 rounded-card border border-line bg-card p-[13px]">
             <Text className="font-sans text-label text-slate">RAÇA</Text>
-            <Text className="mt-[3px] font-sans-medium text-body text-ink">{pet.breed}</Text>
+            <Text className="mt-[3px] font-sans-medium text-body text-ink">{pet.raca}</Text>
           </View>
           <View className="min-w-[48%] flex-1 rounded-card border border-line bg-card p-[13px]">
             <Text className="font-sans text-label text-slate">SEXO</Text>
-            <Text className="mt-[3px] font-sans-medium text-body text-ink">{pet.sex}</Text>
+            <Text className="mt-[3px] font-sans-medium text-body text-ink">{pet.sexo === 'M' ? 'Macho' : 'Fêmea'}</Text>
           </View>
           <View className="min-w-[48%] flex-1 rounded-card border border-line bg-card p-[13px]">
             <Text className="font-sans text-label text-slate">IDADE</Text>
             <Text className="mt-[3px] font-mono-medium text-body text-ink">
-              {calculateAge(pet.birthDate)} anos
+              {petAgeLabel(pet.dataNascimento)}
             </Text>
           </View>
         </View>
@@ -77,9 +77,32 @@ const PetProfile = ({ route, navigation }) => {
         <View className="rounded-card border border-line bg-card p-[13px]">
           <Text className="font-sans text-label text-slate">CLÍNICA VINCULADA</Text>
           <Text className="mt-[3px] font-sans-medium text-body text-ink">
-            {pet.clinic ?? pet.clinicAssociated ?? '-'}
+            {pet.clinicaId ? `Clínica #${pet.clinicaId}` : 'Não vinculada'}
           </Text>
         </View>
+
+        <PetQueryStatus query={query} />
+        <Pressable disabled={deletion.isPending} accessibilityRole="button"
+          onPress={() => navigation.navigate('Pets', { screen: 'NewPet', params: { petId: pet.id }, initial: false })}
+          className="items-center rounded-control bg-clinic px-5 py-3">
+          <Text className="font-sans-semibold text-title text-white">Editar pet</Text>
+        </Pressable>
+        {deletion.error && <Text accessibilityRole="alert" className="font-sans text-body text-alert">{getPetErrorMessage(deletion.error)}</Text>}
+        {confirmDelete ? (
+          <View className="gap-3 rounded-card border border-alert bg-card p-[14px]">
+            <Text className="font-sans text-body text-ink">Excluir {pet.nome}? Esta ação não pode ser desfeita.</Text>
+            <Pressable disabled={deletion.isPending} onPress={handleDelete} accessibilityRole="button" className="items-center rounded-control bg-alert px-5 py-3">
+              <Text className="font-sans-semibold text-title text-white">{deletion.isPending ? 'Excluindo...' : 'Confirmar exclusão'}</Text>
+            </Pressable>
+            <Pressable disabled={deletion.isPending} onPress={() => setConfirmDelete(false)} accessibilityRole="button">
+              <Text className="text-center font-sans-medium text-body text-clinic">Cancelar</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <Pressable disabled={deletion.isPending} onPress={() => setConfirmDelete(true)} accessibilityRole="button" className="items-center rounded-control border border-alert px-5 py-3">
+            <Text className="font-sans-medium text-body text-alert">Excluir pet</Text>
+          </Pressable>
+        )}
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-1">
           {tabs.map((tab) => (
