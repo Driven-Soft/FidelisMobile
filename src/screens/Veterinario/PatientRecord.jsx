@@ -7,11 +7,18 @@ import Avatar from '../../components/common/Avatar';
 import Badge from '../../components/Veterinario/Badge';
 
 const PatientRecord = ({ route, navigation }) => {
-  const { patientId } = route.params;
+  const patientId = route.params?.patientId;
   const patient = MOCK_VET_PATIENTS.find((p) => p.id === patientId);
-  const record = MOCK_VET_PATIENT_RECORDS[patientId] || MOCK_VET_PATIENT_RECORDS['1'];
+  const record = MOCK_VET_PATIENT_RECORDS[patientId];
   const [activeTab, setActiveTab] = useState('Consultas');
   const [expandedId, setExpandedId] = useState(null);
+
+  if (!patient || !record) return (
+    <SafeAreaView className="flex-1 items-center justify-center gap-3 bg-mist" edges={['top']}>
+      <Text className="font-sans text-body text-slate">Paciente ou prontuário não encontrado.</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()}><Text className="text-clinic">Voltar</Text></TouchableOpacity>
+    </SafeAreaView>
+  );
 
   const tabs = ['Consultas', 'Vacinas', 'Prescrições', 'Exames', 'Bem-estar'];
 

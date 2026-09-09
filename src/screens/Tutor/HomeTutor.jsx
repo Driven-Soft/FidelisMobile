@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
-import { MOCK_TUTOR_PROFILE, MOCK_TUTOR_HISTORY, formatPtDate } from '../../data/fidelisData';
-import { UserContext } from '../../context/UserContext';
+import { useTutorProfile, useTutorHistory } from '../../hooks/useTutorData';
+import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
 import TutorHeader from '../../components/Tutor/TutorHeader';
 import PetAvatar from '../../components/Tutor/PetAvatar';
 import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
@@ -12,8 +12,9 @@ import { upcomingReminders as selectUpcomingReminders, formatReminderDate, isRem
 import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
 
 export default function HomeTutor({ navigation }) {
-  const { user } = useContext(UserContext);
-  const tutorName = user?.name ?? MOCK_TUTOR_PROFILE.name;
+  const profileQuery = useTutorProfile();
+  const historyQuery = useTutorHistory();
+  const tutorName = profileQuery.data?.nome;
   const petsQuery = usePets();
   const pets = petsQuery.isError ? [] : petsQuery.data ?? [];
   const remindersQuery = useReminders();
@@ -23,9 +24,10 @@ export default function HomeTutor({ navigation }) {
 
   return (
     <View className="flex-1 bg-mist">
-      <TutorHeader title={`Olá, ${tutorName.split(' ')[0]}`} />
+      <TutorHeader title={tutorName ? `Olá, ${tutorName.split(' ')[0]}` : 'Início'} />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]">
+        <TutorDataStatus query={profileQuery} label="perfil" />
         <View>
           <Text className="font-sans-semibold text-title text-ink">Tudo sob controle para hoje</Text>
           <Text className="mt-1 font-sans text-body text-slate">
@@ -122,23 +124,24 @@ export default function HomeTutor({ navigation }) {
           <View>
             <Text className="font-sans-semibold text-title text-ink">Histórico recente</Text>
             <Text className="mt-[2px] font-sans text-label text-slate">
-              Os últimos eventos clínicos dos seus pets
+              Consultas e vacinações dos seus pets
             </Text>
           </View>
 
           <View className="overflow-hidden rounded-card border border-line bg-card">
-            {MOCK_TUTOR_HISTORY.map((event, index) => (
+            <TutorDataStatus query={historyQuery} label="histórico" empty={historyQuery.data.length === 0} />
+            {historyQuery.data.map((event, index) => (
               <View
                 key={event.id}
                 className={`gap-1 px-[14px] py-3 ${
-                  index === MOCK_TUTOR_HISTORY.length - 1 ? '' : 'border-b border-hairline'
+                  index === historyQuery.data.length - 1 ? '' : 'border-b border-hairline'
                 }`}
               >
                 <View className="flex-row items-center gap-3">
                   <View className="flex-1">
                     <Text className="font-sans-medium text-body text-ink">{event.title}</Text>
                     <Text className="font-mono text-label text-slate">
-                      {event.petName} · {formatPtDate(event.date)}
+                      {event.petName} · {formatReminderDate(event.date)}
                     </Text>
                   </View>
                   <View className="self-start rounded-badge bg-hairline px-2 py-1">
