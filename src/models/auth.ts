@@ -10,3 +10,5 @@ export interface LoginResponse {
   tutorId: number;
   nome: string;
 }
+
+export type AuthSession = LoginResponse;

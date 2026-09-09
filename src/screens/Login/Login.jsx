@@ -9,7 +9,7 @@ import Input from "../../components/common/Input";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login({ navigation }) {
-  const { portalToggle, setPortalToggle, loginTutor } =
+  const { portalToggle, setPortalToggle, sessionError, logout } =
     useContext(UserContext);
   const { mutateAsync, isPending, error: loginError } = useLogin();
   const [portalType, setPortalType] = useState(portalToggle ?? "TUTOR");
@@ -58,15 +58,9 @@ export default function Login({ navigation }) {
     }
 
     try {
-      const result = await mutateAsync({ email: trimmedEmail, senha: password });
-      // Adaptação mínima para o Context legado; a sessão não é persistida aqui.
-      loginTutor({ id: result.tutorId, name: result.nome, email: trimmedEmail });
+      await mutateAsync({ email: trimmedEmail, senha: password });
       setPassword("");
-
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Tabs", params: { userType: portalType } }],
-      });
+      // O Stack troca o fluxo automaticamente após a sessão ser salva.
     } catch (error) {
       Alert.alert("Não foi possível entrar", getLoginErrorMessage(error));
     }
@@ -172,6 +166,15 @@ export default function Login({ navigation }) {
               <Text accessibilityRole="alert" accessibilityLiveRegion="polite" className="mt-2 font-sans text-label text-alert">
                 {getLoginErrorMessage(loginError)}
               </Text>
+            )}
+
+            {sessionError && (
+              <View className="mt-2">
+                <Text accessibilityRole="alert" className="font-sans text-label text-alert">{sessionError}</Text>
+                <Text onPress={() => { if (!isPending) void logout(); }} className="mt-1 font-sans-medium text-label text-clinic">
+                  Tentar limpar sessão local
+                </Text>
+              </View>
             )}
 
             <Text className="mb-4 mt-4 text-center font-sans-medium text-eyebrow text-clinic">

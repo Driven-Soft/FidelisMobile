@@ -5,15 +5,11 @@ import { UserContext } from '../../context/UserContext';
 import { MOCK_VET_PROFILE } from '../../data/fidelisData';
 import Avatar from '../../components/common/Avatar';
 
-const ProfileVet = ({ navigation }) => {
+const ProfileVet = () => {
   const { logout } = useContext(UserContext);
 
   const handleLogout = () => {
-    logout();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
+    void logout();
   };
 
   return (

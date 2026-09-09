@@ -4,15 +4,11 @@ import { UserContext } from '../../context/UserContext';
 import { MOCK_TUTOR_PROFILE, MOCK_TUTOR_PETS } from '../../data/fidelisData';
 import TutorHeader from '../../components/Tutor/TutorHeader';
 
-const ProfileTutor = ({ navigation }) => {
+const ProfileTutor = () => {
   const { logout } = useContext(UserContext);
 
   const handleLogout = () => {
-    logout();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
+    void logout();
   };
 
   return (

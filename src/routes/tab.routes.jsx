@@ -1,8 +1,11 @@
 import TutorTabRoutes from "./tutor.tab.routes";
 import VetTabRoutes from "./vet.tab.routes";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
-export default function TabRoutes({ route }) {
-  const userType = route?.params?.userType ?? "TUTOR";
+export default function TabRoutes() {
+  // Parâmetros de navegação não concedem acesso a outro tipo de usuário.
+  const { userType } = useContext(UserContext);
 
   if (userType === "VET") {
     return <VetTabRoutes />;
