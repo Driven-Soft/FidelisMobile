@@ -116,10 +116,9 @@ export default function CadastroTutor({ navigation }) {
           email: formData.email.trim().toLowerCase(),
           phone: formData.phone.trim(),
           cpf: formData.cpf.trim(),
-          password: formData.password,
         }),
       );
-      Alert.alert("Sucesso", "Cadastro de tutor realizado.");
+      Alert.alert("Dados locais salvos", "Este formulário ainda não cria uma conta na API. A senha não foi salva. Para entrar, utilize uma conta já cadastrada no backend.");
       navigation.replace("Login");
     } catch (error) {
       Alert.alert("Erro", "Não foi possível salvar o cadastro.");
@@ -200,6 +199,9 @@ export default function CadastroTutor({ navigation }) {
     <SafeAreaView className="flex-1 bg-mist" edges={["top"]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="px-4 py-6">
+          <Text className="mb-4 font-sans text-body text-slate">
+            Cadastro ainda não integrado à API. Este formulário salva somente dados locais, sem senha, e não habilita o login.
+          </Text>
           <View className="mb-6 flex-row items-center">
             {[1, 2, 3].map((num) => (
               <React.Fragment key={num}>
@@ -306,7 +308,7 @@ export default function CadastroTutor({ navigation }) {
                     <Text className="mt-1 font-sans text-label text-alert">{errors.cpf}</Text>
                   )}
                   <Text className="mt-2 font-sans text-label text-slate">
-                    Seu CPF será usado para verificação de identidade
+                    Este formulário local não realiza verificação de identidade.
                   </Text>
                 </View>
               </>
@@ -354,7 +356,7 @@ export default function CadastroTutor({ navigation }) {
               className="flex-1 items-center justify-center rounded-control bg-clinic px-5 py-3"
             >
               <Text className="font-sans-semibold text-title text-white">
-                {step === 3 ? "Cadastrar" : "Próximo"}
+                {step === 3 ? "Salvar dados locais" : "Próximo"}
               </Text>
             </TouchableOpacity>
           </View>
