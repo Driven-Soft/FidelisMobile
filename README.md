@@ -12,6 +12,35 @@ Fidelis é um aplicativo móvel de gestão de saúde pet criado para o Challenge
 
 ## Funcionalidades
 
+### Estado atual da integração
+
+O portal Tutor utiliza autenticação real, sessão persistida, CRUD de Pets e Lembretes, perfil e histórico de consultas/vacinações via API .NET. O acesso segue Tela → Hook TanStack Query → Repository → Axios. A URL é definida por `EXPO_PUBLIC_API_URL`; o token é enviado pelo cliente Axios centralizado.
+
+O portal Veterinário permanece com mocks e não é disponibilizado pelo login atual: sua integração depende de autenticação profissional que forneça a identidade do veterinário. As funcionalidades listadas abaixo incluem a interface planejada, não apenas operações já integradas.
+
+Limitações a considerar na entrega:
+
+- O cadastro local não cria uma conta no backend. A integração de cadastro, recuperação de senha e edição do perfil ainda está pendente.
+- Pets exigem fotoUrl e sexo M/F; peso e observações não pertencem ao contrato de Pet. A edição de clinicaId é ignorada pelo backend e não é oferecida.
+- Lembretes permitem editar tipo/descrição. Data, tutor e pet são preservados no PUT; concluir/cancelar envia somente status C/X por PATCH. Cancelar não exclui o registro.
+- TutorResponse não fornece vínculo direto com clínica. O histórico da Home mostra consultas/vacinações vinculadas aos pets atuais, sem inferir conclusão de consulta ou data de criação de lembrete.
+- **Autorização por propriedade é uma pendência do backend.** Listagens podem transmitir dados de outros tutores; os filtros e verificações do Mobile limitam a interface, mas não impedem chamadas diretas. O backend precisa autorizar cada operação pela identidade autenticada e validar os vínculos entre tutor, pet e registros.
+- Dados antigos de pets/lembretes no AsyncStorage não são lidos nem migrados. A sessão persiste apenas token, expiraEm, tutorId e nome. Senhas legadas eventualmente já gravadas não foram removidas automaticamente.
+
+### Validação pendente
+
+As verificações de sintaxe, imports, TypeScript e simulações locais realizadas durante o desenvolvimento não substituem testes reais da API. A checagem dos hooks teve limitação preexistente pela ausência das declarações React. O último impedimento informado no navegador era CORS.
+
+Checklist para a validação final:
+
+- Login, restauração de sessão, expiração, logout e troca de tutor, inclusive com requisições em andamento.
+- CRUD completo de Pets e Lembretes, confirmação de exclusão, status C/X e atualização automática da Home, listas, contagens e detalhes.
+- Perfil real, perfil não encontrado (404), histórico filtrado pelos pets do tutor e navegação entre Home, Pets, Lembretes e Perfil.
+- Loading, refetch, listas vazias sem mocks, falha de rede/CORS, erros HTTP e bloqueio de submissões duplicadas.
+- Datas de nascimento, lembretes e histórico no navegador/dispositivo e em diferentes fusos.
+- Cadastro legado sem habilitar login real; registros antigos locais sem sobrescrever a API; verificar ausência de senha em novas gravações locais.
+- Quando houver ambiente profissional apropriado, paciente/prontuário ausente deve mostrar mensagem e permitir voltar, sem fallback para o registro fictício '1'.
+
 ### Portal do Tutor
 
 - 🐾 Cadastro e login de tutor
@@ -85,7 +114,6 @@ FidelisMobile/
    │  │  └─ TutorHeader.jsx
    │  ├─ Veterinario/     # Componentes específicos do portal do veterinário
    │  │  └─ Badge.jsx
-   │  └─ index.js
    ├─ context/            # Contexto global de aplicação
    │  └─ UserContext.jsx
    ├─ data/               # Dados simulados e mocks
