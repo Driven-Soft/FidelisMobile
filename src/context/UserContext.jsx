@@ -5,8 +5,8 @@ export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const { session, status, sessionError, startSession, logout } = useAuthSession();
-  const user = useMemo(() => session ? { id: session.tutorId, name: session.nome } : null, [session]);
-  const userType = session ? 'TUTOR' : null;
+  const user = useMemo(() => session ? { id: session.tipo === 'TUTOR' ? session.tutorId : session.veterinarioId, name: session.nome } : null, [session]);
+  const userType = session?.tipo ?? null;
   const [portalToggle, setPortalToggle] = useState('TUTOR');
 
   useEffect(() => {

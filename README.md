@@ -8,7 +8,7 @@ O portal Tutor possui integração com a API .NET para cadastro e login, sessão
 
 O cadastro envia nome, email, CPF, telefone, endereço e senha. Após o sucesso, o usuário retorna ao login para autenticar. A senha não é persistida no armazenamento local.
 
-O portal Veterinário possui telas demonstrativas de dashboard, pacientes, prontuário, agenda e perfil. Seus mocks estão preservados, mas o login atual não disponibiliza esse portal. A integração depende de autenticação profissional que identifique o veterinário.
+O portal Veterinário utiliza o tipo e a identidade retornados pela autenticação para consultar o perfil profissional e sua clínica. A opção de pets da clínica permanece pendente da integração específica; agenda e prontuário exibem uma mensagem de indisponibilidade. As telas legadas e seus mocks estão preservados fora do fluxo acessível até a limpeza final.
 
 ## Tecnologias
 
@@ -79,7 +79,7 @@ FidelisMobile/
     └── utils/         # Validação, formatação e transformação
 ```
 
-O cliente `src/services/api.js` lê `EXPO_PUBLIC_API_URL` e envia o Bearer Token da sessão. Os dados de servidor ficam sob responsabilidade do React Query. A sessão persiste somente `token`, `expiraEm`, `tutorId` e `nome`.
+O cliente `src/services/api.js` lê `EXPO_PUBLIC_API_URL` e envia o Bearer Token da sessão. Os dados de servidor ficam sob responsabilidade do React Query. A sessão persiste `token`, `expiraEm`, `tipo`, `tutorId`, `veterinarioId`, `nome` e `email`, sem senha. O ID aplicável depende do tipo autenticado. Sessões antigas sem tipo exigem novo login.
 
 ## Integração e limitações
 

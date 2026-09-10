@@ -8,18 +8,27 @@ export function getSessionExpiration(expiraEm: string): number {
   return Date.parse(expiraEm.replace(/(\.\d{3})\d+Z$/, "$1Z"));
 }
 
-export function isValidSession(value: unknown): value is AuthSession {
+export function isValidLoginResponse(value: unknown): value is AuthSession {
   if (!value || typeof value !== "object") return false;
   const session = value as Partial<AuthSession>;
   return (
     typeof session.token === "string" && !!session.token.trim() &&
     typeof session.nome === "string" && !!session.nome.trim() &&
-    typeof session.tutorId === "number" && Number.isInteger(session.tutorId) && session.tutorId > 0 &&
+    typeof session.email === "string" && !!session.email.trim() &&
+    ((session.tipo === "TUTOR" && Number.isInteger(session.tutorId) && (session.tutorId ?? 0) > 0 && session.veterinarioId == null) ||
+      (session.tipo === "VETERINARIO" && Number.isInteger(session.veterinarioId) && (session.veterinarioId ?? 0) > 0 && session.tutorId == null)) &&
     typeof session.expiraEm === "string" && getSessionExpiration(session.expiraEm) > Date.now()
   );
 }
 
 // Cópia somente para transporte. O hook de sessão controla seu ciclo de vida.
+export const isValidSession = isValidLoginResponse;
+
+export function copySession(session: AuthSession): AuthSession {
+  const { token, expiraEm, tipo, tutorId, veterinarioId, nome, email } = session;
+  return { token, expiraEm, tipo, tutorId: tutorId ?? null, veterinarioId: veterinarioId ?? null, nome, email };
+}
+
 let credential: { token: string; expiresAt: number } | null = null;
 const invalidationListeners = new Set<() => void>();
 

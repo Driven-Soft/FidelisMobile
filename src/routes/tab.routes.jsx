@@ -7,7 +7,7 @@ export default function TabRoutes() {
   // Parâmetros de navegação não concedem acesso a outro tipo de usuário.
   const { userType } = useContext(UserContext);
 
-  if (userType === "VET") {
+  if (userType === "VETERINARIO") {
     return <VetTabRoutes />;
   }
 

@@ -21,7 +21,7 @@ export default function StackRoutes() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {authStatus === 'authenticated' ? (
-        <Stack.Screen name="Tabs" component={Tabs} initialParams={{ userType: 'TUTOR' }} />
+        <Stack.Screen name="Tabs" component={Tabs} />
       ) : (
         <>
           <Stack.Screen name="Login" component={Login} />

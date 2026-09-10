@@ -8,7 +8,10 @@ export interface LoginRequest {
 export interface LoginResponse {
   token: string;
   expiraEm: string; // DateTime serializado pela API.
-  tutorId: number;
+  tipo: "TUTOR" | "VETERINARIO";
+  tutorId: number | null;
+  veterinarioId: number | null;
+  email: string;
   nome: string;
 }
 

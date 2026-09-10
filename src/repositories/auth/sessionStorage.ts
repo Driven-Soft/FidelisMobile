@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AuthSession } from "../../models/auth";
-import { isValidSession } from "../../services/authSession";
+import { isValidSession, copySession } from "../../services/authSession";
 
 const SESSION_STORAGE_KEY = "@fidelis:auth_session";
 
@@ -15,8 +15,7 @@ function enqueue<T>(operation: () => Promise<T>): Promise<T> {
 export function saveSession(session: AuthSession): Promise<void> {
   return enqueue(async () => {
     if (!isValidSession(session)) throw new Error("Invalid auth session");
-    const { token, expiraEm, tutorId, nome } = session;
-    await AsyncStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ token, expiraEm, tutorId, nome }));
+    await AsyncStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(copySession(session)));
   });
 }
 
@@ -35,8 +34,7 @@ export function loadSession(): Promise<AuthSession | null> {
       await AsyncStorage.removeItem(SESSION_STORAGE_KEY);
       return null;
     }
-    const { token, expiraEm, tutorId, nome } = value;
-    return { token, expiraEm, tutorId, nome };
+    return copySession(value);
   });
 }
 

@@ -14,9 +14,9 @@ function useTutorScope() {
   current.current = session;
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
-  const active = authStatus === "authenticated" && isValidSession(session);
+  const active = authStatus === "authenticated" && isValidSession(session) && session.tipo === "TUTOR";
   const requireTutor = () => {
-    if (!active || !isValidSession(session) || current.current !== session || !mounted.current) throw new TutorDataError(401);
+    if (!active || !isValidSession(session) || session.tipo !== "TUTOR" || session.tutorId === null || current.current !== session || !mounted.current) throw new TutorDataError(401);
     return session.tutorId;
   };
   return { active, requireTutor, scope: ["tutor-data", session?.tutorId ?? null, session?.expiraEm ?? null] as const };

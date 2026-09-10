@@ -41,12 +41,6 @@ export default function Login({ navigation }) {
 
     setPortalToggle(portalType);
 
-    // A API atual autentica somente tutores; não simular login veterinário.
-    if (portalType === "VET") {
-      Alert.alert("Acesso indisponível", "A autenticação de veterinários ainda não está disponível.");
-      return;
-    }
-
     setTouched({ email: true, password: true });
 
     if (!isEmailValid || !isPasswordValid) {
@@ -58,7 +52,7 @@ export default function Login({ navigation }) {
     }
 
     try {
-      await mutateAsync({ email: trimmedEmail, senha: password, tipo: "TUTOR" });
+      await mutateAsync({ email: trimmedEmail, senha: password, tipo: portalType === "VET" ? "VETERINARIO" : "TUTOR" });
       setPassword("");
       // O Stack troca o fluxo automaticamente após a sessão ser salva.
     } catch (error) {
@@ -162,7 +156,7 @@ export default function Login({ navigation }) {
               </Text>
             </TouchableOpacity>
 
-            {portalType === "TUTOR" && loginError && (
+            {loginError && (
               <Text accessibilityRole="alert" accessibilityLiveRegion="polite" className="mt-2 font-sans text-label text-alert">
                 {getLoginErrorMessage(loginError)}
               </Text>
@@ -184,7 +178,7 @@ export default function Login({ navigation }) {
             <Text className="font-sans text-label text-slate">
               {portalType === "TUTOR"
                 ? "Entre com seu email e senha ou crie sua conta em Cadastre-se."
-                : "A autenticação de veterinários ainda não está disponível."}
+                : "Entre com o email e a senha da sua conta de veterinário."}
             </Text>
           </View>
         </View>

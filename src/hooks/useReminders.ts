@@ -15,13 +15,13 @@ export const reminderKeys = {
 
 function useReminderScope() {
   const { session, authStatus } = useContext(UserContext) as { session: AuthSession | null; authStatus: string };
-  const active = authStatus === "authenticated" && !!session;
+  const active = authStatus === "authenticated" && session?.tipo === "TUTOR";
   const current = useRef(session);
   current.current = session;
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const requireTutor = () => {
-    if (!active || !session || !mounted.current || current.current !== session) throw new ReminderFlowError(401);
+    if (!active || !session || session.tipo !== "TUTOR" || session.tutorId === null || !mounted.current || current.current !== session) throw new ReminderFlowError(401);
     return session.tutorId;
   };
   const requireOwned = async (id: number, signal?: AbortSignal) => {

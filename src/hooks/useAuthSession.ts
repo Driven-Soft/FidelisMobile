@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import type { AuthSession } from "../models/auth";
 import { loadSession, removeSession, saveSession } from "../repositories/auth/sessionStorage";
-import { getSessionExpiration, isValidSession, setSessionToken, subscribeSessionInvalidation } from "../services/authSession";
+import { copySession, getSessionExpiration, isValidSession, setSessionToken, subscribeSessionInvalidation } from "../services/authSession";
 
 export function useAuthSession() {
   const [session, setSession] = useState<AuthSession | null>(null);
@@ -62,8 +62,7 @@ export function useAuthSession() {
     if (!isValidSession(result)) throw new Error("Invalid auth session");
     const currentRevision = ++revision.current;
     setSessionError(null);
-    const { token, expiraEm, tutorId, nome } = result;
-    const nextSession = { token, expiraEm, tutorId, nome };
+    const nextSession = copySession(result);
     try {
       await saveSession(nextSession);
     } catch {
