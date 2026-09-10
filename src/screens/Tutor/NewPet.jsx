@@ -6,6 +6,8 @@ import PetQueryStatus from "../../components/Tutor/PetQueryStatus";
 import { usePet, useCreatePet, useUpdatePet } from "../../hooks/usePets";
 import { emptyPetForm, petToForm, validatePetForm, petFormFields, petFormPatch, getPetErrorMessage } from "../../utils/petUtils";
 import { Masks } from "react-native-mask-input";
+import { useClinics } from "../../hooks/useClinics";
+import PetClinicSelector from "../../components/Tutor/PetClinicSelector";
 
 export default function NewPet({ navigation, route }) {
   const editing = route.params?.petId !== undefined;
@@ -28,23 +30,27 @@ const PetForm = ({ pet, navigation }) => {
   const create = useCreatePet();
   const update = useUpdatePet();
   const mutation = pet ? update : create;
+  const clinics = useClinics(!pet);
+  const [clinicId, setClinicId] = useState(null);
+  const clinicAvailable = !clinics.isError && clinics.data?.some((clinic) => clinic.id === clinicId);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(() => pet ? petToForm(pet) : { ...emptyPetForm });
   const [touched, setTouched] = useState({});
   const validation = validatePetForm(form);
+  if (!pet && !clinicAvailable) validation.clinicaId = "Selecione uma clínica disponível e confirme o aviso.";
   const fieldErrors = Object.fromEntries(Object.entries(validation).filter(([key]) => touched[key]));
   const handleBlur = (field) => setTouched((current) => ({ ...current, [field]: true }));
   const setField = (field, value) => setForm((current) => ({ ...current, [field]: value }));
-  const stepFields = [["name", "species", "breed"], ["sex", "birthDate"], ["fotoUrl"]];
+  const stepFields = [["name", "species", "breed"], ["sex", "birthDate"], pet ? ["fotoUrl"] : ["fotoUrl", "clinicaId"]];
   const stepLabels = [
     { number: 1, label: "Dados básicos" },
     { number: 2, label: "Dados físicos" },
-    { number: 3, label: "Foto" },
+    { number: 3, label: pet ? "Foto" : "Foto e clínica" },
   ];
   const currentStep = stepLabels[step - 1];
 
   const handleNext = async () => {
-    if (mutation.isPending) return;
+    if (mutation.isPending || (!pet && step === 3 && clinics.isFetching)) return;
     const fields = step === 3 ? stepFields.flat() : stepFields[step - 1];
     setTouched((current) => ({ ...current, ...Object.fromEntries(fields.map((field) => [field, true])) }));
     if (fields.some((field) => validation[field])) return;
@@ -55,7 +61,7 @@ const PetForm = ({ pet, navigation }) => {
         if (Object.keys(changes).length === 0) { navigation.goBack(); return; }
         await update.mutateAsync({ id: pet.id, changes });
       } else {
-        await create.mutateAsync(petFormFields(form));
+        await create.mutateAsync({ ...petFormFields(form), clinicaId: clinicId });
       }
       navigation.goBack();
     } catch {
@@ -206,6 +212,8 @@ const PetForm = ({ pet, navigation }) => {
               editable={!mutation.isPending}
             />
           )}
+          {step === 3 && !pet && <PetClinicSelector query={clinics} selectedId={clinicId}
+            onSelect={setClinicId} disabled={mutation.isPending} error={fieldErrors.clinicaId} />}
         </View>
 
         {mutation.error && <Text accessibilityRole="alert" className="font-sans text-body text-alert">{getPetErrorMessage(mutation.error)}</Text>}
