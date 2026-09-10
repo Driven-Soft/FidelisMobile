@@ -5,13 +5,17 @@ import { petAgeLabel, getPetErrorMessage } from '../../utils/petUtils';
 import TutorHeader from '../../components/Tutor/TutorHeader';
 import PetAvatar from '../../components/Tutor/PetAvatar';
 import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
+import { usePetReminders } from '../../hooks/useReminders';
+import ReminderCard from '../../components/Tutor/ReminderCard';
+import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
 
 const PetProfile = ({ route, navigation }) => {
   const query = usePet(route.params?.petId);
   const pet = query.data;
   const deletion = useDeletePet();
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [activeTab, setActiveTab] = useState('Vacinas');
+  const [activeTab, setActiveTab] = useState(null);
+  const reminders = usePetReminders(pet?.id);
 
   const handleDelete = async () => {
     if (!pet || deletion.isPending) return;
@@ -23,7 +27,9 @@ const PetProfile = ({ route, navigation }) => {
     }
   };
 
-  const tabs = ['Vacinas', 'Consultas', 'Medicamentos', 'Bem-estar'];
+  const tabs = [null, ...reminders.types];
+  const selectedTab = reminders.types.includes(activeTab) ? activeTab : null;
+  const visibleReminders = reminders.data.filter((item) => selectedTab === null || item.tipo === selectedTab);
 
   if (query.isPending || query.error || !pet) {
     return (
@@ -104,30 +110,35 @@ const PetProfile = ({ route, navigation }) => {
           </Pressable>
         )}
 
+        <Text className="font-sans-semibold text-title text-ink">Lembretes do pet</Text>
+        <Text className="font-sans text-label text-slate">Cuidados cadastrados em Lembretes, com suas datas previstas e status.</Text>
+        <ReminderQueryStatus query={reminders} />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-1">
           {tabs.map((tab) => (
             <Pressable
-              key={tab}
+              key={tab === null ? 'all' : `type-${tab}`}
               accessibilityRole="button"
-              accessibilityState={{ selected: activeTab === tab }}
+              accessibilityState={{ selected: selectedTab === tab }}
               onPress={() => setActiveTab(tab)}
               style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
-              className={`rounded-badge px-[10px] py-[5px] ${activeTab === tab ? 'bg-clinic-50' : ''}`}
+              className={`rounded-badge px-[10px] py-[5px] ${selectedTab === tab ? 'bg-clinic-50' : ''}`}
             >
               <Text
                 className={`font-sans-medium text-eyebrow ${
-                  activeTab === tab ? 'text-clinic-ink' : 'text-slate'
+                  selectedTab === tab ? 'text-clinic-ink' : 'text-slate'
                 }`}
               >
-                {tab}
+                {tab ?? 'Todos'}
               </Text>
             </Pressable>
           ))}
         </ScrollView>
 
-        <View className="items-center rounded-card border border-line bg-card px-[14px] py-8">
-          <Text className="font-sans text-body text-slate">Nenhum registro em {activeTab}</Text>
-        </View>
+        {visibleReminders.map((reminder) => <ReminderCard key={reminder.id} reminder={reminder} pet={pet} />)}
+        {!reminders.isPending && !reminders.error && visibleReminders.length === 0 &&
+          <View className="items-center rounded-card border border-line bg-card px-[14px] py-8">
+            <Text className="font-sans text-body text-slate">Nenhum lembrete cadastrado para este pet.</Text>
+          </View>}
       </ScrollView>
     </View>
   );

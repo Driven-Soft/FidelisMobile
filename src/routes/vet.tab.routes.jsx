@@ -8,6 +8,7 @@ import PendingVet from '../screens/Veterinario/PendingVet';
 import HomeVet from '../screens/Veterinario/HomeVet';
 import PatientsVet from '../screens/Veterinario/PatientsVet';
 import ProfileVet from '../screens/Veterinario/ProfileVet';
+import AgendaVet from '../screens/Veterinario/AgendaVet';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -20,7 +21,7 @@ const HomeStack = () => {
       }}
     >
       <Stack.Screen name="HomeVetScreen" component={HomeVet} />
-      <Stack.Screen name="AgendaVet" component={PendingVet} />
+      <Stack.Screen name="AgendaVet" component={AgendaVet} />
       <Stack.Screen name="PatientRecord" component={PendingVet} />
     </Stack.Navigator>
   );
@@ -46,7 +47,7 @@ const AgendaStack = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="AgendaVetScreen" component={PendingVet} />
+      <Stack.Screen name="AgendaVetScreen" component={AgendaVet} />
       <Stack.Screen name="PatientRecord" component={PendingVet} />
     </Stack.Navigator>
   );

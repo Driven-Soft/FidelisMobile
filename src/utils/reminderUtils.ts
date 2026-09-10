@@ -1,4 +1,14 @@
 import type { LembreteResponse } from "../models/reminder";
+import type { PetResponse } from "../models/pet";
+
+export function selectClinicAgenda(reminders: LembreteResponse[], pets: PetResponse[], clinicId: number | undefined, onlyPending = true) {
+  if (!Number.isInteger(clinicId) || (clinicId ?? 0) <= 0) return [];
+  const clinicPets = new Map(pets.filter((pet) => pet.clinicaId === clinicId).map((pet) => [pet.id, pet]));
+  return reminders.flatMap((reminder) => {
+    const pet = clinicPets.get(reminder.petId);
+    return (!onlyPending || reminder.status === "P") && pet && reminder.tutorId === pet.tutorId ? [{ reminder, pet }] : [];
+  }).sort((a, b) => a.reminder.dataPrevista.localeCompare(b.reminder.dataPrevista) || a.reminder.id - b.reminder.id);
+}
 
 export class ReminderFlowError extends Error {
   constructor(public readonly status: number) {
@@ -9,12 +19,6 @@ export class ReminderFlowError extends Error {
 
 export function requireReminderId(id: unknown): asserts id is number {
   if (typeof id !== "number" || !Number.isInteger(id) || id <= 0 || id > 2147483647) throw new ReminderFlowError(400);
-}
-
-// Restrição de fluxo; a autorização precisa ser implementada no servidor.
-export function assertReminderOwner(item: LembreteResponse, tutorId: number, id?: number): LembreteResponse {
-  if (!item || item.tutorId !== tutorId || (id !== undefined && item.id !== id)) throw new ReminderFlowError(403);
-  return item;
 }
 
 export function validateReminderText(tipo: string, descricao: string): boolean {

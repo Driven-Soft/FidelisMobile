@@ -4,11 +4,11 @@ Aplicativo de gestão de saúde pet desenvolvido pela equipe Driven Soft para o 
 
 ## Funcionalidades
 
-O portal Tutor possui integração com a API .NET para cadastro e login, sessão persistida, logout, CRUD de Pets e Lembretes, consulta do perfil e histórico de consultas e vacinações dos pets.
+O portal Tutor possui integração com a API .NET para cadastro e login, sessão persistida, logout, CRUD de Pets, visualização dos cuidados, consulta do perfil e histórico de consultas e vacinações dos pets. Lembretes são somente leitura para o Tutor no aplicativo.
 
 O cadastro envia nome, email, CPF, telefone, endereço e senha. Após o sucesso, o usuário retorna ao login para autenticar. A senha não é persistida no armazenamento local.
 
-O portal Veterinário utiliza o tipo e a identidade retornados pela autenticação para consultar o perfil profissional, sua clínica e os pets vinculados a ela. A listagem compara o clinicaId de cada pet com o clinicaId do veterinário; não depende de vínculo direto entre Tutor e Clínica. Agenda e prontuário exibem uma mensagem de indisponibilidade, sem dados simulados.
+O portal Veterinário utiliza o tipo e a identidade retornados pela autenticação para consultar o perfil profissional, sua clínica e os pets vinculados a ela. A listagem compara o clinicaId de cada pet com o clinicaId do veterinário; não depende de vínculo direto entre Tutor e Clínica. Na Agenda, o veterinário cadastra, edita, conclui, cancela e exclui os cuidados desses pets. O tutorId do cuidado é obtido do pet selecionado. A lista inclui pendentes, atrasados, concluídos e cancelados. Esses lembretes não representam consultas confirmadas. O prontuário ainda está indisponível, sem dados simulados.
 
 ## Tecnologias
 
@@ -88,7 +88,7 @@ O cliente `src/services/api.js` lê `EXPO_PUBLIC_API_URL` e envia o Bearer Token
 - Pets exigem `fotoUrl` e sexo `M` ou `F`. O cadastro permite selecionar uma clínica obtida da API e exige confirmar o aviso de que o vínculo não poderá ser alterado pelo aplicativo. Peso e observações não pertencem ao contrato. A edição de `clinicaId` não é oferecida porque o backend ignora essa alteração.
 - Lembretes permitem editar tipo/descrição, preservando data e vínculos. Concluir/cancelar altera o status; cancelar não exclui o registro.
 - O perfil do tutor não fornece vínculo direto com clínica. O histórico utiliza consultas e vacinações dos pets atuais.
-- A autorização por propriedade permanece uma pendência do backend. Filtros e verificações no Mobile limitam a interface, mas não garantem autorização nem impedem chamadas diretas à API.
+- A autorização por perfil e propriedade permanece uma pendência do backend. Filtros e verificações no Mobile limitam a interface e suas operações, mas não impedem chamadas diretas à API. O servidor precisa garantir que somente veterinários autorizados gerenciem os cuidados da própria clínica.
 - Dados legados de pets/lembretes no AsyncStorage não são utilizados ou migrados. Senhas eventualmente gravadas por versões antigas não são removidas automaticamente.
 
 Verificações estáticas e simulações locais não substituem testes reais de cadastro, login, sessão, CRUDs e navegação com a API.

@@ -3,10 +3,10 @@ import { Modal, View, Text, Pressable, ScrollView, Platform } from "react-native
 import Feather from "@expo/vector-icons/Feather";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Input from "../common/Input";
-import PetAvatar from "./PetAvatar";
-import { useCreateReminder, useUpdateReminder, useReminder } from "../../hooks/useReminders";
+import PetAvatar from "../Tutor/PetAvatar";
+import { useVeterinarianReminderActions, useVeterinarianReminder } from "../../hooks/useVeterinarianReminders";
 import { formatReminderDate, getReminderErrorMessage, parseReminderDate, serializeReminderDate, validateReminderText } from "../../utils/reminderUtils";
-import ReminderQueryStatus from "./ReminderQueryStatus";
+import ReminderQueryStatus from "../Tutor/ReminderQueryStatus";
 
 const TYPE_OPTIONS = [
   { key: "VACINA", label: "Vacina" },
@@ -17,12 +17,12 @@ const TYPE_OPTIONS = [
 ];
 
 const EditReminder = ({ id, onClose, pets }) => {
-  const query = useReminder(id);
-  if (query.isPending || query.error || !query.data) return (
+  const query = useVeterinarianReminder(id);
+  if (query.isPending || query.isFetching || query.error || !query.data) return (
     <Modal visible transparent onRequestClose={onClose}>
       <View className="flex-1 justify-center bg-black/40 p-4"><View className="rounded-card bg-card p-4">
         <ReminderQueryStatus query={query} />
-        {!query.isPending && !query.error && <Text>Lembrete não encontrado.</Text>}
+        {!query.isPending && !query.isFetching && !query.error && <Text>Lembrete não encontrado.</Text>}
         <Pressable onPress={onClose}><Text className="text-clinic">Fechar</Text></Pressable>
       </View></View>
     </Modal>
@@ -36,8 +36,7 @@ const NewReminderModal = ({ visible, onClose, pets = [], reminderId = null }) =>
 };
 
 const ReminderForm = ({ onClose, pets, reminder = null }) => {
-  const create = useCreateReminder();
-  const update = useUpdateReminder();
+  const { create, update } = useVeterinarianReminderActions();
   const mutation = reminder ? update : create;
   const submitting = useRef(false);
   const [type, setType] = useState(reminder?.tipo ?? "VACINA");
