@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import PendingVet from '../screens/Veterinario/PendingVet';
 import HomeVet from '../screens/Veterinario/HomeVet';
+import PatientsVet from '../screens/Veterinario/PatientsVet';
 import ProfileVet from '../screens/Veterinario/ProfileVet';
 
 const Stack = createNativeStackNavigator();
@@ -32,7 +33,7 @@ const PatientsStack = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="PatientsScreen" component={PendingVet} />
+      <Stack.Screen name="PatientsScreen" component={PatientsVet} />
       <Stack.Screen name="PatientRecord" component={PendingVet} />
     </Stack.Navigator>
   );

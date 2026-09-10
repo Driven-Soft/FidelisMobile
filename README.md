@@ -8,7 +8,7 @@ O portal Tutor possui integração com a API .NET para cadastro e login, sessão
 
 O cadastro envia nome, email, CPF, telefone, endereço e senha. Após o sucesso, o usuário retorna ao login para autenticar. A senha não é persistida no armazenamento local.
 
-O portal Veterinário utiliza o tipo e a identidade retornados pela autenticação para consultar o perfil profissional e sua clínica. A opção de pets da clínica permanece pendente da integração específica; agenda e prontuário exibem uma mensagem de indisponibilidade. As telas legadas e seus mocks estão preservados fora do fluxo acessível até a limpeza final.
+O portal Veterinário utiliza o tipo e a identidade retornados pela autenticação para consultar o perfil profissional, sua clínica e os pets vinculados a ela. A listagem compara o clinicaId de cada pet com o clinicaId do veterinário; não depende de vínculo direto entre Tutor e Clínica. Agenda e prontuário exibem uma mensagem de indisponibilidade. As telas legadas e seus mocks estão preservados fora do fluxo acessível até a limpeza final.
 
 ## Tecnologias
 
