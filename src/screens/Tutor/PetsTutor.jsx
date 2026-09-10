@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, ScrollView, Text, Pressable, RefreshControl } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import { usePets } from '../../hooks/usePets';

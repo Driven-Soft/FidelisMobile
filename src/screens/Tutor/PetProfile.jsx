@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import { usePet, useDeletePet } from '../../hooks/usePets';
 import { petAgeLabel, getPetErrorMessage } from '../../utils/petUtils';

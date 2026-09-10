@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import { UserContext } from '../../context/UserContext';
 import TutorHeader from '../../components/Tutor/TutorHeader';

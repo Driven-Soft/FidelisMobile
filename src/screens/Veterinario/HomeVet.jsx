@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, ScrollView, Text, Pressable } from 'react-native';
+import { ScrollView, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useVeterinarian } from '../../hooks/useVeterinarian';
 import TutorDataStatus from '../../components/Tutor/TutorDataStatus';

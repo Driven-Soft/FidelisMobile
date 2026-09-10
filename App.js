@@ -1,10 +1,9 @@
-import React from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./src/config/queryClient";
 import { NavigationContainer } from "@react-navigation/native";
 import { UserProvider } from "./src/context/UserContext";
 import StackRoutes from "./src/routes/stack.routes";
-import { StatusBar, LogBox, View } from "react-native";
+import { StatusBar, View } from "react-native";
 import "./global.css";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";

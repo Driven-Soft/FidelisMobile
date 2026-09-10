@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { View, ScrollView, Text, Pressable } from "react-native";
 import TutorHeader from "../../components/Tutor/TutorHeader";
 import Input from "../../components/common/Input";

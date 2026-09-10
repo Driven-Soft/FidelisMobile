@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useEffect, useMemo, useState } from 'react';
 import { useAuthSession } from '../hooks/useAuthSession';
 
 export const UserContext = createContext();

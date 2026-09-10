@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import { useTutorProfile, useTutorHistory } from '../../hooks/useTutorData';
 import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
