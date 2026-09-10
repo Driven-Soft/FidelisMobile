@@ -101,6 +101,8 @@ Verificações estáticas e simulações locais não substituem testes reais de 
 | Felipe Bezerra Beatrici | 564723 |
 | Max Hayashi Batista | 563717 |
 | Henrique Cunha Torres | 565119 |
+| Lucas da Silva Lima | 562118 |
+| Yasmin Nathalin Miranda dos Santos | 561365 |
 
 ## Links
 
