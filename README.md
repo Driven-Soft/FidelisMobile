@@ -1,28 +1,56 @@
-﻿# FidelisMobile
+# 🐾 FidelisMobile
 
-Aplicativo de gestão de saúde pet desenvolvido pela equipe Driven Soft para o Challenge FIAP 2026, em parceria com a CLYVO VET.
+**Cuide de quem você ama, do jeito certo.**
 
-## Funcionalidades
+Aplicativo de saúde pet desenvolvido pela **Driven Soft** para o **Challenge FIAP 2026 — Sprint 3**, em parceria com a **CLYVO VET**.
 
-O portal Tutor possui integração com a API .NET para cadastro e login, sessão persistida, logout, CRUD de Pets, visualização dos cuidados, consulta do perfil e histórico de consultas e vacinações dos pets. Lembretes são somente leitura para o Tutor no aplicativo.
+## 🎯 Problema e solução
 
-O cadastro envia nome, email, CPF, telefone, endereço e senha. Após o sucesso, o usuário retorna ao login para autenticar. A senha não é persistida no armazenamento local.
+O acompanhamento da saúde de um pet envolve vacinas, retornos, medicamentos e outros cuidados que podem se perder entre anotações e compromissos do dia a dia. A falta de uma visão organizada dificulta a continuidade do cuidado e a comunicação entre tutores e clínicas.
 
-O portal Veterinário utiliza o tipo e a identidade retornados pela autenticação para consultar o perfil profissional, sua clínica e os pets vinculados a ela. A listagem compara o clinicaId de cada pet com o clinicaId do veterinário; não depende de vínculo direto entre Tutor e Clínica. Na Agenda, o veterinário cadastra, edita, conclui, cancela e exclui os cuidados desses pets. O tutorId do cuidado é obtido do pet selecionado. A lista inclui pendentes, atrasados, concluídos e cancelados. Esses lembretes não representam consultas confirmadas. O prontuário ainda está indisponível, sem dados simulados.
+O **FidelisMobile** reúne essas informações em dois portais conectados a uma API .NET: o veterinário organiza os cuidados dos pets da clínica, enquanto o tutor acompanha o que precisa ser feito e mantém os dados dos seus animais.
 
-## Tecnologias
+## ✨ Funcionalidades
 
-- Expo 54, React 19 e React Native 0.81.
-- React Navigation para Stack e Tabs.
-- TanStack React Query para dados de servidor, loading, erros e atualização das consultas.
-- Axios como cliente HTTP centralizado.
-- AsyncStorage para persistência de sessão.
-- JavaScript/JSX e contratos em TypeScript.
-- NativeWind, Tailwind CSS, Expo Font e fontes IBM Plex.
+| Portal do Tutor 🐶 | Portal do Veterinário 🩺 |
+| --- | --- |
+| Cadastro, login e sessão persistida | Login e sessão persistida |
+| Cadastro, consulta, edição e exclusão de pets | Consulta dos pets vinculados à própria clínica |
+| Seleção de clínica no cadastro do pet | Consulta do perfil profissional e da clínica |
+| Visualização dos cuidados, datas e status | Cadastro, edição, conclusão, cancelamento e exclusão de cuidados |
+| Consulta do perfil e histórico disponível na Home | Agenda de cuidados organizada por status |
 
-## Como executar
+Os dados são obtidos da API. A interface apresenta estados de carregamento, erros e atualização após as operações. Os cuidados são lembretes com datas previstas, não agendamentos de consultas confirmadas.
 
-Utilize Node.js compatível com Expo 54 e React Native 0.81. O CLI do Expo é executado pelas dependências do projeto.
+## 🛠️ Tecnologias utilizadas
+
+| Tecnologia | Utilização |
+| --- | --- |
+| React Native 0.81 + Expo 54 | Desenvolvimento e execução do aplicativo |
+| React 19 | Interface e componentes |
+| React Navigation | Navegação entre telas com Stack e Tabs |
+| TanStack React Query | Consultas, mutations, cache e atualização dos dados |
+| Axios | Requisições HTTP à API .NET |
+| AsyncStorage | Persistência da sessão, sem armazenar senha |
+| JavaScript e TypeScript | Interface, lógica e contratos tipados |
+| NativeWind + Tailwind CSS | Estilização |
+| Expo Font + IBM Plex | Tipografia |
+
+A organização segue o fluxo:
+
+```text
+Tela → Hook / TanStack Query → Repository → Axios → API .NET
+```
+
+## 🚀 Como executar
+
+### 1. Pré-requisitos
+
+- Node.js 20.19.4 ou superior, compatível com as dependências do projeto, e npm.
+- API .NET em execução e acessível pelo navegador ou dispositivo.
+- Navegador para testar na web, ou dispositivo/emulador compatível com o Expo.
+
+### 2. Baixar e instalar
 
 ```bash
 git clone https://github.com/Driven-Soft/FidelisMobile.git
@@ -30,15 +58,27 @@ cd FidelisMobile
 npm install
 ```
 
-Crie `.env.local` na raiz seguindo `.env.example`:
+### 3. Configurar a API
+
+Crie `.env.local` na raiz, seguindo `.env.example`, e informe a URL base da API:
 
 ```dotenv
 EXPO_PUBLIC_API_URL=http://rm564723-fidelis-api.azurewebsites.net
 ```
 
-Use somente a URL base, sem `/swagger`. Não versione `.env.local` e não coloque senhas ou tokens em variáveis `EXPO_PUBLIC_*`. Reinicie o Expo após alterar o ambiente.
+Para a API local na porta 8080, testando no navegador do mesmo computador:
 
-Para executar na web:
+```dotenv
+EXPO_PUBLIC_API_URL=http://localhost:8080
+```
+
+Use **uma única URL**, sem `/swagger` ou `/api` no final. Reinicie o Expo após alterar o arquivo.
+
+> 📌 No celular, `localhost` aponta para o próprio aparelho: use um endereço da API acessível pelo dispositivo. Na web, o backend precisa permitir a origem do aplicativo via CORS. Não versione `.env.local` nem coloque senhas ou tokens nas variáveis `EXPO_PUBLIC_*`.
+
+### 4. Iniciar o aplicativo
+
+Para testar na web:
 
 ```bash
 npm run web
@@ -46,54 +86,22 @@ npm run web
 
 Outras opções:
 
-```bash
-npm start
-npm run android
-npm run ios
-```
+| Comando | Execução |
+| --- | --- |
+| `npm start` | Inicia o Expo para escolher a plataforma |
+| `npm run android` | Abre no Android conectado ou emulador |
+| `npm run ios` | Abre no simulador iOS, disponível no macOS |
 
-Android/iOS exigem dispositivo ou emulador compatível. O simulador iOS requer macOS.
+### 5. Acessar os portais
 
-## Arquitetura
+- **Tutor:** crie uma conta pelo aplicativo e faça login selecionando “Tutor”.
+- **Veterinário:** selecione “Veterinário” e utilize uma conta profissional já cadastrada na API.
 
-```text
-Tela → Hook / TanStack Query → Repository → Axios → API .NET
-```
+## 🎬 Vídeo de apresentação
 
-```text
-FidelisMobile/
-├── App.js
-├── app.json
-├── assets/
-└── src/
-    ├── components/    # Componentes de interface
-    ├── config/        # QueryClient compartilhado
-    ├── context/       # Sessão e estado global de interface
-    ├── hooks/         # Autenticação e operações com React Query
-    ├── models/        # Tipos e contratos da API
-    ├── repositories/  # Acesso à API e armazenamento de sessão
-    ├── routes/        # Navegadores e rotas explícitas
-    ├── screens/       # Login, cadastro e portais Tutor/Veterinário
-    ├── services/      # Axios e token em memória
-    └── utils/         # Validação, formatação e transformação
-```
+▶️ **[Assistir à apresentação no YouTube]()**
 
-O cliente `src/services/api.js` lê `EXPO_PUBLIC_API_URL` e envia o Bearer Token da sessão. Os dados de servidor ficam sob responsabilidade do React Query. A sessão persiste `token`, `expiraEm`, `tipo`, `tutorId`, `veterinarioId`, `nome` e `email`, sem senha. O ID aplicável depende do tipo autenticado. Sessões antigas sem tipo exigem novo login.
-
-## Integração e limitações
-
-- Cadastro: `POST /api/Tutor`. Login: `POST /api/Auth/login`.
-- Para executar na web, a API precisa permitir a origem do aplicativo via CORS; não há contorno de CORS no cliente. A validação em um ambiente local não substitui a validação da API hospedada.
-- Recuperação de senha ainda não está implementada.
-- Pets exigem `fotoUrl` e sexo `M` ou `F`. O cadastro permite selecionar uma clínica obtida da API e exige confirmar o aviso de que o vínculo não poderá ser alterado pelo aplicativo. Peso e observações não pertencem ao contrato. A edição de `clinicaId` não é oferecida porque o backend ignora essa alteração.
-- Lembretes permitem editar tipo/descrição, preservando data e vínculos. Concluir/cancelar altera o status; cancelar não exclui o registro.
-- O perfil do tutor não fornece vínculo direto com clínica. O histórico utiliza consultas e vacinações dos pets atuais.
-- A autorização por perfil e propriedade permanece uma pendência do backend. Filtros e verificações no Mobile limitam a interface e suas operações, mas não impedem chamadas diretas à API. O servidor precisa garantir que somente veterinários autorizados gerenciem os cuidados da própria clínica.
-- Dados legados de pets/lembretes no AsyncStorage não são utilizados ou migrados. Senhas eventualmente gravadas por versões antigas não são removidas automaticamente.
-
-Verificações estáticas e simulações locais não substituem testes reais de cadastro, login, sessão, CRUDs e navegação com a API.
-
-## Equipe
+## 👥 Equipe Driven Soft
 
 | Integrante | RM |
 | --- | --- |
@@ -103,7 +111,5 @@ Verificações estáticas e simulações locais não substituem testes reais de 
 | Lucas da Silva Lima | 562118 |
 | Yasmin Nathalin Miranda dos Santos | 561365 |
 
-## Links
 
-- [Repositório](https://github.com/Driven-Soft/FidelisMobile)
-- [Vídeo pitch](https://youtu.be/oG82EtRA0-g)
+🔗 **[Repositório do projeto](https://github.com/Driven-Soft/FidelisMobile)**
