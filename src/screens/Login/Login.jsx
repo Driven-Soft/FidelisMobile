@@ -183,7 +183,7 @@ export default function Login({ navigation }) {
 
             <Text className="font-sans text-label text-slate">
               {portalType === "TUTOR"
-                ? "Entre com uma conta já cadastrada na API. O cadastro pelo aplicativo ainda é local."
+                ? "Entre com seu email e senha ou crie sua conta em Cadastre-se."
                 : "A autenticação de veterinários ainda não está disponível."}
             </Text>
           </View>
