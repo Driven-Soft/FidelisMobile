@@ -57,10 +57,6 @@ const ProfileTutor = () => {
           </View>
         </View>
         <View className="mt-1 gap-[10px]">
-          <Pressable accessibilityRole="button" disabled accessibilityState={{ disabled: true }}
-            className="items-center justify-center rounded-control bg-clinic px-5 py-3" style={{ opacity: 0.5 }}>
-            <Text className="font-sans-semibold text-title text-white">Editar perfil (indisponível nesta etapa)</Text>
-          </Pressable>
           <Pressable accessibilityRole="button" onPress={() => void logout()}
             style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
             className="items-center justify-center rounded-control border border-alert bg-card px-[18px] py-[11px]">

@@ -85,7 +85,7 @@ O cliente `src/services/api.js` lê `EXPO_PUBLIC_API_URL` e envia o Bearer Token
 
 - Cadastro: `POST /api/Tutor`. Login: `POST /api/Auth/login`.
 - O teste de cadastro no navegador encontrou bloqueio de CORS na API hospedada. A validação real de ponta a ponta permanece pendente. A API precisa permitir a origem do aplicativo; não há contorno de CORS no cliente.
-- Recuperação de senha e edição de perfil ainda não estão implementadas.
+- Recuperação de senha ainda não está implementada.
 - Pets exigem `fotoUrl` e sexo `M` ou `F`. Peso e observações não pertencem ao contrato. A edição de `clinicaId` não é oferecida porque o backend ignora essa alteração.
 - Lembretes permitem editar tipo/descrição, preservando data e vínculos. Concluir/cancelar altera o status; cancelar não exclui o registro.
 - O perfil do tutor não fornece vínculo direto com clínica. O histórico utiliza consultas e vacinações dos pets atuais.

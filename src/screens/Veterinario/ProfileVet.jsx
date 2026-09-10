@@ -59,13 +59,6 @@ const ProfileVet = () => {
 
           <View className="mb-6 mt-1 gap-[10px] pb-6">
             <TouchableOpacity
-              onPress={() => {}}
-              className="items-center justify-center rounded-control bg-clinic px-5 py-3"
-            >
-              <Text className="font-sans-semibold text-title text-white">Editar Perfil</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
               onPress={handleLogout}
               className="items-center justify-center rounded-control border border-alert bg-card px-[18px] py-[11px]"
             >
