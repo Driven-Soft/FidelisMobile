@@ -2,6 +2,7 @@
 export interface LoginRequest {
   email: string;
   senha: string;
+  tipo: "TUTOR" | "VETERINARIO";
 }
 
 export interface LoginResponse {

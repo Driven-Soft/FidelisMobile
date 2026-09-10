@@ -58,7 +58,7 @@ export default function Login({ navigation }) {
     }
 
     try {
-      await mutateAsync({ email: trimmedEmail, senha: password });
+      await mutateAsync({ email: trimmedEmail, senha: password, tipo: "TUTOR" });
       setPassword("");
       // O Stack troca o fluxo automaticamente após a sessão ser salva.
     } catch (error) {
