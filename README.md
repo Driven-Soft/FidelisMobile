@@ -26,7 +26,7 @@ Os dados são obtidos da API. A interface apresenta estados de carregamento, err
 
 | Tecnologia | Utilização |
 | --- | --- |
-| React Native 0.81 + Expo 54 | Desenvolvimento e execução do aplicativo |
+| React Native 0.86 + Expo 57 | Desenvolvimento e execução do aplicativo |
 | React 19 | Interface e componentes |
 | React Navigation | Navegação entre telas com Stack e Tabs |
 | TanStack React Query | Consultas, mutations, cache e atualização dos dados |
@@ -83,6 +83,15 @@ Para testar na web:
 ```bash
 npm run web
 ```
+
+Se o Expo avisar que faltam dependências para usar TypeScript e perguntar se deseja instalar `typescript` e `@types/react`, confirme com **Yes** (`y`). O projeto contém arquivos TypeScript. Essas dependências já estão declaradas no `package.json` atual, então o aviso normalmente não aparece após `npm install`.
+
+Para testar no celular com **Expo Go compatível com o SDK 57**:
+
+1. No terminal do computador, execute `npx expo login` e entre na sua conta Expo.
+2. No aplicativo Expo Go do celular, entre com **a mesma conta Expo**. Essa conta é independente do login de Tutor/Veterinário do Fidelis.
+3. Mantenha o computador e o celular na mesma rede e execute `npx expo start --clear` na pasta do projeto. Se o servidor já estiver aberto, encerre-o com `Ctrl+C` antes.
+4. Escaneie o QR Code com o Expo Go no Android ou com a câmera no iPhone.
 
 Outras opções:
 
