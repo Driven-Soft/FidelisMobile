@@ -108,7 +108,7 @@ Outras opções:
 
 ## 🎬 Vídeo de apresentação
 
-▶️ **[Assistir à apresentação no YouTube]()**
+▶️ **[Assistir à apresentação no YouTube](https://youtu.be/ki4T3oCGPOM?is=7kQBMDk6DGpW_iaN)**
 
 ## 👥 Equipe Driven Soft
 
