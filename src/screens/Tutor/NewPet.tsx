@@ -1,19 +1,14 @@
 import type { NewPetScreenProps } from '../../routes/types';
-import { useState } from "react";
 import { View, ScrollView, Text, Pressable } from "react-native";
 import TutorHeader from "../../components/Tutor/TutorHeader";
 import Input from "../../components/common/Input";
 import PetQueryStatus from "../../components/Tutor/PetQueryStatus";
-import { usePet, useCreatePet, useUpdatePet } from "../../hooks/usePets";
-import { emptyPetForm, petToForm, validatePetForm, petFormFields, petFormPatch, getPetErrorMessage } from "../../utils/petUtils";
+import { usePet } from "../../hooks/usePets";
+import { usePetForm } from "../../hooks/usePetForm";
 import { Masks } from "react-native-mask-input";
-import { useClinics } from "../../hooks/useClinics";
 import PetClinicSelector from "../../components/Tutor/PetClinicSelector";
 import type { PetResponse } from "../../models/pet";
-import type { PetFormValues } from "../../utils/petUtils";
 
-type PetFormField = keyof PetFormValues | 'clinicaId';
-type PetFormErrors = Partial<Record<PetFormField, string>>;
 interface PetFormProps {
   pet: PetResponse | null;
   navigation: NewPetScreenProps['navigation'];
@@ -37,24 +32,10 @@ export default function NewPet({ navigation, route }: NewPetScreenProps) {
 }
 
 const PetForm = ({ pet, navigation }: PetFormProps) => {
-  const create = useCreatePet();
-  const update = useUpdatePet();
-  const mutation = pet ? update : create;
-  const clinics = useClinics(!pet);
-  const [clinicId, setClinicId] = useState<number | null>(null);
-  const clinicAvailable = !clinics.isError && clinics.data?.some((clinic) => clinic.id === clinicId);
-  const [step, setStep] = useState(1);
-  const [form, setForm] = useState(() => pet ? petToForm(pet) : { ...emptyPetForm });
-  const [touched, setTouched] = useState<Partial<Record<PetFormField, boolean>>>({});
-  const validation: PetFormErrors = validatePetForm(form);
-  if (!pet && !clinicAvailable) validation.clinicaId = "Selecione uma clínica disponível e confirme o aviso.";
-  const handleBlur = (field: PetFormField) => setTouched((current) => ({ ...current, [field]: true }));
-  const setField = (field: keyof PetFormValues, value: string) => setForm((current) => ({ ...current, [field]: value }));
-  const stepFields: PetFormField[][] = [["name", "species", "breed"], ["sex", "birthDate"], pet ? ["fotoUrl"] : ["fotoUrl", "clinicaId"]];
-  const fieldErrors: PetFormErrors = {};
-  for (const field of stepFields.flat()) {
-    if (touched[field]) fieldErrors[field] = validation[field];
-  }
+  const {
+    clinics, clinicId, setClinicId, step, form, touched, validation, fieldErrors,
+    setField, handleBlur, handleNext, handleBack, isPending, errorMessage,
+  } = usePetForm(pet, () => navigation.goBack());
   const stepLabels = [
     { number: 1, label: "Dados básicos" },
     { number: 2, label: "Dados físicos" },
@@ -62,29 +43,9 @@ const PetForm = ({ pet, navigation }: PetFormProps) => {
   ];
   const currentStep = stepLabels[step - 1];
 
-  const handleNext = async () => {
-    if (mutation.isPending || (!pet && step === 3 && clinics.isFetching)) return;
-    const fields = step === 3 ? stepFields.flat() : stepFields[step - 1];
-    setTouched((current) => ({ ...current, ...Object.fromEntries(fields.map((field) => [field, true])) }));
-    if (fields.some((field) => validation[field])) return;
-    if (step < 3) { setStep(step + 1); return; }
-    try {
-      if (pet) {
-        const changes = petFormPatch(form, pet);
-        if (Object.keys(changes).length === 0) { navigation.goBack(); return; }
-        await update.mutateAsync({ id: pet.id, changes });
-      } else {
-        await create.mutateAsync({ ...petFormFields(form), clinicaId: clinicId });
-      }
-      navigation.goBack();
-    } catch {
-      // O erro da mutation é apresentado no formulário.
-    }
-  };
-
   return (
     <View className="flex-1 bg-mist">
-      <TutorHeader title={pet ? "Editar Pet" : "Cadastrar Pet"} onBack={mutation.isPending ? undefined : () => navigation.goBack()} />
+      <TutorHeader title={pet ? "Editar Pet" : "Cadastrar Pet"} onBack={isPending ? undefined : () => navigation.goBack()} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -148,7 +109,7 @@ const PetForm = ({ pet, navigation }: PetFormProps) => {
                 placeholder="Ex.: Thor"
                 value={form.name}
                 maxLength={30}
-                editable={!mutation.isPending}
+                editable={!isPending}
                 onChangeText={(value) => setField("name", value)}
                 onBlur={() => handleBlur("name")}
                 error={fieldErrors.name}
@@ -160,7 +121,7 @@ const PetForm = ({ pet, navigation }: PetFormProps) => {
                 placeholder="Ex.: Cão"
                 value={form.species}
                 maxLength={20}
-                editable={!mutation.isPending}
+                editable={!isPending}
                 onChangeText={(value) => setField("species", value)}
                 onBlur={() => handleBlur("species")}
                 error={fieldErrors.species}
@@ -172,7 +133,7 @@ const PetForm = ({ pet, navigation }: PetFormProps) => {
                 placeholder="Ex.: Golden Retriever"
                 value={form.breed}
                 maxLength={20}
-                editable={!mutation.isPending}
+                editable={!isPending}
                 onChangeText={(value) => setField("breed", value)}
                 onBlur={() => handleBlur("breed")}
                 error={fieldErrors.breed}
@@ -187,7 +148,7 @@ const PetForm = ({ pet, navigation }: PetFormProps) => {
               <Text className="mb-2 font-sans text-label text-slate">Sexo</Text>
               <View className="mb-3 flex-row gap-3">
                 {[["M", "Macho"], ["F", "Fêmea"]].map(([value, label]) => (
-                  <Pressable key={value} disabled={mutation.isPending} onPress={() => setField("sex", value)}
+                  <Pressable key={value} disabled={isPending} onPress={() => setField("sex", value)}
                     accessibilityRole="button" accessibilityState={{ selected: form.sex === value }}
                     className={`rounded-control border px-4 py-2 ${form.sex === value ? "border-clinic bg-clinic-50" : "border-line-strong bg-card"}`}>
                     <Text className="font-sans text-body text-ink">{label}</Text>
@@ -199,7 +160,7 @@ const PetForm = ({ pet, navigation }: PetFormProps) => {
                 label="Data de nascimento"
                 placeholder="DD/MM/AAAA"
                 value={form.birthDate}
-                editable={!mutation.isPending}
+                editable={!isPending}
                 onChangeText={(value) => setField("birthDate", value)}
                 onBlur={() => handleBlur("birthDate")}
                 error={fieldErrors.birthDate}
@@ -222,20 +183,20 @@ const PetForm = ({ pet, navigation }: PetFormProps) => {
               isValid={touched.fotoUrl && !validation.fotoUrl}
               autoCapitalize="none"
               maxLength={255}
-              editable={!mutation.isPending}
+              editable={!isPending}
             />
           )}
           {step === 3 && !pet && <PetClinicSelector query={clinics} selectedId={clinicId}
-            onSelect={setClinicId} disabled={mutation.isPending} error={fieldErrors.clinicaId} />}
+            onSelect={setClinicId} disabled={isPending} error={fieldErrors.clinicaId} />}
         </View>
 
-        {mutation.error && <Text accessibilityRole="alert" className="font-sans text-body text-alert">{getPetErrorMessage(mutation.error)}</Text>}
+        {errorMessage && <Text accessibilityRole="alert" className="font-sans text-body text-alert">{errorMessage}</Text>}
         <View className="flex-row gap-[10px]">
           {step > 1 && (
             <Pressable
               accessibilityRole="button"
-              disabled={mutation.isPending}
-              onPress={() => setStep((current) => current - 1)}
+              disabled={isPending}
+              onPress={handleBack}
               style={({ pressed }) => [{ flex: 1 }, pressed ? { opacity: 0.7 } : null]}
               className="items-center justify-center rounded-control border border-line-strong bg-card px-[18px] py-[11px]"
             >
@@ -245,13 +206,13 @@ const PetForm = ({ pet, navigation }: PetFormProps) => {
           <Pressable
             accessibilityRole="button"
             onPress={handleNext}
-            disabled={mutation.isPending}
-            accessibilityState={{ disabled: mutation.isPending, busy: mutation.isPending }}
+            disabled={isPending}
+            accessibilityState={{ disabled: isPending, busy: isPending }}
             style={({ pressed }) => [{ flex: 1 }, pressed ? { opacity: 0.7 } : null]}
             className="items-center justify-center rounded-control bg-clinic px-5 py-3"
           >
             <Text className="font-sans-semibold text-title text-white">
-              {mutation.isPending ? "Salvando..." : step === 3 ? "Salvar pet" : "Próximo"}
+              {isPending ? "Salvando..." : step === 3 ? "Salvar pet" : "Próximo"}
             </Text>
           </Pressable>
         </View>

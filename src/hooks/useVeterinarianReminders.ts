@@ -6,7 +6,7 @@ import { isValidSession } from "../services/authSession";
 import { buscarVeterinario } from "../repositories/veterinario/veterinarianRepository";
 import { buscarPet } from "../repositories/pets/petRepository";
 import * as repository from "../repositories/reminders/reminderRepository";
-import { ReminderFlowError, requireReminderId, serializeReminderDate, validateReminderText } from "../utils/reminderUtils";
+import { getReminderErrorMessage, ReminderFlowError, requireReminderId, serializeReminderDate, validateReminderText } from "../utils/reminderUtils";
 
 function useVeterinarianReminderScope() {
   const { session, authStatus } = useUserContext();
@@ -111,4 +111,37 @@ export function useVeterinarianReminderActions() {
     onSuccess: refresh,
   });
   return { create, update, status, remove };
+}
+
+export type ReminderAction = "C" | "X" | "delete";
+
+// Coordena as ações da agenda usando as mutations e regras existentes.
+export function useVeterinarianAgendaActions() {
+  const { status: statusMutation, remove: deleteMutation } = useVeterinarianReminderActions();
+  const submitting = useRef(false);
+  const busy = statusMutation.isPending || deleteMutation.isPending;
+  const act = async (id: number, action: ReminderAction): Promise<boolean> => {
+    if (busy || submitting.current) return false;
+    submitting.current = true;
+    statusMutation.reset();
+    deleteMutation.reset();
+    try {
+      if (action === "delete") await deleteMutation.mutateAsync(id);
+      else await statusMutation.mutateAsync({ id, status: action });
+      return true;
+    } catch {
+      // A tela só fecha a confirmação quando a operação é concluída.
+      return false;
+    } finally {
+      submitting.current = false;
+    }
+  };
+
+  return {
+    act, busy,
+    isDeleting: deleteMutation.isPending,
+    errorMessage: statusMutation.error || deleteMutation.error
+      ? getReminderErrorMessage(statusMutation.error ?? deleteMutation.error)
+      : null,
+  };
 }

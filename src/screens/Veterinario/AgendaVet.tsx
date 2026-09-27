@@ -4,19 +4,19 @@ import Feather from '@expo/vector-icons/Feather';
 import { useClinicPets } from '../../hooks/useClinicPets';
 import { useClinicAgenda } from '../../hooks/useClinicAgenda';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useVeterinarianReminderActions } from '../../hooks/useVeterinarianReminders';
-import { getReminderErrorMessage, groupReminders } from '../../utils/reminderUtils';
+import { useVeterinarianAgendaActions } from '../../hooks/useVeterinarianReminders';
+import type { ReminderAction } from '../../hooks/useVeterinarianReminders';
+import { groupReminders } from '../../utils/reminderUtils';
 import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
 import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
 import ReminderCard from '../../components/Tutor/ReminderCard';
 import NewReminderModal from '../../components/Veterinario/NewReminderModal';
 
-type ReminderAction = 'C' | 'X' | 'delete';
 type Confirmation = { id: number; action: 'X' | 'delete' };
 
 const AgendaVet = () => {
   const query = useClinicAgenda(false);
-  const { status: statusMutation, remove: deleteMutation } = useVeterinarianReminderActions();
+  const { act, busy, isDeleting, errorMessage } = useVeterinarianAgendaActions();
   const petsQuery = useClinicPets();
   const pets = petsQuery.error ? [] : petsQuery.data ?? [];
   const reminders = query.data.map(({ reminder }) => reminder);
@@ -25,26 +25,11 @@ const AgendaVet = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const scale = useRef(new Animated.Value(1)).current;
-  const submitting = useRef(false);
-  const busy = statusMutation.isPending || deleteMutation.isPending;
-  const error = statusMutation.error ?? deleteMutation.error;
   const filterOptions = ['Todos', ...new Set(['VACINA', 'RETORNO', 'MEDICAMENTO', 'CHECKUP', 'VERMÍFUGO', ...reminders.map((item) => item.tipo)])];
   const groups = groupReminders(reminders, filterType);
 
-  const act = async (id: number, action: ReminderAction) => {
-    if (busy || submitting.current) return;
-    submitting.current = true;
-    statusMutation.reset();
-    deleteMutation.reset();
-    try {
-      if (action === 'delete') await deleteMutation.mutateAsync(id);
-      else await statusMutation.mutateAsync({ id, status: action });
-      setConfirmation(null);
-    } catch {
-      // Mantém a confirmação e apresenta o erro fornecido pela mutation.
-    } finally {
-      submitting.current = false;
-    }
+  const handleAction = async (id: number, action: ReminderAction) => {
+    if (await act(id, action)) setConfirmation(null);
   };
 
   return (
@@ -68,11 +53,11 @@ const AgendaVet = () => {
             </Pressable>
           ))}
         </ScrollView>
-        {busy && <Text className="font-sans text-body text-clinic">{deleteMutation.isPending ? 'Excluindo lembrete...' : 'Atualizando status...'}</Text>}
-        {error && <Text accessibilityRole="alert" className="font-sans text-body text-alert">{getReminderErrorMessage(error)}</Text>}
+        {busy && <Text className="font-sans text-body text-clinic">{isDeleting ? 'Excluindo lembrete...' : 'Atualizando status...'}</Text>}
+        {errorMessage && <Text accessibilityRole="alert" className="font-sans text-body text-alert">{errorMessage}</Text>}
         {confirmation && <View className="gap-3 rounded-card border border-alert bg-card p-[14px]">
           <Text className="font-sans text-body text-ink">{confirmation.action === 'delete' ? 'Excluir definitivamente este lembrete?' : 'Cancelar este lembrete? Ele permanecerá listado como cancelado.'}</Text>
-          <Pressable accessibilityRole="button" disabled={busy} onPress={() => act(confirmation.id, confirmation.action)}>
+          <Pressable accessibilityRole="button" disabled={busy} onPress={() => handleAction(confirmation.id, confirmation.action)}>
             <Text className="text-alert">{busy ? 'Aguarde...' : 'Confirmar'}</Text>
           </Pressable>
           <Pressable accessibilityRole="button" disabled={busy} onPress={() => setConfirmation(null)}><Text className="text-clinic">Voltar</Text></Pressable>
@@ -82,7 +67,7 @@ const AgendaVet = () => {
             <Text className="font-sans-semibold text-title text-ink">{group.status} · {group.items.length}</Text>
             {group.items.map((reminder) => <ReminderCard key={reminder.id} reminder={reminder}
               pet={pets.find((pet) => pet.id === reminder.petId)} busy={busy || !!confirmation}
-              onComplete={(id) => act(id, 'C')}
+              onComplete={(id) => handleAction(id, 'C')}
               onCancel={(id) => setConfirmation({ id, action: 'X' })}
               onDelete={(id) => setConfirmation({ id, action: 'delete' })}
               onEdit={(id) => { setEditingId(id); setModalVisible(true); }} />)}

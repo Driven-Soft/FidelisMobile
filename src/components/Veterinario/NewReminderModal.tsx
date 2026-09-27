@@ -1,11 +1,12 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Modal, View, Text, Pressable, ScrollView, Platform } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Input from "../common/Input";
 import PetAvatar from "../Tutor/PetAvatar";
-import { useVeterinarianReminderActions, useVeterinarianReminder } from "../../hooks/useVeterinarianReminders";
-import { formatReminderDate, getReminderErrorMessage, parseReminderDate, serializeReminderDate, validateReminderText } from "../../utils/reminderUtils";
+import { useVeterinarianReminder } from "../../hooks/useVeterinarianReminders";
+import { formatReminderDate } from "../../utils/reminderUtils";
+import { useReminderForm } from "../../hooks/useReminderForm";
 import ReminderQueryStatus from "../Tutor/ReminderQueryStatus";
 import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import type { PetResponse } from "../../models/pet";
@@ -58,45 +59,16 @@ const NewReminderModal = ({ visible, onClose, pets = [], reminderId = null }: Ne
 };
 
 const ReminderForm = ({ onClose, pets, reminder = null }: ReminderFormProps) => {
-  const { create, update } = useVeterinarianReminderActions();
-  const mutation = reminder ? update : create;
-  const submitting = useRef(false);
-  const [type, setType] = useState(reminder?.tipo ?? "VACINA");
-  const [petId, setPetId] = useState<number | null>(pets?.[0]?.id || null);
-  const [description, setDescription] = useState(reminder?.descricao ?? "");
-  const [date, setDate] = useState(new Date());
-  const [dateText, setDateText] = useState(() => serializeReminderDate(new Date()).slice(0, 10));
-  const selectedDate = Platform.OS === "web" ? parseReminderDate(dateText) : date;
+  const {
+    type, setType, setPetId, description, setDescription,
+    date, setDate, dateText, setDateText, dateError, selectedPet,
+    touched, setTouched, isDescriptionValid, error, isSaveDisabled, handleSave,
+    isPending, errorMessage,
+  } = useReminderForm(pets, reminder, onClose);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [touched, setTouched] = useState(false);
-
-  const selectedPet = pets.find((pet) => pet.id === petId) ?? (petId === null ? pets[0] : undefined);
-
-  const isDescriptionValid = description.trim().length > 0;
-  const error =
-    touched && !isDescriptionValid ? "A descrição é obrigatória" : null;
 
   const closeAndReset = () => {
-    if (!mutation.isPending) onClose();
-  };
-
-  const handleSave = async () => {
-    setTouched(true);
-    if (isSaveDisabled || submitting.current) return;
-    submitting.current = true;
-    try {
-      if (reminder) await update.mutateAsync({ id: reminder.id, tipo: type, descricao: description });
-      else {
-        // A mesma condição já desabilita Salvar; explicita a nulidade neste ramo.
-        if (!selectedPet) return;
-        await create.mutateAsync({ tipo: type, descricao: description, date: selectedDate, petId: selectedPet.id });
-      }
-      onClose();
-    } catch {
-      // A mutation mantém o formulário aberto e fornece o erro visual.
-    } finally {
-      submitting.current = false;
-    }
+    if (!isPending) onClose();
   };
 
   // O seletor e um dialog: fecha ao escolher a data ou ao cancelar.
@@ -106,7 +78,6 @@ const ReminderForm = ({ onClose, pets, reminder = null }: ReminderFormProps) => 
     if (selectedDate) setDate(selectedDate);
   };
 
-  const isSaveDisabled = mutation.isPending || !validateReminderText(type, description) || (!reminder && (!selectedPet || !Number.isFinite(selectedDate.getTime())));
 
   return (
     <Modal
@@ -134,7 +105,7 @@ const ReminderForm = ({ onClose, pets, reminder = null }: ReminderFormProps) => 
               return (
                 <Pressable
                   key={t.key}
-                  disabled={mutation.isPending}
+                  disabled={isPending}
                   accessibilityRole="button"
                   accessibilityState={{ selected: isActive }}
                   onPress={() => setType(t.key)}
@@ -151,7 +122,7 @@ const ReminderForm = ({ onClose, pets, reminder = null }: ReminderFormProps) => 
             })}
           </ScrollView>
 
-          <Input label="Tipo" value={type} onChangeText={setType} maxLength={50} editable={!mutation.isPending} />
+          <Input label="Tipo" value={type} onChangeText={setType} maxLength={50} editable={!isPending} />
           {!reminder && <>
           <Text className="mb-[6px] font-sans text-label text-slate">Pet</Text>
           <View className="mb-3 max-h-36">
@@ -159,7 +130,7 @@ const ReminderForm = ({ onClose, pets, reminder = null }: ReminderFormProps) => 
               {pets.map((p) => (
                 <Pressable
                   key={p.id}
-                  disabled={mutation.isPending}
+                  disabled={isPending}
                   accessibilityRole="button"
                   accessibilityState={{ selected: selectedPet?.id === p.id }}
                   className="flex-row items-center gap-3 py-2"
@@ -186,7 +157,7 @@ const ReminderForm = ({ onClose, pets, reminder = null }: ReminderFormProps) => 
             label="Descrição"
             placeholder="Ex: Reforço da V10"
             value={description}
-            editable={!mutation.isPending}
+            editable={!isPending}
             onChangeText={setDescription}
             onBlur={() => setTouched(true)}
             error={error}
@@ -198,10 +169,10 @@ const ReminderForm = ({ onClose, pets, reminder = null }: ReminderFormProps) => 
           </Text> : <>
           <Text className="mb-[6px] font-sans text-label text-slate">Data</Text>
           {Platform.OS === "web" ? <Input label="Data (AAAA-MM-DD)"
-            value={dateText} error={!Number.isFinite(selectedDate.getTime()) ? "Informe uma data válida em AAAA-MM-DD." : undefined}
-            editable={!mutation.isPending} onChangeText={setDateText} /> : <>
+            value={dateText} error={dateError}
+            editable={!isPending} onChangeText={setDateText} /> : <>
           <Pressable
-            disabled={mutation.isPending}
+            disabled={isPending}
             accessibilityRole="button"
             onPress={() => setShowDatePicker(true)}
             style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
@@ -223,13 +194,13 @@ const ReminderForm = ({ onClose, pets, reminder = null }: ReminderFormProps) => 
           </>}
           </>}
 
-          {mutation.error && <Text accessibilityRole="alert" className="font-sans text-body text-alert">{getReminderErrorMessage(mutation.error)}</Text>}
+          {errorMessage && <Text accessibilityRole="alert" className="font-sans text-body text-alert">{errorMessage}</Text>}
 
           <View className="mt-[14px] flex-row justify-end gap-[10px]">
             <Pressable
               accessibilityRole="button"
               onPress={closeAndReset}
-              disabled={mutation.isPending}
+              disabled={isPending}
               style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
               className="items-center justify-center rounded-control border border-line-strong bg-card px-[18px] py-[11px]"
             >
@@ -246,7 +217,7 @@ const ReminderForm = ({ onClose, pets, reminder = null }: ReminderFormProps) => 
               ]}
               className="items-center justify-center rounded-control bg-clinic px-5 py-3"
             >
-              <Text className="font-sans-semibold text-title text-white">{mutation.isPending ? "Salvando..." : "Salvar"}</Text>
+              <Text className="font-sans-semibold text-title text-white">{isPending ? "Salvando..." : "Salvar"}</Text>
             </Pressable>
           </View>
         </ScrollView>

@@ -1,66 +1,23 @@
 import type { CadastroTutorScreenProps } from '../../routes/types';
-import React, { useState, useRef } from "react";
+import React from "react";
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaskInput, { Masks } from "react-native-mask-input";
 import Input from "../../components/common/Input";
 import { useRegisterTutor } from "../../hooks/useRegisterTutor";
-import { validateTutorRegistration, tutorRegistrationRequest, getRegistrationErrorMessage } from "../../utils/tutorRegistration";
-import type { TutorRegistrationForm } from "../../utils/tutorRegistration";
-
-type RegistrationField = keyof TutorRegistrationForm;
 
 export default function CadastroTutor({ navigation }: CadastroTutorScreenProps) {
-  const registration = useRegisterTutor();
-  const submitting = useRef(false);
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<TutorRegistrationForm>({
-    name: "", email: "", phone: "", cpf: "", address: "", password: "", confirmPassword: "",
-  });
-  const [touched, setTouched] = useState<Partial<Record<RegistrationField, boolean>>>({});
-  const stepFields: RegistrationField[][] = [["name", "email", "phone"], ["cpf", "address"], ["password", "confirmPassword"]];
-  const validation = validateTutorRegistration(formData);
-  const errors: Partial<Record<RegistrationField, string>> = {};
-  for (const field of stepFields.flat()) {
-    if (touched[field]) errors[field] = validation[field];
-  }
-  const isNameValid = !validation.name;
-  const isEmailValid = !validation.email;
-  const isPhoneValid = !validation.phone;
-  const isCpfValid = !validation.cpf;
-  const isPasswordValid = !validation.password;
-  const isConfirmPasswordValid = !validation.confirmPassword;
+  const {
+    step, formData, touched, validation, errors,
+    handleInputChange, handleBlur, handleNext, handleBack,
+    isPending, isSuccess, errorMessage, canLeave,
+  } = useRegisterTutor();
 
-  const handleInputChange = (field: RegistrationField, value: string) => {
-    if (!submitting.current) setFormData((current) => ({ ...current, [field]: value }));
-  };
-  const handleBlur = (field: RegistrationField) => setTouched((current) => ({ ...current, [field]: true }));
-
-  const handleNext = async () => {
-    if (registration.isPending || submitting.current || registration.isSuccess) return;
-    const fields = step === 3 ? stepFields.flat() : stepFields[step - 1];
-    setTouched((current) => ({ ...current, ...Object.fromEntries(fields.map((field) => [field, true])) }));
-    if (fields.some((field) => validation[field])) return;
-    if (step < 3) { setStep(step + 1); return; }
-    submitting.current = true;
-    try {
-      await registration.mutateAsync(tutorRegistrationRequest(formData));
-      setFormData((current) => ({ ...current, password: "", confirmPassword: "" }));
-    } catch {
-      // A mutation mantém o formulário e expõe o erro para a interface.
-    } finally {
-      submitting.current = false;
-    }
-  };
-  const handleBack = () => {
-    if (!registration.isPending && !submitting.current && step > 1) setStep(step - 1);
-  };
-
-  if (registration.isSuccess) return (
+  if (isSuccess) return (
     <SafeAreaView className="flex-1 items-center justify-center gap-4 bg-mist px-4" edges={["top"]}>
       <Text accessibilityLiveRegion="polite" className="font-sans-semibold text-title text-ink">Cadastro realizado com sucesso.</Text>
       <Text className="font-sans text-body text-slate">Entre com o email e a senha que você cadastrou.</Text>
-      <TouchableOpacity accessibilityRole="button" onPress={() => { if (!submitting.current) navigation.replace("Login"); }} className="rounded-control bg-clinic px-5 py-3">
+      <TouchableOpacity accessibilityRole="button" onPress={() => { if (canLeave()) navigation.replace("Login"); }} className="rounded-control bg-clinic px-5 py-3">
         <Text className="font-sans-semibold text-title text-white">Ir para login</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -127,11 +84,11 @@ export default function CadastroTutor({ navigation }: CadastroTutorScreenProps) 
                   label="Nome Completo"
                   placeholder="João Silva"
                   value={formData.name}
-                  editable={!registration.isPending}
+                  editable={!isPending}
                   onChangeText={(value) => handleInputChange("name", value)}
                   onBlur={() => handleBlur("name")}
                   error={errors.name}
-                  isValid={touched.name && isNameValid}
+                  isValid={touched.name && !validation.name}
                   maxLength={75}
                   autoCapitalize="words"
                 />
@@ -140,11 +97,11 @@ export default function CadastroTutor({ navigation }: CadastroTutorScreenProps) 
                   label="Email"
                   placeholder="joao@exemplo.com"
                   value={formData.email}
-                  editable={!registration.isPending}
+                  editable={!isPending}
                   onChangeText={(value) => handleInputChange("email", value)}
                   onBlur={() => handleBlur("email")}
                   error={errors.email}
-                  isValid={touched.email && isEmailValid}
+                  isValid={touched.email && !validation.email}
                   maxLength={75}
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -156,7 +113,7 @@ export default function CadastroTutor({ navigation }: CadastroTutorScreenProps) 
                   </Text>
                   <MaskInput
                     value={formData.phone}
-                  editable={!registration.isPending}
+                  editable={!isPending}
                     onChangeText={(masked) => handleInputChange("phone", masked)}
                     onBlur={() => handleBlur("phone")}
                     mask={Masks.BRL_PHONE}
@@ -182,7 +139,7 @@ export default function CadastroTutor({ navigation }: CadastroTutorScreenProps) 
                   </Text>
                   <MaskInput
                     value={formData.cpf}
-                  editable={!registration.isPending}
+                  editable={!isPending}
                     onChangeText={(masked) => handleInputChange("cpf", masked)}
                     onBlur={() => handleBlur("cpf")}
                     mask={Masks.BRL_CPF}
@@ -208,7 +165,7 @@ export default function CadastroTutor({ navigation }: CadastroTutorScreenProps) 
               value={formData.address} onChangeText={(value) => handleInputChange("address", value)}
               onBlur={() => handleBlur("address")} error={errors.address}
               isValid={touched.address && !validation.address}
-              editable={!registration.isPending} maxLength={255}
+              editable={!isPending} maxLength={255}
             />}
 
             {step === 3 && (
@@ -217,11 +174,11 @@ export default function CadastroTutor({ navigation }: CadastroTutorScreenProps) 
                   label="Senha"
                   placeholder="••••••••"
                   value={formData.password}
-                  editable={!registration.isPending}
+                  editable={!isPending}
                   onChangeText={(value) => handleInputChange("password", value)}
                   onBlur={() => handleBlur("password")}
                   error={errors.password}
-                  isValid={touched.password && isPasswordValid}
+                  isValid={touched.password && !validation.password}
                   maxLength={50}
                   type="password"
                 />
@@ -229,13 +186,13 @@ export default function CadastroTutor({ navigation }: CadastroTutorScreenProps) 
                   label="Confirmar Senha"
                   placeholder="••••••••"
                   value={formData.confirmPassword}
-                  editable={!registration.isPending}
+                  editable={!isPending}
                   onChangeText={(value) =>
                     handleInputChange("confirmPassword", value)
                   }
                   onBlur={() => handleBlur("confirmPassword")}
                   error={errors.confirmPassword}
-                  isValid={touched.confirmPassword && isConfirmPasswordValid}
+                  isValid={touched.confirmPassword && !validation.confirmPassword}
                   maxLength={50}
                   type="password"
                 />
@@ -243,13 +200,13 @@ export default function CadastroTutor({ navigation }: CadastroTutorScreenProps) 
             )}
           </View>
 
-          {registration.isPending && <ActivityIndicator color="#0E7A63" />}
-          {registration.error && <Text accessibilityRole="alert" accessibilityLiveRegion="polite" className="mt-3 font-sans text-body text-alert">{getRegistrationErrorMessage(registration.error)}</Text>}
+          {isPending && <ActivityIndicator color="#0E7A63" />}
+          {errorMessage && <Text accessibilityRole="alert" accessibilityLiveRegion="polite" className="mt-3 font-sans text-body text-alert">{errorMessage}</Text>}
 
           <View className="mt-6 flex-row gap-[10px] pb-6">
             {step > 1 && (
               <TouchableOpacity
-                disabled={registration.isPending}
+                disabled={isPending}
                 onPress={handleBack}
                 className="flex-1 items-center justify-center rounded-control border border-line-strong bg-card px-[18px] py-[11px]"
               >
@@ -257,13 +214,13 @@ export default function CadastroTutor({ navigation }: CadastroTutorScreenProps) 
               </TouchableOpacity>
             )}
             <TouchableOpacity
-              disabled={registration.isPending}
-              accessibilityState={{ disabled: registration.isPending, busy: registration.isPending }}
+              disabled={isPending}
+              accessibilityState={{ disabled: isPending, busy: isPending }}
               onPress={handleNext}
               className="flex-1 items-center justify-center rounded-control bg-clinic px-5 py-3"
             >
               <Text className="font-sans-semibold text-title text-white">
-                {registration.isPending ? "Cadastrando..." : step === 3 ? "Cadastrar" : "Próximo"}
+                {isPending ? "Cadastrando..." : step === 3 ? "Cadastrar" : "Próximo"}
               </Text>
             </TouchableOpacity>
           </View>
