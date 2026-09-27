@@ -21,36 +21,10 @@ export function isValidLoginResponse(value: unknown): value is AuthSession {
   );
 }
 
-// Cópia somente para transporte. O hook de sessão controla seu ciclo de vida.
+// A mesma validação serve para a resposta da API e para a sessão salva.
 export const isValidSession = isValidLoginResponse;
 
 export function copySession(session: AuthSession): AuthSession {
   const { token, expiraEm, tipo, tutorId, veterinarioId, nome, email } = session;
   return { token, expiraEm, tipo, tutorId: tutorId ?? null, veterinarioId: veterinarioId ?? null, nome, email };
-}
-
-let credential: { token: string; expiresAt: number } | null = null;
-const invalidationListeners = new Set<() => void>();
-
-export function setSessionToken(session: AuthSession | null): void {
-  credential = session ? { token: session.token, expiresAt: getSessionExpiration(session.expiraEm) } : null;
-}
-
-export function invalidateSessionToken(token: string): void {
-  // Uma resposta atrasada da sessão anterior não deve invalidar um novo login.
-  if (credential?.token !== token) return;
-  credential = null;
-  invalidationListeners.forEach((listener) => listener());
-}
-
-export function getSessionToken(): string | null {
-  if (credential && credential.expiresAt <= Date.now()) {
-    invalidateSessionToken(credential.token);
-  }
-  return credential?.token ?? null;
-}
-
-export function subscribeSessionInvalidation(listener: () => void): () => void {
-  invalidationListeners.add(listener);
-  return () => { invalidationListeners.delete(listener); };
 }
