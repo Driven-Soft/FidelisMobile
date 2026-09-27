@@ -7,6 +7,28 @@ import PetAvatar from "../Tutor/PetAvatar";
 import { useVeterinarianReminderActions, useVeterinarianReminder } from "../../hooks/useVeterinarianReminders";
 import { formatReminderDate, getReminderErrorMessage, parseReminderDate, serializeReminderDate, validateReminderText } from "../../utils/reminderUtils";
 import ReminderQueryStatus from "../Tutor/ReminderQueryStatus";
+import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import type { PetResponse } from "../../models/pet";
+import type { LembreteResponse } from "../../models/reminder";
+
+interface ReminderFormProps {
+  onClose: () => void;
+  pets: PetResponse[];
+  reminder?: LembreteResponse | null;
+}
+
+interface EditReminderProps {
+  id: number;
+  onClose: () => void;
+  pets: PetResponse[];
+}
+
+interface NewReminderModalProps {
+  visible: boolean;
+  onClose: () => void;
+  pets?: PetResponse[];
+  reminderId?: number | null;
+}
 
 const TYPE_OPTIONS = [
   { key: "VACINA", label: "Vacina" },
@@ -16,7 +38,7 @@ const TYPE_OPTIONS = [
   { key: "VERMÍFUGO", label: "Vermífugo" },
 ];
 
-const EditReminder = ({ id, onClose, pets }) => {
+const EditReminder = ({ id, onClose, pets }: EditReminderProps) => {
   const query = useVeterinarianReminder(id);
   if (query.isPending || query.isFetching || query.error || !query.data) return (
     <Modal visible transparent onRequestClose={onClose}>
@@ -30,17 +52,17 @@ const EditReminder = ({ id, onClose, pets }) => {
   return <ReminderForm key={id} onClose={onClose} pets={pets} reminder={query.data} />;
 };
 
-const NewReminderModal = ({ visible, onClose, pets = [], reminderId = null }) => {
+const NewReminderModal = ({ visible, onClose, pets = [], reminderId = null }: NewReminderModalProps) => {
   if (!visible) return null;
   return reminderId === null ? <ReminderForm onClose={onClose} pets={pets} /> : <EditReminder id={reminderId} onClose={onClose} pets={pets} />;
 };
 
-const ReminderForm = ({ onClose, pets, reminder = null }) => {
+const ReminderForm = ({ onClose, pets, reminder = null }: ReminderFormProps) => {
   const { create, update } = useVeterinarianReminderActions();
   const mutation = reminder ? update : create;
   const submitting = useRef(false);
   const [type, setType] = useState(reminder?.tipo ?? "VACINA");
-  const [petId, setPetId] = useState(pets?.[0]?.id || null);
+  const [petId, setPetId] = useState<number | null>(pets?.[0]?.id || null);
   const [description, setDescription] = useState(reminder?.descricao ?? "");
   const [date, setDate] = useState(new Date());
   const [dateText, setDateText] = useState(() => serializeReminderDate(new Date()).slice(0, 10));
@@ -64,7 +86,11 @@ const ReminderForm = ({ onClose, pets, reminder = null }) => {
     submitting.current = true;
     try {
       if (reminder) await update.mutateAsync({ id: reminder.id, tipo: type, descricao: description });
-      else await create.mutateAsync({ tipo: type, descricao: description, date: selectedDate, petId: selectedPet.id });
+      else {
+        // A mesma condição já desabilita Salvar; explicita a nulidade neste ramo.
+        if (!selectedPet) return;
+        await create.mutateAsync({ tipo: type, descricao: description, date: selectedDate, petId: selectedPet.id });
+      }
       onClose();
     } catch {
       // A mutation mantém o formulário aberto e fornece o erro visual.
@@ -74,7 +100,7 @@ const ReminderForm = ({ onClose, pets, reminder = null }) => {
   };
 
   // O seletor e um dialog: fecha ao escolher a data ou ao cancelar.
-  const onChangeDate = (event, selectedDate) => {
+  const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowDatePicker(false);
     if (event.type === "dismissed") return;
     if (selectedDate) setDate(selectedDate);

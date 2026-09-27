@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { AxiosResponse } from "axios";
 import { getSessionToken, invalidateSessionToken } from "./authSession";
 
 export const api = axios.create({
@@ -15,9 +16,9 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
+  (response: AxiosResponse<unknown, unknown>) => response,
+  (error: unknown) => {
+    if (axios.isAxiosError<unknown, unknown>(error) && error.response?.status === 401) {
       const authorization = error.config?.headers?.get?.("Authorization");
       if (typeof authorization === "string" && authorization.startsWith("Bearer ")) {
         invalidateSessionToken(authorization.slice(7));

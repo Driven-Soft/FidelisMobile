@@ -10,58 +10,65 @@ import PatientsVet from '../screens/Veterinario/PatientsVet';
 import ProfileVet from '../screens/Veterinario/ProfileVet';
 import AgendaVet from '../screens/Veterinario/AgendaVet';
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+import type { ComponentProps } from 'react';
+import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import type { VetHomeStackParamList, VetPatientsStackParamList, VetAgendaStackParamList, VetProfileStackParamList, VetTabParamList } from './types';
+
+const HomeNavigator = createNativeStackNavigator<VetHomeStackParamList>();
+const PatientsNavigator = createNativeStackNavigator<VetPatientsStackParamList>();
+const AgendaNavigator = createNativeStackNavigator<VetAgendaStackParamList>();
+const ProfileNavigator = createNativeStackNavigator<VetProfileStackParamList>();
+const Tab = createBottomTabNavigator<VetTabParamList>();
 
 const HomeStack = () => {
   return (
-    <Stack.Navigator id={undefined}
+    <HomeNavigator.Navigator
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="HomeVetScreen" component={HomeVet} />
-      <Stack.Screen name="AgendaVet" component={AgendaVet} />
-      <Stack.Screen name="PatientRecord" component={PendingVet} />
-    </Stack.Navigator>
+      <HomeNavigator.Screen name="HomeVetScreen" component={HomeVet} />
+      <HomeNavigator.Screen name="AgendaVet" component={AgendaVet} />
+      <HomeNavigator.Screen name="PatientRecord" component={PendingVet} />
+    </HomeNavigator.Navigator>
   );
 };
 
 const PatientsStack = () => {
   return (
-    <Stack.Navigator id={undefined}
+    <PatientsNavigator.Navigator
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="PatientsScreen" component={PatientsVet} />
-      <Stack.Screen name="PatientRecord" component={PendingVet} />
-    </Stack.Navigator>
+      <PatientsNavigator.Screen name="PatientsScreen" component={PatientsVet} />
+      <PatientsNavigator.Screen name="PatientRecord" component={PendingVet} />
+    </PatientsNavigator.Navigator>
   );
 };
 
 const AgendaStack = () => {
   return (
-    <Stack.Navigator id={undefined}
+    <AgendaNavigator.Navigator
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="AgendaVetScreen" component={AgendaVet} />
-      <Stack.Screen name="PatientRecord" component={PendingVet} />
-    </Stack.Navigator>
+      <AgendaNavigator.Screen name="AgendaVetScreen" component={AgendaVet} />
+      <AgendaNavigator.Screen name="PatientRecord" component={PendingVet} />
+    </AgendaNavigator.Navigator>
   );
 };
 
 const ProfileStack = () => {
   return (
-    <Stack.Navigator id={undefined}
+    <ProfileNavigator.Navigator
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="ProfileVetScreen" component={ProfileVet} />
-    </Stack.Navigator>
+      <ProfileNavigator.Screen name="ProfileVetScreen" component={ProfileVet} />
+    </ProfileNavigator.Navigator>
   );
 };
 
@@ -70,7 +77,7 @@ export default function VetTabRoutes() {
   const bottomInset = Math.max(insets.bottom, 22);
 
   // Icone/label da tab: cor clinic quando ativo, icon-off/text-off quando inativo.
-  const tabOptions = (label, icon) => ({
+  const tabOptions = (label: string, icon: ComponentProps<typeof Feather>['name']): BottomTabNavigationOptions => ({
     tabBarIcon: ({ focused }) => (
       <Feather name={icon} size={20} color={focused ? '#0E7A63' : '#D3DEDB'} />
     ),
@@ -86,7 +93,7 @@ export default function VetTabRoutes() {
   });
 
   return (
-    <Tab.Navigator id={undefined}
+    <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarStyle: {

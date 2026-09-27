@@ -11,6 +11,9 @@ import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
 import ReminderCard from '../../components/Tutor/ReminderCard';
 import NewReminderModal from '../../components/Veterinario/NewReminderModal';
 
+type ReminderAction = 'C' | 'X' | 'delete';
+type Confirmation = { id: number; action: 'X' | 'delete' };
+
 const AgendaVet = () => {
   const query = useClinicAgenda(false);
   const { status: statusMutation, remove: deleteMutation } = useVeterinarianReminderActions();
@@ -19,8 +22,8 @@ const AgendaVet = () => {
   const reminders = query.data.map(({ reminder }) => reminder);
   const [filterType, setFilterType] = useState('Todos');
   const [modalVisible, setModalVisible] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [confirmation, setConfirmation] = useState(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const scale = useRef(new Animated.Value(1)).current;
   const submitting = useRef(false);
   const busy = statusMutation.isPending || deleteMutation.isPending;
@@ -28,7 +31,7 @@ const AgendaVet = () => {
   const filterOptions = ['Todos', ...new Set(['VACINA', 'RETORNO', 'MEDICAMENTO', 'CHECKUP', 'VERMÍFUGO', ...reminders.map((item) => item.tipo)])];
   const groups = groupReminders(reminders, filterType);
 
-  const act = async (id, action) => {
+  const act = async (id: number, action: ReminderAction) => {
     if (busy || submitting.current) return;
     submitting.current = true;
     statusMutation.reset();

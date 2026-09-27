@@ -1,11 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { useContext } from "react";
-import { UserContext } from "../context/UserContext";
+import { useUserContext } from "../context/UserContext";
 import { login } from "../repositories/auth/authRepository";
 import type { LoginRequest, LoginResponse } from "../models/auth";
 
 export function useLogin() {
-  const { startSession } = useContext(UserContext);
+  const { startSession } = useUserContext();
   return useMutation<LoginResponse, Error, LoginRequest>({
     mutationFn: async (request) => {
       const result = await login(request);

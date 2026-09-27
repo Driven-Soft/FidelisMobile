@@ -1,7 +1,8 @@
+import type { PendingVetScreenProps } from '../../routes/types';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function PendingVet({ route }) {
+export default function PendingVet({ route }: PendingVetScreenProps) {
   const record = route.name === 'PatientRecord';
   return <SafeAreaView className="flex-1 bg-mist" edges={['top']}>
     <View className="gap-3 px-4 py-6">

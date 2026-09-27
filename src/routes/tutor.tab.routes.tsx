@@ -11,58 +11,65 @@ import RemindersScreen from '../screens/Tutor/RemindersScreen';
 import ProfileTutor from '../screens/Tutor/ProfileTutor';
 import PetProfile from '../screens/Tutor/PetProfile';
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+import type { ComponentProps } from 'react';
+import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import type { TutorHomeStackParamList, TutorPetsStackParamList, TutorRemindersStackParamList, TutorProfileStackParamList, TutorTabParamList } from './types';
+
+const HomeNavigator = createNativeStackNavigator<TutorHomeStackParamList>();
+const PetsNavigator = createNativeStackNavigator<TutorPetsStackParamList>();
+const RemindersNavigator = createNativeStackNavigator<TutorRemindersStackParamList>();
+const ProfileNavigator = createNativeStackNavigator<TutorProfileStackParamList>();
+const Tab = createBottomTabNavigator<TutorTabParamList>();
 
 const HomeStack = () => {
   return (
-    <Stack.Navigator id={undefined}
+    <HomeNavigator.Navigator
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="HomeTutorScreen" component={HomeTutor} />
-      <Stack.Screen name="PetProfile" component={PetProfile} />
-      <Stack.Screen name="RemindersTutorScreen" component={RemindersScreen} />
-    </Stack.Navigator>
+      <HomeNavigator.Screen name="HomeTutorScreen" component={HomeTutor} />
+      <HomeNavigator.Screen name="PetProfile" component={PetProfile} />
+      <HomeNavigator.Screen name="RemindersTutorScreen" component={RemindersScreen} />
+    </HomeNavigator.Navigator>
   );
 };
 
 const PetsStack = () => {
   return (
-    <Stack.Navigator id={undefined}
+    <PetsNavigator.Navigator
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="PetsTutorScreen" component={PetsTutor} />
-      <Stack.Screen name="NewPet" component={NewPet} />
-      <Stack.Screen name="PetProfile" component={PetProfile} />
-    </Stack.Navigator>
+      <PetsNavigator.Screen name="PetsTutorScreen" component={PetsTutor} />
+      <PetsNavigator.Screen name="NewPet" component={NewPet} />
+      <PetsNavigator.Screen name="PetProfile" component={PetProfile} />
+    </PetsNavigator.Navigator>
   );
 };
 
 const RemindersStack = () => {
   return (
-    <Stack.Navigator id={undefined}
+    <RemindersNavigator.Navigator
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="RemindersScreenStack" component={RemindersScreen} />
-    </Stack.Navigator>
+      <RemindersNavigator.Screen name="RemindersScreenStack" component={RemindersScreen} />
+    </RemindersNavigator.Navigator>
   );
 };
 
 const ProfileStack = () => {
   return (
-    <Stack.Navigator id={undefined}
+    <ProfileNavigator.Navigator
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="ProfileTutorScreen" component={ProfileTutor} />
-    </Stack.Navigator>
+      <ProfileNavigator.Screen name="ProfileTutorScreen" component={ProfileTutor} />
+    </ProfileNavigator.Navigator>
   );
 };
 
@@ -71,7 +78,7 @@ export default function TutorTabRoutes() {
   const bottomInset = Math.max(insets.bottom, 22);
 
   // Icone/label da tab: cor clinic quando ativo, icon-off/text-off quando inativo.
-  const tabOptions = (label, icon) => ({
+  const tabOptions = (label: string, icon: ComponentProps<typeof Feather>['name']): BottomTabNavigationOptions => ({
     tabBarIcon: ({ focused }) => (
       <Feather name={icon} size={20} color={focused ? '#0E7A63' : '#D3DEDB'} />
     ),
@@ -87,7 +94,7 @@ export default function TutorTabRoutes() {
   });
 
   return (
-    <Tab.Navigator id={undefined}
+    <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarStyle: {

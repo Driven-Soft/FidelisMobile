@@ -1,14 +1,13 @@
-import { useContext, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { UserContext } from "../context/UserContext";
-import type { AuthSession } from "../models/auth";
+import { useUserContext } from "../context/UserContext";
 import { isValidSession } from "../services/authSession";
 import { listarPets } from "../repositories/pets/petRepository";
 import { useVeterinarian } from "./useVeterinarian";
 import { TutorDataError } from "../utils/tutorDataUtils";
 
 export function useClinicPets() {
-  const { session, authStatus } = useContext(UserContext) as { session: AuthSession | null; authStatus: string };
+  const { session, authStatus } = useUserContext();
   const { profile, clinic, hasClinic } = useVeterinarian();
   const clinicId = profile.data?.clinicaId;
   const active = authStatus === "authenticated" && isValidSession(session) && session.tipo === "VETERINARIO";

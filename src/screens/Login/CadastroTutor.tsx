@@ -1,3 +1,4 @@
+import type { CadastroTutorScreenProps } from '../../routes/types';
 import React, { useState, useRef } from "react";
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -5,17 +6,24 @@ import MaskInput, { Masks } from "react-native-mask-input";
 import Input from "../../components/common/Input";
 import { useRegisterTutor } from "../../hooks/useRegisterTutor";
 import { validateTutorRegistration, tutorRegistrationRequest, getRegistrationErrorMessage } from "../../utils/tutorRegistration";
+import type { TutorRegistrationForm } from "../../utils/tutorRegistration";
 
-export default function CadastroTutor({ navigation }) {
+type RegistrationField = keyof TutorRegistrationForm;
+
+export default function CadastroTutor({ navigation }: CadastroTutorScreenProps) {
   const registration = useRegisterTutor();
   const submitting = useRef(false);
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<TutorRegistrationForm>({
     name: "", email: "", phone: "", cpf: "", address: "", password: "", confirmPassword: "",
   });
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [touched, setTouched] = useState<Partial<Record<RegistrationField, boolean>>>({});
+  const stepFields: RegistrationField[][] = [["name", "email", "phone"], ["cpf", "address"], ["password", "confirmPassword"]];
   const validation = validateTutorRegistration(formData);
-  const errors = Object.fromEntries(Object.entries(validation).filter(([field]) => touched[field]));
+  const errors: Partial<Record<RegistrationField, string>> = {};
+  for (const field of stepFields.flat()) {
+    if (touched[field]) errors[field] = validation[field];
+  }
   const isNameValid = !validation.name;
   const isEmailValid = !validation.email;
   const isPhoneValid = !validation.phone;
@@ -23,11 +31,10 @@ export default function CadastroTutor({ navigation }) {
   const isPasswordValid = !validation.password;
   const isConfirmPasswordValid = !validation.confirmPassword;
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: RegistrationField, value: string) => {
     if (!submitting.current) setFormData((current) => ({ ...current, [field]: value }));
   };
-  const handleBlur = (field) => setTouched((current) => ({ ...current, [field]: true }));
-  const stepFields = [["name", "email", "phone"], ["cpf", "address"], ["password", "confirmPassword"]];
+  const handleBlur = (field: RegistrationField) => setTouched((current) => ({ ...current, [field]: true }));
 
   const handleNext = async () => {
     if (registration.isPending || submitting.current || registration.isSuccess) return;

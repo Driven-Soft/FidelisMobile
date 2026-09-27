@@ -11,9 +11,9 @@ import { petAgeLabel } from '../../utils/petUtils';
 export default function PatientsVet() {
   const query = useClinicPets();
   const [searchText, setSearchText] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const species = [...new Set(query.data.map((pet) => pet.especie))];
-  const filter = species.includes(selectedFilter) ? selectedFilter : null;
+  const filter = selectedFilter !== null && species.includes(selectedFilter) ? selectedFilter : null;
   const search = searchText.trim().toLocaleLowerCase('pt-BR');
   const pets = query.data.filter((pet) =>
     pet.nome.toLocaleLowerCase('pt-BR').includes(search) && (filter === null || pet.especie === filter));

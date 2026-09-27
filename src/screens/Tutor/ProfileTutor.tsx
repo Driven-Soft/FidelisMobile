@@ -1,6 +1,5 @@
-import { useContext } from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
-import { UserContext } from '../../context/UserContext';
+import { useUserContext } from '../../context/UserContext';
 import TutorHeader from '../../components/Tutor/TutorHeader';
 import { usePets } from '../../hooks/usePets';
 import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
@@ -12,7 +11,7 @@ const ProfileTutor = () => {
   const petsQuery = usePets();
   const profileQuery = useTutorProfile();
   const tutor = profileQuery.data;
-  const { logout } = useContext(UserContext);
+  const { logout } = useUserContext();
 
   return (
     <View className="flex-1 bg-mist">

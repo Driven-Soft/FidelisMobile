@@ -1,19 +1,20 @@
-import { useContext, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { UserContext } from "../context/UserContext";
-import type { AuthSession } from "../models/auth";
+import { useUserContext } from "../context/UserContext";
 import type { PetRequest, PetPatchRequest, PetResponse } from "../models/pet";
 import * as repository from "../repositories/pets/petRepository";
 import { assertPetOwner, normalizePetId, PetFlowError } from "../utils/petUtils";
 
+type PetScopeKey = readonly ["pets", number | null, string | null];
+
 export const petKeys = {
-  scope: (tutorId: number | null, expiration: string | null) => ["pets", tutorId, expiration] as const,
-  list: (scope: readonly unknown[]) => [...scope, "list"] as const,
-  detail: (scope: readonly unknown[], id: number | null) => [...scope, "detail", id] as const,
+  scope: (tutorId: number | null, expiration: string | null): PetScopeKey => ["pets", tutorId, expiration],
+  list: (scope: PetScopeKey) => [...scope, "list"] as const,
+  detail: (scope: PetScopeKey, id: number | null) => [...scope, "detail", id] as const,
 };
 
 function usePetScope() {
-  const { session, authStatus } = useContext(UserContext) as { session: AuthSession | null; authStatus: string };
+  const { session, authStatus } = useUserContext();
   const active = authStatus === "authenticated" && session?.tipo === "TUTOR";
   const scope = petKeys.scope(session?.tutorId ?? null, session?.expiraEm ?? null);
   const current = useRef(session);

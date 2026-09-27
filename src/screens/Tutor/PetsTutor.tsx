@@ -1,3 +1,4 @@
+import type { PetsTutorScreenProps } from '../../routes/types';
 import { View, ScrollView, Text, Pressable, RefreshControl } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import { usePets } from '../../hooks/usePets';
@@ -6,7 +7,7 @@ import TutorHeader from '../../components/Tutor/TutorHeader';
 import PetAvatar from '../../components/Tutor/PetAvatar';
 import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
 
-const PetsTutor = ({ navigation }) => {
+const PetsTutor = ({ navigation }: PetsTutorScreenProps) => {
   const query = usePets();
   const pets = query.isError ? [] : query.data ?? [];
 

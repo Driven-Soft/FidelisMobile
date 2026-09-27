@@ -1,0 +1,59 @@
+import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+
+export type RootStackParamList = {
+  Login: undefined;
+  CadastroTutor: undefined;
+  Tabs: undefined;
+};
+
+type PetDetailParamList = { PetProfile: { petId: number } };
+
+export type TutorHomeStackParamList = PetDetailParamList & {
+  HomeTutorScreen: undefined;
+  RemindersTutorScreen: undefined;
+};
+export type TutorPetsStackParamList = PetDetailParamList & {
+  PetsTutorScreen: undefined;
+  NewPet: { petId?: number } | undefined;
+};
+export type TutorRemindersStackParamList = { RemindersScreenStack: undefined };
+export type TutorProfileStackParamList = { ProfileTutorScreen: undefined };
+export type TutorTabParamList = {
+  Home: NavigatorScreenParams<TutorHomeStackParamList> | undefined;
+  Pets: NavigatorScreenParams<TutorPetsStackParamList> | undefined;
+  Reminders: NavigatorScreenParams<TutorRemindersStackParamList> | undefined;
+  Profile: NavigatorScreenParams<TutorProfileStackParamList> | undefined;
+};
+
+export type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
+export type CadastroTutorScreenProps = NativeStackScreenProps<RootStackParamList, 'CadastroTutor'>;
+export type HomeTutorScreenProps = NativeStackScreenProps<TutorHomeStackParamList, 'HomeTutorScreen'>;
+export type PetsTutorScreenProps = NativeStackScreenProps<TutorPetsStackParamList, 'PetsTutorScreen'>;
+export type NewPetScreenProps = NativeStackScreenProps<TutorPetsStackParamList, 'NewPet'>;
+// A mesma tela é registrada nos stacks Início e Meus Pets.
+export type PetProfileScreenProps = CompositeScreenProps<
+  NativeStackScreenProps<PetDetailParamList, 'PetProfile'>,
+  BottomTabScreenProps<TutorTabParamList>
+>;
+
+type PatientRecordParamList = { PatientRecord: undefined };
+export type VetHomeStackParamList = PatientRecordParamList & {
+  HomeVetScreen: undefined;
+  AgendaVet: undefined;
+};
+export type VetPatientsStackParamList = PatientRecordParamList & { PatientsScreen: undefined };
+export type VetAgendaStackParamList = PatientRecordParamList & { AgendaVetScreen: undefined };
+export type VetProfileStackParamList = { ProfileVetScreen: undefined };
+export type VetTabParamList = {
+  Dashboard: NavigatorScreenParams<VetHomeStackParamList> | undefined;
+  Patients: NavigatorScreenParams<VetPatientsStackParamList> | undefined;
+  Agenda: NavigatorScreenParams<VetAgendaStackParamList> | undefined;
+  Profile: NavigatorScreenParams<VetProfileStackParamList> | undefined;
+};
+export type HomeVetScreenProps = CompositeScreenProps<
+  NativeStackScreenProps<VetHomeStackParamList, 'HomeVetScreen'>,
+  BottomTabScreenProps<VetTabParamList, 'Dashboard'>
+>;
+export type PendingVetScreenProps = NativeStackScreenProps<PatientRecordParamList, 'PatientRecord'>;

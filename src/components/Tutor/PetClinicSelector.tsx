@@ -1,9 +1,25 @@
 import { useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import TutorDataStatus from './TutorDataStatus';
+import type { ClinicaResponse } from '../../models/veterinarian';
 
-export default function PetClinicSelector({ query, selectedId, onSelect, disabled, error }) {
-  const [pendingId, setPendingId] = useState(null);
+interface Props {
+  query: {
+    data: ClinicaResponse[] | undefined;
+    isError: boolean;
+    isPending: boolean;
+    isFetching: boolean;
+    error: Error | null;
+    refetch: () => Promise<unknown>;
+  };
+  selectedId: number | null;
+  onSelect: (id: number) => void;
+  disabled?: boolean;
+  error?: string;
+}
+
+export default function PetClinicSelector({ query, selectedId, onSelect, disabled, error }: Props) {
+  const [pendingId, setPendingId] = useState<number | null>(null);
   const clinics = query.isError ? [] : query.data ?? [];
   const pending = clinics.find((clinic) => clinic.id === pendingId);
   return <View className="gap-2">

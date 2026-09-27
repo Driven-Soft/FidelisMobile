@@ -1,10 +1,11 @@
+import type { HomeVetScreenProps } from '../../routes/types';
 import { ScrollView, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useVeterinarian } from '../../hooks/useVeterinarian';
 import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
 import ClinicSummary from '../../components/Veterinario/ClinicSummary';
 
-export default function HomeVet({ navigation }) {
+export default function HomeVet({ navigation }: HomeVetScreenProps) {
   const { profile, clinic, hasClinic } = useVeterinarian();
   return <SafeAreaView className="flex-1 bg-mist" edges={['top']}>
     <ScrollView contentContainerClassName="gap-3 px-4 py-6">

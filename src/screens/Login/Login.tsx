@@ -1,18 +1,20 @@
-import { useContext, useState } from "react";
+import type { LoginScreenProps } from '../../routes/types';
+import { useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Feather from "@expo/vector-icons/Feather";
-import { UserContext } from "../../context/UserContext";
+import { useUserContext } from "../../context/UserContext";
 import { useLogin, getLoginErrorMessage } from "../../hooks/useLogin";
 import Input from "../../components/common/Input";
+import type { PortalType } from "../../models/auth";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function Login({ navigation }) {
+export default function Login({ navigation }: LoginScreenProps) {
   const { portalToggle, setPortalToggle, sessionError, logout } =
-    useContext(UserContext);
+    useUserContext();
   const { mutateAsync, isPending, error: loginError } = useLogin();
-  const [portalType, setPortalType] = useState(portalToggle ?? "TUTOR");
+  const [portalType, setPortalType] = useState<PortalType>(portalToggle ?? "TUTOR");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [touched, setTouched] = useState({
@@ -20,7 +22,7 @@ export default function Login({ navigation }) {
     password: false,
   });
 
-  const handleBlur = (field) => {
+  const handleBlur = (field: keyof typeof touched) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
   };
 

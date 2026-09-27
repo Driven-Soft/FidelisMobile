@@ -1,18 +1,20 @@
-import { useContext, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { UserContext } from "../context/UserContext";
+import { useUserContext } from "../context/UserContext";
 import type { AuthSession } from "../models/auth";
 import type { LembreteResponse } from "../models/reminder";
 import * as repository from "../repositories/reminders/reminderRepository";
 import { ReminderFlowError } from "../utils/reminderUtils";
 
+type ReminderScopeKey = readonly ["reminders", number | null, string | null];
+
 export const reminderKeys = {
-  scope: (session: AuthSession | null) => ["reminders", session?.tutorId ?? null, session?.expiraEm ?? null] as const,
-  list: (scope: readonly unknown[]) => [...scope, "list"] as const,
+  scope: (session: AuthSession | null): ReminderScopeKey => ["reminders", session?.tutorId ?? null, session?.expiraEm ?? null],
+  list: (scope: ReminderScopeKey) => [...scope, "list"] as const,
 };
 
 function useReminderScope() {
-  const { session, authStatus } = useContext(UserContext) as { session: AuthSession | null; authStatus: string };
+  const { session, authStatus } = useUserContext();
   const active = authStatus === "authenticated" && session?.tipo === "TUTOR";
   const current = useRef(session);
   current.current = session;

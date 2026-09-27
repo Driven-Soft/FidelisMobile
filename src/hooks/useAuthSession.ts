@@ -1,10 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
-import type { AuthSession } from "../models/auth";
+import type { AuthSession, AuthStatus } from "../models/auth";
 import { loadSession, removeSession, saveSession } from "../repositories/auth/sessionStorage";
 import { copySession, getSessionExpiration, isValidSession, setSessionToken, subscribeSessionInvalidation } from "../services/authSession";
 
-export function useAuthSession() {
+interface AuthSessionState {
+  session: AuthSession | null;
+  status: AuthStatus;
+  sessionError: string | null;
+  startSession: (result: AuthSession) => Promise<void>;
+  logout: () => Promise<void>;
+}
+
+export function useAuthSession(): AuthSessionState {
   const [session, setSession] = useState<AuthSession | null>(null);
   const [isRestoring, setIsRestoring] = useState(true);
   const [sessionError, setSessionError] = useState<string | null>(null);

@@ -1,3 +1,4 @@
+import type { PetProfileScreenProps } from '../../routes/types';
 import { useState } from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import { usePet, useDeletePet } from '../../hooks/usePets';
@@ -9,12 +10,12 @@ import { usePetReminders } from '../../hooks/useReminders';
 import ReminderCard from '../../components/Tutor/ReminderCard';
 import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
 
-const PetProfile = ({ route, navigation }) => {
+const PetProfile = ({ route, navigation }: PetProfileScreenProps) => {
   const query = usePet(route.params?.petId);
   const pet = query.data;
   const deletion = useDeletePet();
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [activeTab, setActiveTab] = useState(null);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
   const reminders = usePetReminders(pet?.id);
 
   const handleDelete = async () => {
@@ -28,7 +29,7 @@ const PetProfile = ({ route, navigation }) => {
   };
 
   const tabs = [null, ...reminders.types];
-  const selectedTab = reminders.types.includes(activeTab) ? activeTab : null;
+  const selectedTab = activeTab !== null && reminders.types.includes(activeTab) ? activeTab : null;
   const visibleReminders = reminders.data.filter((item) => selectedTab === null || item.tipo === selectedTab);
 
   if (query.isPending || query.error || !pet) {

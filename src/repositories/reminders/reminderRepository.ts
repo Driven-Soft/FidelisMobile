@@ -22,5 +22,5 @@ export async function alterarLembrete(id: number, body: LembretePatchRequest): P
 }
 
 export async function excluirLembrete(id: number): Promise<void> {
-  await api.delete(`/api/Lembrete/${id}`);
+  await api.delete<void>(`/api/Lembrete/${id}`);
 }

@@ -1,7 +1,18 @@
 import { Text, View } from 'react-native';
 import TutorDataStatus from '../Tutor/TutorDataStatus';
+import type { ClinicaResponse } from '../../models/veterinarian';
 
-export default function ClinicSummary({ query }) {
+interface Props {
+  query: {
+    data: ClinicaResponse | undefined;
+    isPending: boolean;
+    isFetching: boolean;
+    error: Error | null;
+    refetch: () => Promise<unknown>;
+  };
+}
+
+export default function ClinicSummary({ query }: Props) {
   const clinic = query.data;
   return <View className="gap-2 rounded-card border border-line bg-card p-[14px]">
     <Text className="font-sans-semibold text-title text-ink">Minha clínica</Text>

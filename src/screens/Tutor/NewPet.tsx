@@ -1,3 +1,4 @@
+import type { NewPetScreenProps } from '../../routes/types';
 import { useState } from "react";
 import { View, ScrollView, Text, Pressable } from "react-native";
 import TutorHeader from "../../components/Tutor/TutorHeader";
@@ -8,8 +9,17 @@ import { emptyPetForm, petToForm, validatePetForm, petFormFields, petFormPatch, 
 import { Masks } from "react-native-mask-input";
 import { useClinics } from "../../hooks/useClinics";
 import PetClinicSelector from "../../components/Tutor/PetClinicSelector";
+import type { PetResponse } from "../../models/pet";
+import type { PetFormValues } from "../../utils/petUtils";
 
-export default function NewPet({ navigation, route }) {
+type PetFormField = keyof PetFormValues | 'clinicaId';
+type PetFormErrors = Partial<Record<PetFormField, string>>;
+interface PetFormProps {
+  pet: PetResponse | null;
+  navigation: NewPetScreenProps['navigation'];
+}
+
+export default function NewPet({ navigation, route }: NewPetScreenProps) {
   const editing = route.params?.petId !== undefined;
   const query = usePet(route.params?.petId);
   if (editing && (query.isPending || query.error || !query.data)) {
@@ -23,25 +33,28 @@ export default function NewPet({ navigation, route }) {
       </View>
     );
   }
-  return <PetForm key={editing ? query.data.id : "new"} pet={editing ? query.data : null} navigation={navigation} />;
+  return <PetForm key={editing ? query.data?.id : "new"} pet={editing ? query.data ?? null : null} navigation={navigation} />;
 }
 
-const PetForm = ({ pet, navigation }) => {
+const PetForm = ({ pet, navigation }: PetFormProps) => {
   const create = useCreatePet();
   const update = useUpdatePet();
   const mutation = pet ? update : create;
   const clinics = useClinics(!pet);
-  const [clinicId, setClinicId] = useState(null);
+  const [clinicId, setClinicId] = useState<number | null>(null);
   const clinicAvailable = !clinics.isError && clinics.data?.some((clinic) => clinic.id === clinicId);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(() => pet ? petToForm(pet) : { ...emptyPetForm });
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const validation: ReturnType<typeof validatePetForm> & { clinicaId?: string } = validatePetForm(form);
+  const [touched, setTouched] = useState<Partial<Record<PetFormField, boolean>>>({});
+  const validation: PetFormErrors = validatePetForm(form);
   if (!pet && !clinicAvailable) validation.clinicaId = "Selecione uma clínica disponível e confirme o aviso.";
-  const fieldErrors = Object.fromEntries(Object.entries(validation).filter(([key]) => touched[key]));
-  const handleBlur = (field) => setTouched((current) => ({ ...current, [field]: true }));
-  const setField = (field, value) => setForm((current) => ({ ...current, [field]: value }));
-  const stepFields = [["name", "species", "breed"], ["sex", "birthDate"], pet ? ["fotoUrl"] : ["fotoUrl", "clinicaId"]];
+  const handleBlur = (field: PetFormField) => setTouched((current) => ({ ...current, [field]: true }));
+  const setField = (field: keyof PetFormValues, value: string) => setForm((current) => ({ ...current, [field]: value }));
+  const stepFields: PetFormField[][] = [["name", "species", "breed"], ["sex", "birthDate"], pet ? ["fotoUrl"] : ["fotoUrl", "clinicaId"]];
+  const fieldErrors: PetFormErrors = {};
+  for (const field of stepFields.flat()) {
+    if (touched[field]) fieldErrors[field] = validation[field];
+  }
   const stepLabels = [
     { number: 1, label: "Dados básicos" },
     { number: 2, label: "Dados físicos" },

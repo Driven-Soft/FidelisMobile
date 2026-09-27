@@ -7,11 +7,11 @@ import type { StyleProp, ViewStyle } from 'react-native';
 type Props = Omit<ComponentProps<typeof MaskInput>, 'style' | 'onChangeText'> & {
   onChangeText?: (text: string, unmasked?: string, obfuscated?: string) => void;
   label?: string;
-  error?: string;
+  error?: string | null;
   isValid?: boolean;
   icon?: ReactNode;
   mono?: boolean;
-  type?: string;
+  type?: 'text' | 'password';
   rightIcon?: ReactNode;
   onRightIconPress?: () => void;
   style?: StyleProp<ViewStyle>;

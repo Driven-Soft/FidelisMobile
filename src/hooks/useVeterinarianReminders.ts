@@ -1,7 +1,6 @@
-import { useContext, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { UserContext } from "../context/UserContext";
-import type { AuthSession } from "../models/auth";
+import { useUserContext } from "../context/UserContext";
 import type { LembreteResponse } from "../models/reminder";
 import { isValidSession } from "../services/authSession";
 import { buscarVeterinario } from "../repositories/veterinario/veterinarianRepository";
@@ -10,7 +9,7 @@ import * as repository from "../repositories/reminders/reminderRepository";
 import { ReminderFlowError, requireReminderId, serializeReminderDate, validateReminderText } from "../utils/reminderUtils";
 
 function useVeterinarianReminderScope() {
-  const { session, authStatus } = useContext(UserContext) as { session: AuthSession | null; authStatus: string };
+  const { session, authStatus } = useUserContext();
   const current = useRef(session);
   current.current = session;
   const mounted = useRef(true);

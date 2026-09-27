@@ -3,6 +3,9 @@
   "compilerOptions": {
     "allowJs": false,
     "strict": false,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "useUnknownInCatchVariables": true,
     "noEmit": true
   },
   "include": [

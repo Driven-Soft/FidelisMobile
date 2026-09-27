@@ -22,5 +22,5 @@ export async function atualizarPet(id: number, request: PetPatchRequest): Promis
 }
 
 export async function excluirPet(id: number): Promise<void> {
-  await api.delete(`/api/Pet/${id}`);
+  await api.delete<void>(`/api/Pet/${id}`);
 }

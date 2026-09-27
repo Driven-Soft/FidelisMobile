@@ -1,3 +1,4 @@
+import type { HomeTutorScreenProps } from '../../routes/types';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import { useTutorProfile, useTutorHistory } from '../../hooks/useTutorData';
 import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
@@ -10,7 +11,7 @@ import { useReminders } from '../../hooks/useReminders';
 import { upcomingReminders as selectUpcomingReminders, formatReminderDate, isReminderUrgent } from '../../utils/reminderUtils';
 import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
 
-export default function HomeTutor({ navigation }) {
+export default function HomeTutor({ navigation }: HomeTutorScreenProps) {
   const profileQuery = useTutorProfile();
   const historyQuery = useTutorHistory();
   const tutorName = profileQuery.data?.nome;

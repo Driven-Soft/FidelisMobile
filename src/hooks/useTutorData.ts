@@ -1,7 +1,6 @@
-import { useContext, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { UserContext } from "../context/UserContext";
-import type { AuthSession } from "../models/auth";
+import { useUserContext } from "../context/UserContext";
 import { isValidSession } from "../services/authSession";
 import { buscarTutor } from "../repositories/tutor/tutorRepository";
 import { listarConsultas, listarVacinacoes } from "../repositories/tutor/historyRepository";
@@ -9,7 +8,7 @@ import { buildTutorHistory, TutorDataError } from "../utils/tutorDataUtils";
 import { usePets } from "./usePets";
 
 function useTutorScope() {
-  const { session, authStatus } = useContext(UserContext) as { session: AuthSession | null; authStatus: string };
+  const { session, authStatus } = useUserContext();
   const current = useRef(session);
   current.current = session;
   const mounted = useRef(true);

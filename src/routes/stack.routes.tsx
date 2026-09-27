@@ -2,14 +2,15 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Tabs from './tab.routes';
 import Login from '../screens/Login/Login';
 import CadastroTutor from '../screens/Login/CadastroTutor';
-import { useContext } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
-import { UserContext } from '../context/UserContext';
+import { useUserContext } from '../context/UserContext';
 
-const Stack = createNativeStackNavigator();
+import type { RootStackParamList } from './types';
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackRoutes() {
-  const { authStatus } = useContext(UserContext);
+  const { authStatus } = useUserContext();
   if (authStatus === 'restoring') {
     return (
       <View className="flex-1 items-center justify-center gap-3 bg-mist">
@@ -19,7 +20,7 @@ export default function StackRoutes() {
     );
   }
   return (
-    <Stack.Navigator id={undefined} screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {authStatus === 'authenticated' ? (
         <Stack.Screen name="Tabs" component={Tabs} />
       ) : (

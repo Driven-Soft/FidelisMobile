@@ -1,7 +1,6 @@
-import { useContext } from 'react';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { UserContext } from '../../context/UserContext';
+import { useUserContext } from '../../context/UserContext';
 import Avatar from '../../components/common/Avatar';
 import { useVeterinarian } from '../../hooks/useVeterinarian';
 import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
@@ -9,7 +8,7 @@ import ClinicSummary from '../../components/Veterinario/ClinicSummary';
 import { nameInitials } from '../../utils/tutorDataUtils';
 
 export default function ProfileVet() {
-  const { logout } = useContext(UserContext);
+  const { logout } = useUserContext();
   const { profile, clinic, hasClinic } = useVeterinarian();
   const veterinarian = profile.data;
   return <SafeAreaView className="flex-1 bg-mist" edges={['top']}>
