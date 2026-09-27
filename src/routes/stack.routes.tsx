@@ -19,7 +19,7 @@ export default function StackRoutes() {
     );
   }
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator id={undefined} screenOptions={{ headerShown: false }}>
       {authStatus === 'authenticated' ? (
         <Stack.Screen name="Tabs" component={Tabs} />
       ) : (

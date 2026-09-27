@@ -2,8 +2,21 @@ import { View, Text, Pressable } from 'react-native';
 import Avatar from '../common/Avatar';
 import PetAvatar from './PetAvatar';
 import { formatReminderDate, reminderStatusLabel } from '../../utils/reminderUtils';
+import type { LembreteResponse } from '../../models/reminder';
+import type { PetResponse } from '../../models/pet';
 
-const ReminderCard = ({ reminder, pet, onComplete, onCancel, onEdit, onDelete, busy = false, horizontal = false }) => {
+type Props = {
+  reminder: LembreteResponse;
+  pet?: PetResponse;
+  onComplete?: (id: number) => void;
+  onCancel?: (id: number) => void;
+  onEdit?: (id: number) => void;
+  onDelete?: (id: number) => void;
+  busy?: boolean;
+  horizontal?: boolean;
+};
+
+const ReminderCard = ({ reminder, pet, onComplete, onCancel, onEdit, onDelete, busy = false, horizontal = false }: Props) => {
   const status = reminderStatusLabel(reminder);
   const dueLabel = formatReminderDate(reminder.dataPrevista);
   const petName = pet?.nome ?? `Pet #${reminder.petId}`;

@@ -35,8 +35,8 @@ const PetForm = ({ pet, navigation }) => {
   const clinicAvailable = !clinics.isError && clinics.data?.some((clinic) => clinic.id === clinicId);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(() => pet ? petToForm(pet) : { ...emptyPetForm });
-  const [touched, setTouched] = useState({});
-  const validation = validatePetForm(form);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const validation: ReturnType<typeof validatePetForm> & { clinicaId?: string } = validatePetForm(form);
   if (!pet && !clinicAvailable) validation.clinicaId = "Selecione uma clínica disponível e confirme o aviso.";
   const fieldErrors = Object.fromEntries(Object.entries(validation).filter(([key]) => touched[key]));
   const handleBlur = (field) => setTouched((current) => ({ ...current, [field]: true }));

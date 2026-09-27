@@ -1,8 +1,11 @@
 import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Feather from '@expo/vector-icons/Feather';
+import type { ReactNode } from 'react';
 
-const TutorHeader = ({ eyebrow = 'Portal do Tutor', title, onBack, action }) => {
+type Props = { eyebrow?: string; title: string; onBack?: () => void; action?: ReactNode };
+
+const TutorHeader = ({ eyebrow = 'Portal do Tutor', title, onBack, action }: Props) => {
   return (
     <SafeAreaView edges={['top']} className="bg-card">
       <View className="flex-row items-center border-b border-line px-5 pb-[14px] pt-[10px]">

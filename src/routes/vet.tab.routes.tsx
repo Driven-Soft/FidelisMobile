@@ -1,72 +1,71 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Feather from '@expo/vector-icons/Feather';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import HomeTutor from '../screens/Tutor/HomeTutor';
-import PetsTutor from '../screens/Tutor/PetsTutor';
-import NewPet from '../screens/Tutor/NewPet';
-import RemindersScreen from '../screens/Tutor/RemindersScreen';
-import ProfileTutor from '../screens/Tutor/ProfileTutor';
-import PetProfile from '../screens/Tutor/PetProfile';
+import PendingVet from '../screens/Veterinario/PendingVet';
+import HomeVet from '../screens/Veterinario/HomeVet';
+import PatientsVet from '../screens/Veterinario/PatientsVet';
+import ProfileVet from '../screens/Veterinario/ProfileVet';
+import AgendaVet from '../screens/Veterinario/AgendaVet';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const HomeStack = () => {
   return (
-    <Stack.Navigator
+    <Stack.Navigator id={undefined}
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="HomeTutorScreen" component={HomeTutor} />
-      <Stack.Screen name="PetProfile" component={PetProfile} />
-      <Stack.Screen name="RemindersTutorScreen" component={RemindersScreen} />
+      <Stack.Screen name="HomeVetScreen" component={HomeVet} />
+      <Stack.Screen name="AgendaVet" component={AgendaVet} />
+      <Stack.Screen name="PatientRecord" component={PendingVet} />
     </Stack.Navigator>
   );
 };
 
-const PetsStack = () => {
+const PatientsStack = () => {
   return (
-    <Stack.Navigator
+    <Stack.Navigator id={undefined}
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="PetsTutorScreen" component={PetsTutor} />
-      <Stack.Screen name="NewPet" component={NewPet} />
-      <Stack.Screen name="PetProfile" component={PetProfile} />
+      <Stack.Screen name="PatientsScreen" component={PatientsVet} />
+      <Stack.Screen name="PatientRecord" component={PendingVet} />
     </Stack.Navigator>
   );
 };
 
-const RemindersStack = () => {
+const AgendaStack = () => {
   return (
-    <Stack.Navigator
+    <Stack.Navigator id={undefined}
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="RemindersScreenStack" component={RemindersScreen} />
+      <Stack.Screen name="AgendaVetScreen" component={AgendaVet} />
+      <Stack.Screen name="PatientRecord" component={PendingVet} />
     </Stack.Navigator>
   );
 };
 
 const ProfileStack = () => {
   return (
-    <Stack.Navigator
+    <Stack.Navigator id={undefined}
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="ProfileTutorScreen" component={ProfileTutor} />
+      <Stack.Screen name="ProfileVetScreen" component={ProfileVet} />
     </Stack.Navigator>
   );
 };
 
-export default function TutorTabRoutes() {
+export default function VetTabRoutes() {
   const insets = useSafeAreaInsets();
   const bottomInset = Math.max(insets.bottom, 22);
 
@@ -87,7 +86,7 @@ export default function TutorTabRoutes() {
   });
 
   return (
-    <Tab.Navigator
+    <Tab.Navigator id={undefined}
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -101,13 +100,9 @@ export default function TutorTabRoutes() {
         },
       }}
     >
-      <Tab.Screen name="Home" component={HomeStack} options={tabOptions('Início', 'home')} />
-      <Tab.Screen name="Pets" component={PetsStack} options={tabOptions('Meus Pets', 'heart')} />
-      <Tab.Screen
-        name="Reminders"
-        component={RemindersStack}
-        options={tabOptions('Lembretes', 'bell')}
-      />
+      <Tab.Screen name="Dashboard" component={HomeStack} options={tabOptions('Dashboard', 'grid')} />
+      <Tab.Screen name="Patients" component={PatientsStack} options={tabOptions('Pets da clínica', 'heart')} />
+      <Tab.Screen name="Agenda" component={AgendaStack} options={tabOptions('Agenda', 'calendar')} />
       <Tab.Screen name="Profile" component={ProfileStack} options={tabOptions('Perfil', 'user')} />
     </Tab.Navigator>
   );

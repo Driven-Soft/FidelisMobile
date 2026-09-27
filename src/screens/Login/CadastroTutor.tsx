@@ -13,7 +13,7 @@ export default function CadastroTutor({ navigation }) {
   const [formData, setFormData] = useState({
     name: "", email: "", phone: "", cpf: "", address: "", password: "", confirmPassword: "",
   });
-  const [touched, setTouched] = useState({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const validation = validateTutorRegistration(formData);
   const errors = Object.fromEntries(Object.entries(validation).filter(([field]) => touched[field]));
   const isNameValid = !validation.name;

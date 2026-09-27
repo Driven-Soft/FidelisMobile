@@ -32,7 +32,7 @@ Os dados são obtidos da API. A interface apresenta estados de carregamento, err
 | TanStack React Query | Consultas, mutations, cache e atualização dos dados |
 | Axios | Requisições HTTP à API .NET |
 | AsyncStorage | Persistência da sessão, sem armazenar senha |
-| JavaScript e TypeScript | Interface, lógica e contratos tipados |
+| TypeScript | Interface, lógica e contratos (migração estrutural; tipagem completa em etapa posterior) |
 | NativeWind + Tailwind CSS | Estilização |
 | Expo Font + IBM Plex | Tipografia |
 
@@ -84,7 +84,7 @@ Para testar na web:
 npm run web
 ```
 
-Se o Expo avisar que faltam dependências para usar TypeScript e perguntar se deseja instalar `typescript` e `@types/react`, confirme com **Yes** (`y`). O projeto contém arquivos TypeScript. Essas dependências já estão declaradas no `package.json` atual, então o aviso normalmente não aparece após `npm install`.
+As dependências `typescript` e `@types/react` já estão declaradas. Execute `npm run typecheck` para verificar o código TypeScript. A entrada da aplicação é `index.ts`; apenas as configurações de Babel, Metro e Tailwind permanecem JavaScript.
 
 Para testar no celular com **Expo Go compatível com o SDK 57**:
 

@@ -1,9 +1,19 @@
 import { createContext, useEffect, useMemo, useState } from 'react';
 import { useAuthSession } from '../hooks/useAuthSession';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
-export const UserContext = createContext();
+type AuthState = ReturnType<typeof useAuthSession>;
+type UserContextValue = Omit<AuthState, 'status'> & {
+  user: { id: number; name: string } | null;
+  userType: AuthState['session']['tipo'] | null;
+  authStatus: AuthState['status'];
+  portalToggle: string;
+  setPortalToggle: Dispatch<SetStateAction<string>>;
+};
 
-export const UserProvider = ({ children }) => {
+export const UserContext = createContext<UserContextValue | undefined>(undefined);
+
+export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { session, status, sessionError, startSession, logout } = useAuthSession();
   const user = useMemo(() => session ? { id: session.tipo === 'TUTOR' ? session.tutorId : session.veterinarioId, name: session.nome } : null, [session]);
   const userType = session?.tipo ?? null;

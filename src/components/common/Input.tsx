@@ -1,6 +1,21 @@
 import { TextInput, View, Text, Pressable } from 'react-native';
 import MaskInput from 'react-native-mask-input';
 import Feather from '@expo/vector-icons/Feather';
+import type { ReactNode, ComponentProps } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
+
+type Props = Omit<ComponentProps<typeof MaskInput>, 'style' | 'onChangeText'> & {
+  onChangeText?: (text: string, unmasked?: string, obfuscated?: string) => void;
+  label?: string;
+  error?: string;
+  isValid?: boolean;
+  icon?: ReactNode;
+  mono?: boolean;
+  type?: string;
+  rightIcon?: ReactNode;
+  onRightIconPress?: () => void;
+  style?: StyleProp<ViewStyle>;
+};
 
 const Input = ({
   label,
@@ -19,7 +34,7 @@ const Input = ({
   style,
   mask,
   ...props
-}) => {
+}: Props) => {
   const Component = mask ? MaskInput : TextInput;
 
   return (
