@@ -16,7 +16,6 @@ export type TutorHomeStackParamList = PetDetailParamList & {
 };
 export type TutorPetsStackParamList = PetDetailParamList & {
   PetsTutorScreen: undefined;
-  NewPet: { petId?: number } | undefined;
 };
 export type TutorRemindersStackParamList = { RemindersScreenStack: undefined };
 export type TutorProfileStackParamList = { ProfileTutorScreen: undefined };
@@ -31,7 +30,7 @@ export type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login
 export type CadastroTutorScreenProps = NativeStackScreenProps<RootStackParamList, 'CadastroTutor'>;
 export type HomeTutorScreenProps = NativeStackScreenProps<TutorHomeStackParamList, 'HomeTutorScreen'>;
 export type PetsTutorScreenProps = NativeStackScreenProps<TutorPetsStackParamList, 'PetsTutorScreen'>;
-export type NewPetScreenProps = NativeStackScreenProps<TutorPetsStackParamList, 'NewPet'>;
+export type NewPetScreenProps = NativeStackScreenProps<VetPatientsStackParamList, 'NewPet'>;
 // A mesma tela é registrada nos stacks Início e Meus Pets.
 export type PetProfileScreenProps = CompositeScreenProps<
   NativeStackScreenProps<PetDetailParamList, 'PetProfile'>,
@@ -43,7 +42,8 @@ export type VetHomeStackParamList = PatientRecordParamList & {
   HomeVetScreen: undefined;
   AgendaVet: undefined;
 };
-export type VetPatientsStackParamList = PatientRecordParamList & { PatientsScreen: undefined };
+export type VetPatientsStackParamList = PatientRecordParamList & { PatientsScreen: undefined; NewPet: { petId?: number } | undefined };
+export type PatientsVetScreenProps = NativeStackScreenProps<VetPatientsStackParamList, "PatientsScreen">;
 export type VetAgendaStackParamList = PatientRecordParamList & { AgendaVetScreen: undefined };
 export type VetProfileStackParamList = { ProfileVetScreen: undefined };
 export type VetTabParamList = {

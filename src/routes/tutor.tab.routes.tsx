@@ -6,7 +6,6 @@ import Feather from '@expo/vector-icons/Feather';
 
 import HomeTutor from '../screens/Tutor/HomeTutor';
 import PetsTutor from '../screens/Tutor/PetsTutor';
-import NewPet from '../screens/Tutor/NewPet';
 import RemindersScreen from '../screens/Tutor/RemindersScreen';
 import ProfileTutor from '../screens/Tutor/ProfileTutor';
 import PetProfile from '../screens/Tutor/PetProfile';
@@ -43,7 +42,6 @@ const PetsStack = () => {
       }}
     >
       <PetsNavigator.Screen name="PetsTutorScreen" component={PetsTutor} />
-      <PetsNavigator.Screen name="NewPet" component={NewPet} />
       <PetsNavigator.Screen name="PetProfile" component={PetProfile} />
     </PetsNavigator.Navigator>
   );

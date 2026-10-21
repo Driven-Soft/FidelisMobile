@@ -9,3 +9,7 @@ export async function criarTutor(request: TutorRequest): Promise<TutorResponse> 
   const { cpf, nome, email, senha, telefone, endereco } = request;
   return (await api.post<TutorResponse>("/api/Tutor", { cpf, nome, email, senha, telefone, endereco })).data;
 }
+
+export async function listarTutores(signal?: AbortSignal): Promise<TutorResponse[]> {
+  return (await api.get<TutorResponse[]>("/api/Tutor", { signal })).data;
+}

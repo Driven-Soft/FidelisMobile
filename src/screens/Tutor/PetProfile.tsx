@@ -1,8 +1,8 @@
 import type { PetProfileScreenProps } from '../../routes/types';
 import { useState } from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
-import { usePet, useDeletePet } from '../../hooks/usePets';
-import { petAgeLabel, getPetErrorMessage } from '../../utils/petUtils';
+import { usePet } from '../../hooks/usePets';
+import { petAgeLabel } from '../../utils/petUtils';
 import TutorHeader from '../../components/Tutor/TutorHeader';
 import PetAvatar from '../../components/Tutor/PetAvatar';
 import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
@@ -13,20 +13,8 @@ import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
 const PetProfile = ({ route, navigation }: PetProfileScreenProps) => {
   const query = usePet(route.params?.petId);
   const pet = query.data;
-  const deletion = useDeletePet();
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const reminders = usePetReminders(pet?.id);
-
-  const handleDelete = async () => {
-    if (!pet || deletion.isPending) return;
-    try {
-      await deletion.mutateAsync(pet.id);
-      navigation.goBack();
-    } catch {
-      // O erro da mutation é apresentado abaixo; a sessão cuida de respostas 401.
-    }
-  };
 
   const tabs = [null, ...reminders.types];
   const selectedTab = activeTab !== null && reminders.types.includes(activeTab) ? activeTab : null;
@@ -38,7 +26,7 @@ const PetProfile = ({ route, navigation }: PetProfileScreenProps) => {
         <TutorHeader title="Pet" onBack={() => navigation.goBack()} />
         <View className="flex-1 items-center justify-center px-4">
           <PetQueryStatus query={query} />
-          {!query.isPending && !query.error && <Text className="font-sans-medium text-body text-ink">{deletion.isPending ? 'Excluindo...' : 'Pet não encontrado'}</Text>}
+          {!query.isPending && !query.error && <Text className="font-sans-medium text-body text-ink">Pet não encontrado</Text>}
           <Pressable
             className="mt-3"
             onPress={() => navigation.goBack()}
@@ -53,7 +41,7 @@ const PetProfile = ({ route, navigation }: PetProfileScreenProps) => {
 
   return (
     <View className="flex-1 bg-mist">
-      <TutorHeader title={pet.nome} onBack={deletion.isPending ? undefined : () => navigation.goBack()} />
+      <TutorHeader title={pet.nome} onBack={() => navigation.goBack()} />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]">
         <View className="items-center rounded-card border border-line bg-card p-[14px]">
@@ -89,28 +77,6 @@ const PetProfile = ({ route, navigation }: PetProfileScreenProps) => {
         </View>
 
         <PetQueryStatus query={query} />
-        <Pressable disabled={deletion.isPending} accessibilityRole="button"
-          onPress={() => navigation.navigate('Pets', { screen: 'NewPet', params: { petId: pet.id }, initial: false })}
-          className="items-center rounded-control bg-clinic px-5 py-3">
-          <Text className="font-sans-semibold text-title text-white">Editar pet</Text>
-        </Pressable>
-        {deletion.error && <Text accessibilityRole="alert" className="font-sans text-body text-alert">{getPetErrorMessage(deletion.error)}</Text>}
-        {confirmDelete ? (
-          <View className="gap-3 rounded-card border border-alert bg-card p-[14px]">
-            <Text className="font-sans text-body text-ink">Excluir {pet.nome}? Esta ação não pode ser desfeita.</Text>
-            <Pressable disabled={deletion.isPending} onPress={handleDelete} accessibilityRole="button" className="items-center rounded-control bg-alert px-5 py-3">
-              <Text className="font-sans-semibold text-title text-white">{deletion.isPending ? 'Excluindo...' : 'Confirmar exclusão'}</Text>
-            </Pressable>
-            <Pressable disabled={deletion.isPending} onPress={() => setConfirmDelete(false)} accessibilityRole="button">
-              <Text className="text-center font-sans-medium text-body text-clinic">Cancelar</Text>
-            </Pressable>
-          </View>
-        ) : (
-          <Pressable disabled={deletion.isPending} onPress={() => setConfirmDelete(true)} accessibilityRole="button" className="items-center rounded-control border border-alert px-5 py-3">
-            <Text className="font-sans-medium text-body text-alert">Excluir pet</Text>
-          </Pressable>
-        )}
-
         <Text className="font-sans-semibold text-title text-ink">Lembretes do pet</Text>
         <Text className="font-sans text-label text-slate">Cuidados cadastrados em Lembretes, com suas datas previstas e status.</Text>
         <ReminderQueryStatus query={reminders} />

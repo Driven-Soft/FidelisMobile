@@ -1,3 +1,4 @@
+import type { PatientsVetScreenProps } from "../../routes/types";
 import { useState } from 'react';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,10 +7,13 @@ import Input from '../../components/common/Input';
 import PetAvatar from '../../components/Tutor/PetAvatar';
 import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
 import { useClinicPets } from '../../hooks/useClinicPets';
+import { usePetTutors } from '../../hooks/useVeterinarianPets';
 import { petAgeLabel } from '../../utils/petUtils';
 
-export default function PatientsVet() {
+export default function PatientsVet({ navigation }: PatientsVetScreenProps) {
   const query = useClinicPets();
+  const tutors = usePetTutors(query.hasClinic && query.data.length > 0);
+  const tutorNames = new Map(tutors.data?.map((tutor) => [tutor.id, tutor.nome]));
   const [searchText, setSearchText] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const species = [...new Set(query.data.map((pet) => pet.especie))];
@@ -32,6 +36,7 @@ export default function PatientsVet() {
         {!query.isPending && !query.error && !query.hasClinic &&
           <Text className="font-sans text-body text-slate">Não há uma clínica válida vinculada ao seu perfil.</Text>}
         {query.hasClinic && <>
+          <TouchableOpacity accessibilityRole="button" onPress={() => navigation.navigate('NewPet')} className="rounded-control bg-clinic p-3 mb-3"><Text className="font-sans-semibold text-body text-white">Cadastrar pet</Text></TouchableOpacity>
           <Input placeholder="Buscar pelo nome do pet..." value={searchText} onChangeText={setSearchText}
             icon={<Feather name="search" size={15} color="#5D706B" />} />
           <View className="mt-1 flex-row flex-wrap gap-1">
@@ -51,10 +56,16 @@ export default function PatientsVet() {
                 <Text className="font-sans text-label text-slate">{pet.raca}</Text>
                 <Text className="font-sans text-label text-slate">{pet.sexo === 'M' ? 'Macho' : pet.sexo === 'F' ? 'Fêmea' : 'Sexo não informado'}</Text>
                 <Text className="font-mono text-label text-slate">{petAgeLabel(pet.dataNascimento)}</Text>
-                <Text className="font-sans text-label text-clinic">Tutor #{pet.tutorId}</Text>
+                <Text className="font-sans text-label text-clinic">
+                  {tutors.isPending ? 'Carregando tutor...' : tutors.isError ? 'Nome do tutor indisponível' : `Tutor: ${tutorNames.get(pet.tutorId) ?? 'Não encontrado'}`}
+                </Text>
+                <TouchableOpacity accessibilityRole="button" onPress={() => navigation.navigate('NewPet', { petId: pet.id })}><Text className="font-sans-medium text-body text-clinic">Gerenciar pet</Text></TouchableOpacity>
               </View>
             </View>)}
           </View>
+          {tutors.isError && <TouchableOpacity accessibilityRole="button" disabled={tutors.isFetching} onPress={() => tutors.refetch()}>
+            <Text className="font-sans text-body text-clinic">Tentar carregar os nomes dos tutores novamente</Text>
+          </TouchableOpacity>}
           {!query.isPending && !query.error && pets.length === 0 && <Text className="py-8 text-center font-sans text-body text-slate">
             {query.data.length === 0 ? 'Nenhum pet vinculado a esta clínica.' : 'Nenhum pet corresponde à busca.'}
           </Text>}

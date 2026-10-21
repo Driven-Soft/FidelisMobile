@@ -8,15 +8,15 @@ Aplicativo de saúde pet desenvolvido pela **Driven Soft** para o **Challenge FI
 
 O acompanhamento da saúde de um pet envolve vacinas, retornos, medicamentos e outros cuidados que podem se perder entre anotações e compromissos do dia a dia. A falta de uma visão organizada dificulta a continuidade do cuidado e a comunicação entre tutores e clínicas.
 
-O **FidelisMobile** reúne essas informações em dois portais conectados a uma API .NET: o veterinário organiza os cuidados dos pets da clínica, enquanto o tutor acompanha o que precisa ser feito e mantém os dados dos seus animais.
+O **FidelisMobile** reúne essas informações em dois portais conectados a uma API .NET: o veterinário cadastra os pets da clínica e organiza seus cuidados, enquanto o tutor acompanha os dados dos seus animais e o que precisa ser feito.
 
 ## ✨ Funcionalidades
 
 | Portal do Tutor 🐶 | Portal do Veterinário 🩺 |
 | --- | --- |
 | Cadastro, login e sessão persistida | Login e sessão persistida |
-| Cadastro, consulta, edição e exclusão de pets | Consulta dos pets vinculados à própria clínica |
-| Seleção de clínica no cadastro do pet | Consulta do perfil profissional e da clínica |
+| Consulta dos seus pets cadastrados pela clínica | Cadastro, consulta, edição e exclusão dos pets da própria clínica |
+| Acompanhamento das atualizações de pets e cuidados | Seleção de tutor já cadastrado e vínculo automático do pet à clínica profissional |
 | Visualização dos cuidados, datas e status | Cadastro, edição, conclusão, cancelamento e exclusão de cuidados |
 | Consulta do perfil e histórico disponível na Home | Agenda de cuidados organizada por status |
 
@@ -105,6 +105,8 @@ Outras opções:
 
 - **Tutor:** crie uma conta pelo aplicativo e faça login selecionando “Tutor”.
 - **Veterinário:** selecione “Veterinário” e utilize uma conta profissional já cadastrada na API.
+
+O tutor cria sua conta antes de o veterinário cadastrar o pet. O profissional seleciona o tutor e o pet recebe automaticamente a clínica do veterinário. As consultas de pets e lembretes do tutor são atualizadas a cada 30 segundos enquanto observadas pelo aplicativo; não são notificações push. As restrições de perfil e clínica no Mobile não substituem a autorização no backend.
 
 ## 🎬 Vídeo de apresentação
 

@@ -3,10 +3,10 @@ import { View, ScrollView, Text, Pressable } from "react-native";
 import TutorHeader from "../../components/Tutor/TutorHeader";
 import Input from "../../components/common/Input";
 import PetQueryStatus from "../../components/Tutor/PetQueryStatus";
-import { usePet } from "../../hooks/usePets";
+import { useVeterinarianPet } from "../../hooks/useVeterinarianPets";
 import { usePetForm } from "../../hooks/usePetForm";
 import { Masks } from "react-native-mask-input";
-import PetClinicSelector from "../../components/Tutor/PetClinicSelector";
+import TutorDataStatus from "../../components/Tutor/TutorDataStatus";
 import type { PetResponse } from "../../models/pet";
 
 interface PetFormProps {
@@ -16,11 +16,11 @@ interface PetFormProps {
 
 export default function NewPet({ navigation, route }: NewPetScreenProps) {
   const editing = route.params?.petId !== undefined;
-  const query = usePet(route.params?.petId);
+  const query = useVeterinarianPet(route.params?.petId);
   if (editing && (query.isPending || query.error || !query.data)) {
     return (
       <View className="flex-1 bg-mist">
-        <TutorHeader title="Editar Pet" onBack={() => navigation.goBack()} />
+        <TutorHeader eyebrow="Portal do Veterinário" title="Editar Pet" onBack={() => navigation.goBack()} />
         <View className="px-4">
           <PetQueryStatus query={query} />
           {!query.isPending && !query.error && <Text className="font-sans text-body text-slate">Pet não encontrado.</Text>}
@@ -33,19 +33,20 @@ export default function NewPet({ navigation, route }: NewPetScreenProps) {
 
 const PetForm = ({ pet, navigation }: PetFormProps) => {
   const {
-    clinics, clinicId, setClinicId, step, form, touched, validation, fieldErrors,
+    tutors, tutor, tutorId, setTutorId, profile, clinic, step, form, touched, validation, fieldErrors,
+    confirmDelete, setConfirmDelete, handleDelete,
     setField, handleBlur, handleNext, handleBack, isPending, errorMessage,
   } = usePetForm(pet, () => navigation.goBack());
   const stepLabels = [
     { number: 1, label: "Dados básicos" },
     { number: 2, label: "Dados físicos" },
-    { number: 3, label: pet ? "Foto" : "Foto e clínica" },
+    { number: 3, label: pet ? "Foto" : "Foto e tutor" },
   ];
   const currentStep = stepLabels[step - 1];
 
   return (
     <View className="flex-1 bg-mist">
-      <TutorHeader title={pet ? "Editar Pet" : "Cadastrar Pet"} onBack={isPending ? undefined : () => navigation.goBack()} />
+      <TutorHeader eyebrow="Portal do Veterinário" title={pet ? "Editar Pet" : "Cadastrar Pet"} onBack={isPending ? undefined : () => navigation.goBack()} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -186,8 +187,30 @@ const PetForm = ({ pet, navigation }: PetFormProps) => {
               editable={!isPending}
             />
           )}
-          {step === 3 && !pet && <PetClinicSelector query={clinics} selectedId={clinicId}
-            onSelect={setClinicId} disabled={isPending} error={fieldErrors.clinicaId} />}
+          {step === 3 && <View className="gap-2">
+            {(profile.isPending || clinic.isPending) && <Text className="font-sans text-body text-slate">Carregando clínica...</Text>}
+            {(profile.error || clinic.error) && <View>
+              <Text accessibilityRole="alert" className="font-sans text-body text-alert">Não foi possível carregar os dados da clínica.</Text>
+              <Pressable accessibilityRole="button" onPress={() => { void profile.refetch(); void clinic.refetch(); }}><Text className="text-clinic">Tentar novamente</Text></Pressable>
+            </View>}
+            <Text className="font-sans text-body text-clinic">Clínica: {clinic.data?.nome ?? (profile.data?.clinicaId ? `#${profile.data.clinicaId}` : 'Indisponível')}</Text>
+            <Text className="font-sans text-label text-slate">O pet será vinculado à sua clínica. A clínica e o tutor não poderão ser alterados neste formulário.</Text>
+            {pet ? <View>
+              {tutor.isPending ? <Text className="font-sans text-body text-slate">Carregando tutor...</Text> : tutor.error ? <>
+                <Text accessibilityRole="alert" className="font-sans text-body text-alert">Não foi possível carregar o nome do tutor.</Text>
+                <Pressable accessibilityRole="button" disabled={tutor.isFetching} onPress={() => tutor.refetch()}><Text className="text-clinic">Tentar novamente</Text></Pressable>
+              </> : <Text className="font-sans text-body text-ink">Tutor: {tutor.data?.nome}</Text>}
+            </View> : <>
+              <Text className="font-sans-semibold text-body text-ink">Selecione o tutor</Text>
+              <TutorDataStatus query={tutors} label="tutores" />
+              {!tutors.isPending && !tutors.error && tutors.data?.length === 0 && <Text>Nenhum tutor cadastrado. O tutor precisa criar sua conta primeiro.</Text>}
+              {!tutors.error && tutors.data?.map((tutor) => <Pressable key={tutor.id} disabled={isPending} onPress={() => setTutorId(tutor.id)} accessibilityRole="button" accessibilityState={{ selected: tutorId === tutor.id }} className={`rounded-control border p-3 ${tutorId === tutor.id ? 'border-clinic bg-clinic-50' : 'border-line bg-card'}`}>
+                <Text className="font-sans-medium text-body text-ink">{tutor.nome}</Text>
+                <Text className="font-sans text-label text-slate">{tutor.email}</Text>
+              </Pressable>)}
+              {fieldErrors.tutorId && <Text className="text-alert">{fieldErrors.tutorId}</Text>}
+            </>}
+          </View>}
         </View>
 
         {errorMessage && <Text accessibilityRole="alert" className="font-sans text-body text-alert">{errorMessage}</Text>}
@@ -216,6 +239,13 @@ const PetForm = ({ pet, navigation }: PetFormProps) => {
             </Text>
           </Pressable>
         </View>
+        {pet && <View className="gap-3 mt-3">
+          {confirmDelete ? <>
+            <Text className="font-sans text-body text-alert">Excluir {pet.nome}? Esta ação não pode ser desfeita.</Text>
+            <Pressable disabled={isPending} onPress={handleDelete} accessibilityRole="button"><Text className="text-alert">Confirmar exclusão</Text></Pressable>
+            <Pressable disabled={isPending} onPress={() => setConfirmDelete(false)} accessibilityRole="button"><Text className="text-clinic">Cancelar</Text></Pressable>
+          </> : <Pressable disabled={isPending} onPress={() => setConfirmDelete(true)} accessibilityRole="button"><Text className="text-alert">Excluir pet</Text></Pressable>}
+        </View>}
       </ScrollView>
     </View>
   );

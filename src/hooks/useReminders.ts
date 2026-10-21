@@ -30,7 +30,7 @@ function useReminderScope() {
 export function useReminders() {
   const { active, scope, requireTutor } = useReminderScope();
   return useQuery<LembreteResponse[], Error>({
-    queryKey: reminderKeys.list(scope), enabled: active, retry: false,
+    queryKey: reminderKeys.list(scope), enabled: active, retry: false, refetchInterval: 30000,
     queryFn: async ({ signal }) => {
       const tutorId = requireTutor();
       const items = await repository.listarLembretes(signal);

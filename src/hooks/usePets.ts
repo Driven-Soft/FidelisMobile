@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useUserContext } from "../context/UserContext";
-import type { PetRequest, PetPatchRequest, PetResponse } from "../models/pet";
+import type { PetResponse } from "../models/pet";
 import * as repository from "../repositories/pets/petRepository";
 import { assertPetOwner, normalizePetId, PetFlowError } from "../utils/petUtils";
 
@@ -31,7 +31,7 @@ function usePetScope() {
 export function usePets() {
   const { active, scope, requireTutor } = usePetScope();
   return useQuery<PetResponse[], Error>({
-    queryKey: petKeys.list(scope), enabled: active, retry: false,
+    queryKey: petKeys.list(scope), enabled: active, retry: false, refetchInterval: 30000,
     queryFn: async ({ signal }) => {
       const tutorId = requireTutor();
       const pets = await repository.listarPets(signal);
@@ -46,7 +46,7 @@ export function usePet(value: unknown) {
   const id = normalizePetId(value);
   const { active, scope, requireTutor } = usePetScope();
   const query = useQuery<PetResponse | null, Error>({
-    queryKey: petKeys.detail(scope, id), enabled: active && id !== null, retry: false,
+    queryKey: petKeys.detail(scope, id), enabled: active && id !== null, retry: false, refetchInterval: 30000,
     queryFn: async ({ signal }) => {
       if (id === null) throw new PetFlowError(404);
       const tutorId = requireTutor();
@@ -57,63 +57,4 @@ export function usePet(value: unknown) {
   });
   return { ...query, data: query.isError ? undefined : query.data,
     isPending: id !== null && query.isPending, error: id === null ? new PetFlowError(404) : query.error };
-}
-
-export function useCreatePet() {
-  const { scope, requireTutor } = usePetScope();
-  const client = useQueryClient();
-  return useMutation<PetResponse, Error, Omit<PetRequest, "tutorId">>({
-    mutationFn: async (fields) => {
-      const tutorId = requireTutor();
-      const { nome, especie, raca, sexo, dataNascimento, fotoUrl, clinicaId } = fields;
-      const pet = await repository.criarPet({ nome, especie, raca, sexo, dataNascimento, fotoUrl, clinicaId, tutorId });
-      requireTutor();
-      return assertPetOwner(pet, tutorId);
-    },
-    onSuccess: async (pet) => {
-      client.setQueryData(petKeys.detail(scope, pet.id), pet);
-      await client.invalidateQueries({ queryKey: petKeys.list(scope) });
-    },
-  });
-}
-
-export function useUpdatePet() {
-  const { scope, requireTutor } = usePetScope();
-  const client = useQueryClient();
-  return useMutation<PetResponse, Error, { id: number; changes: Omit<PetPatchRequest, "clinicaId"> }>({
-    mutationFn: async ({ id, changes }) => {
-      if (normalizePetId(id) === null) throw new PetFlowError(404);
-      const tutorId = requireTutor();
-      assertPetOwner(await repository.buscarPet(id), tutorId, id);
-      requireTutor();
-      const { nome, especie, raca, sexo, dataNascimento, fotoUrl } = changes;
-      const pet = await repository.atualizarPet(id, { nome, especie, raca, sexo, dataNascimento, fotoUrl });
-      requireTutor();
-      return assertPetOwner(pet, tutorId, id);
-    },
-    onSuccess: async (pet) => {
-      await client.cancelQueries({ queryKey: petKeys.detail(scope, pet.id) });
-      client.setQueryData(petKeys.detail(scope, pet.id), pet);
-      await client.invalidateQueries({ queryKey: scope });
-    },
-  });
-}
-
-export function useDeletePet() {
-  const { scope, requireTutor } = usePetScope();
-  const client = useQueryClient();
-  return useMutation<void, Error, number>({
-    mutationFn: async (id) => {
-      if (normalizePetId(id) === null) throw new PetFlowError(404);
-      const tutorId = requireTutor();
-      assertPetOwner(await repository.buscarPet(id), tutorId, id);
-      requireTutor();
-      await repository.excluirPet(id);
-    },
-    onSuccess: async (_, id) => {
-      await client.cancelQueries({ queryKey: petKeys.detail(scope, id) });
-      client.setQueryData(petKeys.detail(scope, id), null);
-      await client.invalidateQueries({ queryKey: petKeys.list(scope) });
-    },
-  });
 }
