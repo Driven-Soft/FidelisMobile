@@ -1,3 +1,4 @@
+import type { ProfileVetScreenProps } from '../../routes/types';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUserContext } from '../../context/UserContext';
@@ -7,7 +8,7 @@ import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
 import ClinicSummary from '../../components/Veterinario/ClinicSummary';
 import { nameInitials } from '../../utils/tutorDataUtils';
 
-export default function ProfileVet() {
+export default function ProfileVet({ navigation }: ProfileVetScreenProps) {
   const { logout } = useUserContext();
   const { profile, clinic, hasClinic } = useVeterinarian();
   const veterinarian = profile.data;
@@ -30,6 +31,10 @@ export default function ProfileVet() {
         </View>
         {hasClinic ? <ClinicSummary query={clinic} /> : <Text className="font-sans text-body text-slate">Vínculo com clínica não disponível.</Text>}
       </>}
+      <TouchableOpacity accessibilityRole="button" onPress={() => navigation.navigate('About')}
+        className="items-center justify-center rounded-control border border-line bg-card px-[18px] py-[11px]">
+        <Text className="font-sans-medium text-body text-clinic">Sobre o App</Text>
+      </TouchableOpacity>
       <TouchableOpacity onPress={() => void logout()}
         className="items-center justify-center rounded-control border border-alert bg-card px-[18px] py-[11px]">
         <Text className="font-sans-medium text-xs text-alert">Sair</Text>

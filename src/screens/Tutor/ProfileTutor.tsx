@@ -1,3 +1,4 @@
+import type { ProfileTutorScreenProps } from '../../routes/types';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import { useUserContext } from '../../context/UserContext';
 import TutorHeader from '../../components/Tutor/TutorHeader';
@@ -7,7 +8,7 @@ import { useTutorProfile } from '../../hooks/useTutorData';
 import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
 import { nameInitials } from '../../utils/tutorDataUtils';
 
-const ProfileTutor = () => {
+const ProfileTutor = ({ navigation }: ProfileTutorScreenProps) => {
   const petsQuery = usePets();
   const profileQuery = useTutorProfile();
   const tutor = profileQuery.data;
@@ -56,6 +57,10 @@ const ProfileTutor = () => {
           </View>
         </View>
         <View className="mt-1 gap-[10px]">
+          <Pressable accessibilityRole="button" onPress={() => navigation.navigate('About')}
+            className="items-center justify-center rounded-control border border-line bg-card px-[18px] py-[11px]">
+            <Text className="font-sans-medium text-body text-clinic">Sobre o App</Text>
+          </Pressable>
           <Pressable accessibilityRole="button" onPress={() => void logout()}
             style={({ pressed }) => (pressed ? { opacity: 0.7 } : null)}
             className="items-center justify-center rounded-control border border-alert bg-card px-[18px] py-[11px]">

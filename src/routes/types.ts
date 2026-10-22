@@ -18,7 +18,7 @@ export type TutorPetsStackParamList = PetDetailParamList & {
   PetsTutorScreen: undefined;
 };
 export type TutorRemindersStackParamList = { RemindersScreenStack: undefined };
-export type TutorProfileStackParamList = { ProfileTutorScreen: undefined };
+export type TutorProfileStackParamList = { ProfileTutorScreen: undefined; About: undefined };
 export type TutorTabParamList = {
   Home: NavigatorScreenParams<TutorHomeStackParamList> | undefined;
   Pets: NavigatorScreenParams<TutorPetsStackParamList> | undefined;
@@ -45,7 +45,7 @@ export type VetHomeStackParamList = PatientRecordParamList & {
 export type VetPatientsStackParamList = PatientRecordParamList & { PatientsScreen: undefined; NewPet: { petId?: number } | undefined };
 export type PatientsVetScreenProps = NativeStackScreenProps<VetPatientsStackParamList, "PatientsScreen">;
 export type VetAgendaStackParamList = PatientRecordParamList & { AgendaVetScreen: undefined };
-export type VetProfileStackParamList = { ProfileVetScreen: undefined };
+export type VetProfileStackParamList = { ProfileVetScreen: undefined; About: undefined };
 export type VetTabParamList = {
   Dashboard: NavigatorScreenParams<VetHomeStackParamList> | undefined;
   Patients: NavigatorScreenParams<VetPatientsStackParamList> | undefined;
@@ -57,3 +57,6 @@ export type HomeVetScreenProps = CompositeScreenProps<
   BottomTabScreenProps<VetTabParamList, 'Dashboard'>
 >;
 export type PendingVetScreenProps = NativeStackScreenProps<PatientRecordParamList, 'PatientRecord'>;
+
+export type ProfileTutorScreenProps = NativeStackScreenProps<TutorProfileStackParamList, "ProfileTutorScreen">;
+export type ProfileVetScreenProps = NativeStackScreenProps<VetProfileStackParamList, "ProfileVetScreen">;

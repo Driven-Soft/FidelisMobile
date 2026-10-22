@@ -1,3 +1,4 @@
+import AboutScreen from '../screens/AboutScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
@@ -70,6 +71,7 @@ const ProfileStack = () => {
       }}
     >
       <ProfileNavigator.Screen name="ProfileVetScreen" component={ProfileVet} />
+      <ProfileNavigator.Screen name="About" component={AboutScreen} />
     </ProfileNavigator.Navigator>
   );
 };
