@@ -4,7 +4,7 @@ import TutorHeader from '../components/Tutor/TutorHeader';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 // Atualize manualmente com o commit de referência antes de gerar o APK.
-const COMMIT_HASH = "COLOCAR_HASH_AQUI";
+const COMMIT_HASH = "ebf36024376c3239282f169e3e32b54fc63d101c";
 
 type Props = NativeStackScreenProps<{ About: undefined }, 'About'>;
 
