@@ -1,24 +1,23 @@
-import { api } from "../../services/api";
+import { api, getAll, getResource } from "../../services/api";
+import type { ResourceResponse } from "../../services/api";
 import type { PetRequest, PetPatchRequest, PetResponse } from "../../models/pet";
 
 export async function listarPets(signal?: AbortSignal): Promise<PetResponse[]> {
-  const { data } = await api.get<PetResponse[]>("/api/Pet", { signal });
-  return data;
+  return getAll<PetResponse>("/api/Pet", { signal });
 }
 
 export async function buscarPet(id: number, signal?: AbortSignal): Promise<PetResponse> {
-  const { data } = await api.get<PetResponse>(`/api/Pet/${id}`, { signal });
-  return data;
+  return getResource<PetResponse>(`/api/Pet/${id}`, { signal });
 }
 
 export async function criarPet(request: PetRequest): Promise<PetResponse> {
-  const { data } = await api.post<PetResponse>("/api/Pet", request);
-  return data;
+  const { data } = await api.post<ResourceResponse<PetResponse>>("/api/Pet", request);
+  return data.data;
 }
 
 export async function atualizarPet(id: number, request: PetPatchRequest): Promise<PetResponse> {
-  const { data } = await api.patch<PetResponse>(`/api/Pet/${id}`, request);
-  return data;
+  const { data } = await api.patch<ResourceResponse<PetResponse>>(`/api/Pet/${id}`, request);
+  return data.data;
 }
 
 export async function excluirPet(id: number): Promise<void> {

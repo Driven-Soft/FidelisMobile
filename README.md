@@ -18,6 +18,7 @@ O **FidelisMobile** reúne essas informações em dois portais conectados a uma 
 | Consulta dos seus pets cadastrados pela clínica | Cadastro, consulta, edição e exclusão dos pets da própria clínica |
 | Acompanhamento das atualizações de pets e cuidados | Seleção de tutor já cadastrado e vínculo automático do pet à clínica profissional |
 | Visualização dos cuidados, datas e status | Cadastro, edição, conclusão, cancelamento e exclusão de cuidados |
+| Evolução do peso com a faixa saudável do perfil e avaliação da IA (verde, atenção ou alerta) no perfil do pet | |
 | Consulta do perfil e histórico disponível na Home | Agenda de cuidados organizada por status |
 
 Os dados são obtidos da API. A interface apresenta estados de carregamento, erros e atualização após as operações. Os cuidados são lembretes com datas previstas, não agendamentos de consultas confirmadas.

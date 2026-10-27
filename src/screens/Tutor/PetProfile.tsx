@@ -9,12 +9,19 @@ import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
 import { usePetReminders } from '../../hooks/useReminders';
 import ReminderCard from '../../components/Tutor/ReminderCard';
 import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
+import { usePetWeights, usePetWeightAssessment } from '../../hooks/useWeights';
+import WeightAssessmentCard from '../../components/Tutor/WeightAssessmentCard';
+import WeightChart from '../../components/Tutor/WeightChart';
+import WeightQueryStatus from '../../components/Tutor/WeightQueryStatus';
 
 const PetProfile = ({ route, navigation }: PetProfileScreenProps) => {
   const query = usePet(route.params?.petId);
   const pet = query.data;
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const reminders = usePetReminders(pet?.id);
+  const weights = usePetWeights(pet?.id);
+  const latestWeight = weights.data[weights.data.length - 1];
+  const assessment = usePetWeightAssessment(pet?.id, latestWeight?.id);
 
   const tabs = [null, ...reminders.types];
   const selectedTab = activeTab !== null && reminders.types.includes(activeTab) ? activeTab : null;
@@ -75,6 +82,18 @@ const PetProfile = ({ route, navigation }: PetProfileScreenProps) => {
             {pet.clinicaId ? `Clínica #${pet.clinicaId}` : 'Não vinculada'}
           </Text>
         </View>
+
+        <Text className="font-sans-semibold text-title text-ink">Peso e avaliação da IA</Text>
+        <Text className="font-sans text-label text-slate">Pesagens registradas e a faixa saudável estimada para o perfil do pet.</Text>
+        <WeightQueryStatus query={weights} label="pesagens" />
+        {latestWeight && <WeightQueryStatus query={assessment} label="avaliação da IA" />}
+        {assessment.data && <WeightAssessmentCard assessment={assessment.data} />}
+        {latestWeight &&
+          <WeightChart weights={weights.data} range={assessment.data?.avaliacao.faixaEsperadaKg} risk={assessment.data?.avaliacao.risco} />}
+        {!weights.isPending && !weights.error && weights.data.length === 0 &&
+          <View className="items-center rounded-card border border-line bg-card px-[14px] py-8">
+            <Text className="font-sans text-body text-slate">Nenhuma pesagem registrada para este pet.</Text>
+          </View>}
 
         <PetQueryStatus query={query} />
         <Text className="font-sans-semibold text-title text-ink">Lembretes do pet</Text>
