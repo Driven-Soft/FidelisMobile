@@ -19,7 +19,7 @@ export default function RemindersScreen() {
   return <View className="flex-1 bg-mist">
     <TutorHeader title="Lembretes" />
     <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]"
-      refreshControl={<RefreshControl refreshing={query.isFetching && !query.isPending} onRefresh={() => query.refetch()} />}>
+      refreshControl={<RefreshControl refreshing={query.isFetching && !query.isPending} onRefresh={async () => { await query.refetch(); }} />}>
       <Text className="font-sans text-body text-slate">Acompanhe os cuidados dos seus pets. O cadastro e a atualização são realizados pelo veterinário da clínica.</Text>
       <PetQueryStatus query={petsQuery} empty={pets.length === 0} />
       <ReminderQueryStatus query={query} empty={groups.every((group) => group.items.length === 0)} />

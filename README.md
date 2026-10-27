@@ -26,7 +26,7 @@ Os dados são obtidos da API. A interface apresenta estados de carregamento, err
 
 | Tecnologia | Utilização |
 | --- | --- |
-| React Native 0.86 + Expo 57 | Desenvolvimento e execução do aplicativo |
+| React Native 0.88 + Expo 58 | Desenvolvimento e execução do aplicativo |
 | React 19 | Interface e componentes |
 | React Navigation | Navegação entre telas com Stack e Tabs |
 | TanStack React Query | Consultas, mutations, cache e atualização dos dados |
@@ -46,7 +46,7 @@ Tela → Hook / TanStack Query → Repository → Axios → API .NET
 
 ### 1. Pré-requisitos
 
-- Node.js 20.19.4 ou superior, compatível com as dependências do projeto, e npm.
+- Node.js 22.13 ou superior na linha 22 LTS (ou 24.3+ na linha 24 LTS) e npm.
 - API .NET em execução e acessível pelo navegador ou dispositivo.
 - Navegador para testar na web, ou dispositivo/emulador compatível com o Expo.
 
@@ -86,7 +86,7 @@ npm run web
 
 As dependências `typescript` e `@types/react` já estão declaradas. Execute `npm run typecheck` para verificar o código TypeScript. A entrada da aplicação é `index.ts`; apenas as configurações de Babel, Metro e Tailwind permanecem JavaScript.
 
-Para testar no celular com **Expo Go compatível com o SDK 57**:
+Para testar no celular com **Expo Go compatível com o SDK 58**:
 
 1. No terminal do computador, execute `npx expo login` e entre na sua conta Expo.
 2. No aplicativo Expo Go do celular, entre com **a mesma conta Expo**. Essa conta é independente do login de Tutor/Veterinário do Fidelis.
