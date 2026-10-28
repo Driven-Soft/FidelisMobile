@@ -15,6 +15,8 @@ const PetProfile = ({ route, navigation }: PetProfileScreenProps) => {
   const pet = query.data;
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const reminders = usePetReminders(pet?.id);
+  const notificationReminderId = route.params?.reminderId;
+  const notificationReminder = reminders.data.find(item => item.id === notificationReminderId);
 
   const tabs = [null, ...reminders.types];
   const selectedTab = activeTab !== null && reminders.types.includes(activeTab) ? activeTab : null;
@@ -44,6 +46,13 @@ const PetProfile = ({ route, navigation }: PetProfileScreenProps) => {
       <TutorHeader title={pet.nome} onBack={() => navigation.goBack()} />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]">
+        {notificationReminderId !== undefined && <View className="gap-2 rounded-card border border-clinic bg-clinic-50 p-[14px]">
+          <Text className="font-sans-semibold text-title text-clinic-ink">Cuidado do aviso</Text>
+          <ReminderQueryStatus query={reminders} />
+          {notificationReminder && <ReminderCard reminder={notificationReminder} pet={pet} />}
+          {!reminders.isPending && !reminders.error && !notificationReminder &&
+            <Text className="font-sans text-body text-slate">Este cuidado não está mais disponível para este pet. Consulte os lembretes atualizados abaixo.</Text>}
+        </View>}
         <View className="items-center rounded-card border border-line bg-card p-[14px]">
           <PetAvatar pet={pet} size={96} />
         </View>

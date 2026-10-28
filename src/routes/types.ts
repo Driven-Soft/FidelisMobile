@@ -5,10 +5,10 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 export type RootStackParamList = {
   Login: undefined;
   CadastroTutor: undefined;
-  Tabs: undefined;
+  Tabs: NavigatorScreenParams<TutorTabParamList> | NavigatorScreenParams<VetTabParamList> | undefined;
 };
 
-type PetDetailParamList = { PetProfile: { petId: number } };
+type PetDetailParamList = { PetProfile: { petId: number; reminderId?: number } };
 
 export type TutorHomeStackParamList = PetDetailParamList & {
   HomeTutorScreen: undefined;

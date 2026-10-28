@@ -116,7 +116,17 @@ Os avisos usam os cuidados **pendentes** e os pets do tutor recebidos da API. Co
 
 O app mantém até 60 avisos futuros, sem duplicar os existentes, e atualiza a programação quando recebe alterações da API. Conclusão, cancelamento ou exclusão de um cuidado remove seu aviso. Logout e troca de conta limpam os avisos da sessão anterior. Sem conexão, os avisos já agendados podem ficar desatualizados: abra o app conectado para sincronizar. Não há consulta à API com o app encerrado, nem push enviado pelo servidor.
 
-O agendamento e a apresentação em primeiro plano estão implementados. A navegação pelo toque será adicionada na próxima etapa antes da validação conjunta no APK.
+Ao tocar no aviso, o app abre **Meus Pets → perfil do pet**, com o cuidado destacado e os dados atuais da API. O listener de resposta também trata a abertura com o app encerrado. Se precisar entrar novamente, o destino aguarda o login do mesmo tutor; outro usuário ou o portal veterinário não abre esse destino. O aviso não renova a sessão nem substitui as verificações de acesso da API.
+
+### Testar no Android
+
+1. Pelo portal veterinário, cadastre um cuidado real **pendente para hoje**, associado a um pet do tutor usado no teste.
+2. No APK, entre como esse tutor. Em **Perfil → Notificações de cuidados**, permita notificações e alarmes/horário exato. Selecione um horário alguns minutos à frente e toque em **Atualizar avisos**. Confira a contagem de avisos futuros.
+3. Deixe o app em segundo plano e aguarde. Toque no aviso: deve abrir o pet correto e destacar o cuidado. Repita com o app aberto e com ele removido dos recentes (sem usar **Forçar parada** nas configurações do Android).
+4. Antes do horário, conclua, cancele, exclua ou altere o cuidado pelo portal veterinário. Abra o APK conectado como tutor e atualize os avisos: a programação deve refletir a alteração, sem duplicatas.
+5. Saia da conta antes do horário: seus avisos devem ser removidos. Entre com outro tutor ou veterinário e confira que não recebe nem abre cuidados da conta anterior. Teste também negar e reativar as permissões.
+
+Sem o app conectado, mudanças feitas pela clínica ainda não chegaram ao aparelho e não podem corrigir avisos já programados. A entrega depende das permissões e das políticas de bateria do sistema. Com o app encerrado, o aviso pode aparecer mesmo após o token expirar; ao tocar, o acesso continua exigindo uma sessão válida. O horário escolhido é uma preferência do aparelho, não uma alteração no cuidado da API.
 
 É necessário gerar e instalar um novo APK após adicionar `expo-notifications` e a permissão de alarmes. O APK anterior não recebe módulos nativos apenas reiniciando o Expo. Teste permitir, negar e reativar notificações nas configurações, além de retornar ao app. Nenhum token de push é necessário.
 

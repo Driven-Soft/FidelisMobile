@@ -1,10 +1,9 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./src/config/queryClient";
-import { NavigationContainer } from "@react-navigation/native";
 import { UserProvider } from "./src/context/UserContext";
 import { CareNotificationsProvider } from "./src/context/CareNotificationsContext";
-import StackRoutes from "./src/routes/stack.routes";
-import { StatusBar, View } from "react-native";
+import AppNavigation from "./src/routes/AppNavigation";
+import { View } from "react-native";
 import "./global.css";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
@@ -36,10 +35,7 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <UserProvider>
           <CareNotificationsProvider>
-            <NavigationContainer>
-              <StatusBar hidden />
-              <StackRoutes />
-            </NavigationContainer>
+            <AppNavigation />
           </CareNotificationsProvider>
         </UserProvider>
       </QueryClientProvider>
