@@ -2,6 +2,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./src/config/queryClient";
 import { NavigationContainer } from "@react-navigation/native";
 import { UserProvider } from "./src/context/UserContext";
+import { CareNotificationsProvider } from "./src/context/CareNotificationsContext";
 import StackRoutes from "./src/routes/stack.routes";
 import { StatusBar, View } from "react-native";
 import "./global.css";
@@ -34,10 +35,12 @@ export default function App() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <UserProvider>
-          <NavigationContainer>
-            <StatusBar hidden />
-            <StackRoutes />
-          </NavigationContainer>
+          <CareNotificationsProvider>
+            <NavigationContainer>
+              <StatusBar hidden />
+              <StackRoutes />
+            </NavigationContainer>
+          </CareNotificationsProvider>
         </UserProvider>
       </QueryClientProvider>
     </SafeAreaProvider>

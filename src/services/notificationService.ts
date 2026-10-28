@@ -11,7 +11,7 @@ const unsupported: NotificationPermissionState = {
 export const supportsLocalNotifications = Platform.OS === 'android' || Platform.OS === 'ios';
 
 // O módulo nativo não é carregado no navegador.
-async function getNotifications() {
+export async function getNotifications() {
   const notifications = await import('expo-notifications');
   if (Platform.OS === 'android') {
     await notifications.setNotificationChannelAsync(CARE_CHANNEL_ID, {

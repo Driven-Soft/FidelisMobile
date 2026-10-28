@@ -108,11 +108,15 @@ Outras opções:
 
 O tutor cria sua conta antes de o veterinário cadastrar o pet. O profissional seleciona o tutor e o pet recebe automaticamente a clínica do veterinário. As consultas de pets e lembretes do tutor são atualizadas a cada 30 segundos enquanto observadas pelo aplicativo; não são notificações push. As restrições de perfil e clínica no Mobile não substituem a autorização no backend.
 
-## 🔔 Notificações locais — validação da infraestrutura
+## 🔔 Notificações locais de cuidados
 
 No perfil do Tutor, a seção **Notificações de cuidados** consulta as permissões do aparelho. O botão **Permitir notificações** solicita autorização; no Android, **Permitir horário exato** abre a configuração de alarmes e lembretes. Ao retornar das configurações, o estado é atualizado. A versão web informa que notificações locais são disponíveis no aplicativo nativo.
 
-Esta primeira etapa prepara as permissões e o canal de cuidados. Ainda não agenda avisos nem implementa navegação pelo toque: essas partes serão integradas aos lembretes reais após a validação no aparelho, sem alertas fictícios.
+Os avisos usam os cuidados **pendentes** e os pets do tutor recebidos da API. Como o cadastro informa uma data civil, o aviso é agendado para esse dia às **09:00**, por padrão. Em **Alterar horário dos avisos**, o tutor escolhe outro horário local para este aparelho, salvo separadamente da sessão. Horários passados não disparam avisos retroativos.
+
+O app mantém até 60 avisos futuros, sem duplicar os existentes, e atualiza a programação quando recebe alterações da API. Conclusão, cancelamento ou exclusão de um cuidado remove seu aviso. Logout e troca de conta limpam os avisos da sessão anterior. Sem conexão, os avisos já agendados podem ficar desatualizados: abra o app conectado para sincronizar. Não há consulta à API com o app encerrado, nem push enviado pelo servidor.
+
+O agendamento e a apresentação em primeiro plano estão implementados. A navegação pelo toque será adicionada na próxima etapa antes da validação conjunta no APK.
 
 É necessário gerar e instalar um novo APK após adicionar `expo-notifications` e a permissão de alarmes. O APK anterior não recebe módulos nativos apenas reiniciando o Expo. Teste permitir, negar e reativar notificações nas configurações, além de retornar ao app. Nenhum token de push é necessário.
 
