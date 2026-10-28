@@ -108,6 +108,14 @@ Outras opções:
 
 O tutor cria sua conta antes de o veterinário cadastrar o pet. O profissional seleciona o tutor e o pet recebe automaticamente a clínica do veterinário. As consultas de pets e lembretes do tutor são atualizadas a cada 30 segundos enquanto observadas pelo aplicativo; não são notificações push. As restrições de perfil e clínica no Mobile não substituem a autorização no backend.
 
+## 🔔 Notificações locais — validação da infraestrutura
+
+No perfil do Tutor, a seção **Notificações de cuidados** consulta as permissões do aparelho. O botão **Permitir notificações** solicita autorização; no Android, **Permitir horário exato** abre a configuração de alarmes e lembretes. Ao retornar das configurações, o estado é atualizado. A versão web informa que notificações locais são disponíveis no aplicativo nativo.
+
+Esta primeira etapa prepara as permissões e o canal de cuidados. Ainda não agenda avisos nem implementa navegação pelo toque: essas partes serão integradas aos lembretes reais após a validação no aparelho, sem alertas fictícios.
+
+É necessário gerar e instalar um novo APK após adicionar `expo-notifications` e a permissão de alarmes. O APK anterior não recebe módulos nativos apenas reiniciando o Expo. Teste permitir, negar e reativar notificações nas configurações, além de retornar ao app. Nenhum token de push é necessário.
+
 ## 🎬 Vídeo de apresentação
 
 ▶️ **[Assistir à apresentação no YouTube](https://youtu.be/ki4T3oCGPOM?is=7kQBMDk6DGpW_iaN)**

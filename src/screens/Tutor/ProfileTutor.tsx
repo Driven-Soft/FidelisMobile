@@ -1,4 +1,5 @@
 import type { ProfileTutorScreenProps } from '../../routes/types';
+import NotificationPermissionsCard from '../../components/Tutor/NotificationPermissionsCard';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import { useUserContext } from '../../context/UserContext';
 import TutorHeader from '../../components/Tutor/TutorHeader';
@@ -56,6 +57,7 @@ const ProfileTutor = ({ navigation }: ProfileTutorScreenProps) => {
             <Text className="font-sans text-label text-slate">O perfil do tutor não informa vínculo com clínica. Consulte o vínculo de cada pet em seu perfil.</Text>
           </View>
         </View>
+        <NotificationPermissionsCard />
         <View className="mt-1 gap-[10px]">
           <Pressable accessibilityRole="button" onPress={() => navigation.navigate('About')}
             className="items-center justify-center rounded-control border border-line bg-card px-[18px] py-[11px]">
