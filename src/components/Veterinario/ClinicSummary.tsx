@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
-import TutorDataStatus from '../Tutor/TutorDataStatus';
-import type { ClinicaResponse } from '../../models/veterinarian';
+import TutorDataStatus from '../common/TutorDataStatus';
+import type { ClinicaResponse } from '../../models/clinic';
 
 interface Props {
   query: {

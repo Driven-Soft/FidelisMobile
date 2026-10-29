@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUserContext } from '../../context/UserContext';
 import Avatar from '../../components/common/Avatar';
 import { useVeterinarian } from '../../hooks/useVeterinarian';
-import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
+import TutorDataStatus from '../../components/common/TutorDataStatus';
 import ClinicSummary from '../../components/Veterinario/ClinicSummary';
 import { nameInitials } from '../../utils/tutorDataUtils';
 

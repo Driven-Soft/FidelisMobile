@@ -3,10 +3,10 @@ import { View, ScrollView, Text, Pressable, RefreshControl } from 'react-native'
 import { usePets } from '../../hooks/usePets';
 import { useReminders } from '../../hooks/useReminders';
 import { groupReminders } from '../../utils/reminderUtils';
-import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
-import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
+import PetQueryStatus from '../../components/common/PetQueryStatus';
+import ReminderQueryStatus from '../../components/common/ReminderQueryStatus';
 import TutorHeader from '../../components/Tutor/TutorHeader';
-import ReminderCard from '../../components/Tutor/ReminderCard';
+import ReminderCard from '../../components/common/ReminderCard';
 
 export default function RemindersScreen() {
   const query = useReminders();

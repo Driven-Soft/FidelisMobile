@@ -7,9 +7,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useVeterinarianAgendaActions } from '../../hooks/useVeterinarianReminders';
 import type { ReminderAction } from '../../hooks/useVeterinarianReminders';
 import { groupReminders } from '../../utils/reminderUtils';
-import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
-import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
-import ReminderCard from '../../components/Tutor/ReminderCard';
+import PetQueryStatus from '../../components/common/PetQueryStatus';
+import ReminderQueryStatus from '../../components/common/ReminderQueryStatus';
+import ReminderCard from '../../components/common/ReminderCard';
 import NewReminderModal from '../../components/Veterinario/NewReminderModal';
 
 type Confirmation = { id: number; action: 'X' | 'delete' };

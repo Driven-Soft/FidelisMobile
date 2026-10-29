@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useUserContext } from "../context/UserContext";
 import { isValidSession } from "../services/authSession";
-import { buscarVeterinario, buscarClinica } from "../repositories/veterinario/veterinarianRepository";
+import { buscarVeterinario } from "../repositories/veterinario/veterinarianRepository";
+import { buscarClinica } from "../repositories/clinics/clinicRepository";
 import { TutorDataError } from "../utils/tutorDataUtils";
 
 export function useVeterinarian() {

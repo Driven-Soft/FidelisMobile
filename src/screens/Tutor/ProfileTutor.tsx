@@ -4,9 +4,9 @@ import { View, ScrollView, Text, Pressable } from 'react-native';
 import { useUserContext } from '../../context/UserContext';
 import TutorHeader from '../../components/Tutor/TutorHeader';
 import { usePets } from '../../hooks/usePets';
-import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
+import PetQueryStatus from '../../components/common/PetQueryStatus';
 import { useTutorClinics, useTutorProfile } from '../../hooks/useTutorData';
-import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
+import TutorDataStatus from '../../components/common/TutorDataStatus';
 import { nameInitials } from '../../utils/tutorDataUtils';
 
 const ProfileTutor = ({ navigation }: ProfileTutorScreenProps) => {

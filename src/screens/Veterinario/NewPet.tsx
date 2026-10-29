@@ -2,11 +2,11 @@ import type { NewPetScreenProps } from '../../routes/types';
 import { View, ScrollView, Text, Pressable } from "react-native";
 import TutorHeader from "../../components/Tutor/TutorHeader";
 import Input from "../../components/common/Input";
-import PetQueryStatus from "../../components/Tutor/PetQueryStatus";
+import PetQueryStatus from "../../components/common/PetQueryStatus";
 import { useVeterinarianPet } from "../../hooks/useVeterinarianPets";
 import { usePetForm } from "../../hooks/usePetForm";
 import { Masks } from "react-native-mask-input";
-import TutorDataStatus from "../../components/Tutor/TutorDataStatus";
+import TutorDataStatus from "../../components/common/TutorDataStatus";
 import type { PetResponse } from "../../models/pet";
 
 interface PetFormProps {

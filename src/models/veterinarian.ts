@@ -7,12 +7,3 @@ export interface VeterinarioResponse {
   clinicaId: number;
   dataCriacao: string;
 }
-
-export interface ClinicaResponse {
-  id: number;
-  nome: string;
-  cnpj: string;
-  telefone: string;
-  email: string;
-  endereco: string;
-}

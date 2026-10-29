@@ -4,11 +4,11 @@ import { View, ScrollView, Text, Pressable } from 'react-native';
 import { usePet } from '../../hooks/usePets';
 import { petAgeLabel } from '../../utils/petUtils';
 import TutorHeader from '../../components/Tutor/TutorHeader';
-import PetAvatar from '../../components/Tutor/PetAvatar';
-import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
+import PetAvatar from '../../components/common/PetAvatar';
+import PetQueryStatus from '../../components/common/PetQueryStatus';
 import { usePetReminders } from '../../hooks/useReminders';
-import ReminderCard from '../../components/Tutor/ReminderCard';
-import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
+import ReminderCard from '../../components/common/ReminderCard';
+import ReminderQueryStatus from '../../components/common/ReminderQueryStatus';
 
 const PetProfile = ({ route, navigation }: PetProfileScreenProps) => {
   const query = usePet(route.params?.petId);

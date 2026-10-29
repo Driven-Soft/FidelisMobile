@@ -3,8 +3,8 @@ import { View, ScrollView, Text, Pressable, RefreshControl } from 'react-native'
 import { usePets } from '../../hooks/usePets';
 import { petAgeLabel } from '../../utils/petUtils';
 import TutorHeader from '../../components/Tutor/TutorHeader';
-import PetAvatar from '../../components/Tutor/PetAvatar';
-import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
+import PetAvatar from '../../components/common/PetAvatar';
+import PetQueryStatus from '../../components/common/PetQueryStatus';
 
 const PetsTutor = ({ navigation }: PetsTutorScreenProps) => {
   const query = usePets();

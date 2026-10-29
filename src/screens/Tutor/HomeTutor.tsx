@@ -1,15 +1,15 @@
 import type { HomeTutorScreenProps } from '../../routes/types';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import { useTutorProfile, useTutorHistory } from '../../hooks/useTutorData';
-import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
+import TutorDataStatus from '../../components/common/TutorDataStatus';
 import TutorHeader from '../../components/Tutor/TutorHeader';
-import PetAvatar from '../../components/Tutor/PetAvatar';
-import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
+import PetAvatar from '../../components/common/PetAvatar';
+import PetQueryStatus from '../../components/common/PetQueryStatus';
 import { usePets } from '../../hooks/usePets';
 import { petAgeLabel } from '../../utils/petUtils';
 import { useReminders } from '../../hooks/useReminders';
 import { upcomingReminders as selectUpcomingReminders, formatReminderDate, isReminderUrgent } from '../../utils/reminderUtils';
-import ReminderQueryStatus from '../../components/Tutor/ReminderQueryStatus';
+import ReminderQueryStatus from '../../components/common/ReminderQueryStatus';
 
 export default function HomeTutor({ navigation }: HomeTutorScreenProps) {
   const profileQuery = useTutorProfile();

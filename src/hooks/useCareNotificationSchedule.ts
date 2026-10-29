@@ -27,7 +27,7 @@ export function useCareNotificationSchedule() {
   const refresh = useCallback(() => setRevision(value => value + 1), []);
   const savingRef = useRef(false);
 
-  // Troca de conta invalida a contagem; sincronização periódica mantém a última confirmada.
+  // Troca de conta invalida a contagem; durante a atualização mantém a última confirmada.
   useEffect(() => { setScheduledCounts(null); }, [tutorId]);
 
   useEffect(() => {

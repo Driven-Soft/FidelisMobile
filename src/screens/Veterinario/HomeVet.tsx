@@ -2,7 +2,7 @@ import type { HomeVetScreenProps } from '../../routes/types';
 import { ScrollView, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useVeterinarian } from '../../hooks/useVeterinarian';
-import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
+import TutorDataStatus from '../../components/common/TutorDataStatus';
 import ClinicSummary from '../../components/Veterinario/ClinicSummary';
 
 export default function HomeVet({ navigation }: HomeVetScreenProps) {

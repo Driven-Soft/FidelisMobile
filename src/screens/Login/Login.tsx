@@ -1,65 +1,20 @@
 import type { LoginScreenProps } from '../../routes/types';
-import { useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Feather from "@expo/vector-icons/Feather";
-import { useUserContext } from "../../context/UserContext";
-import { useLogin, getLoginErrorMessage } from "../../hooks/useLogin";
+import { useLoginForm } from "../../hooks/useLoginForm";
 import Input from "../../components/common/Input";
-import type { PortalType } from "../../models/auth";
-
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login({ navigation }: LoginScreenProps) {
-  const { portalToggle, setPortalToggle, sessionError, logout } =
-    useUserContext();
-  const { mutateAsync, isPending, error: loginError } = useLogin();
-  const [portalType, setPortalType] = useState<PortalType>(portalToggle ?? "TUTOR");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [touched, setTouched] = useState({
-    email: false,
-    password: false,
-  });
-
-  const handleBlur = (field: keyof typeof touched) => {
-    setTouched((prev) => ({ ...prev, [field]: true }));
-  };
-
-  const isEmailValid = emailRegex.test(email.trim());
-  const isPasswordValid = password.length >= 6;
-
-  const errors = {
-    email: touched.email && !isEmailValid ? "Informe um email válido." : null,
-    password:
-      touched.password && !isPasswordValid
-        ? "A senha deve ter ao menos 6 caracteres."
-        : null,
-  };
+  const {
+    portalType, selectPortal, email, setEmail, password, setPassword,
+    touched, errors, isEmailValid, isPasswordValid, handleBlur,
+    submit, isPending, errorMessage, sessionError, clearSession,
+  } = useLoginForm();
 
   const handleLogin = async () => {
-    if (isPending) return;
-    const trimmedEmail = email.trim().toLowerCase();
-
-    setPortalToggle(portalType);
-
-    setTouched({ email: true, password: true });
-
-    if (!isEmailValid || !isPasswordValid) {
-      Alert.alert(
-        "Campos inválidos",
-        "Informe email e senha válidos para entrar.",
-      );
-      return;
-    }
-
-    try {
-      await mutateAsync({ email: trimmedEmail, senha: password, tipo: portalType === "VET" ? "VETERINARIO" : "TUTOR" });
-      setPassword("");
-      // O Stack troca o fluxo automaticamente após a sessão ser salva.
-    } catch (error) {
-      Alert.alert("Não foi possível entrar", getLoginErrorMessage(error));
-    }
+    const feedback = await submit();
+    if (feedback) Alert.alert(feedback.title, feedback.message);
   };
 
   return (
@@ -95,10 +50,7 @@ export default function Login({ navigation }: LoginScreenProps) {
               <TouchableOpacity
                 disabled={isPending}
                 className={`flex-1 items-center rounded-badge py-[9px] ${portalType === "TUTOR" ? "bg-clinic" : "bg-transparent"}`}
-                onPress={() => {
-                  setPortalType("TUTOR");
-                  setPortalToggle("TUTOR");
-                }}
+                onPress={() => selectPortal("TUTOR")}
               >
                 <Text
                   className={`font-sans-semibold text-eyebrow ${portalType === "TUTOR" ? "text-white" : "text-slate"}`}
@@ -109,10 +61,7 @@ export default function Login({ navigation }: LoginScreenProps) {
               <TouchableOpacity
                 disabled={isPending}
                 className={`flex-1 items-center rounded-badge py-[9px] ${portalType === "VET" ? "bg-clinic" : "bg-transparent"}`}
-                onPress={() => {
-                  setPortalType("VET");
-                  setPortalToggle("VET");
-                }}
+                onPress={() => selectPortal("VET")}
               >
                 <Text
                   className={`font-sans-semibold text-eyebrow ${portalType === "VET" ? "text-white" : "text-slate"}`}
@@ -158,16 +107,16 @@ export default function Login({ navigation }: LoginScreenProps) {
               </Text>
             </TouchableOpacity>
 
-            {loginError && (
+            {errorMessage && (
               <Text accessibilityRole="alert" accessibilityLiveRegion="polite" className="mt-2 font-sans text-label text-alert">
-                {getLoginErrorMessage(loginError)}
+                {errorMessage}
               </Text>
             )}
 
             {sessionError && (
               <View className="mt-2">
                 <Text accessibilityRole="alert" className="font-sans text-label text-alert">{sessionError}</Text>
-                <Text onPress={() => { if (!isPending) void logout(); }} className="mt-1 font-sans-medium text-label text-clinic">
+                <Text onPress={() => { void clearSession(); }} className="mt-1 font-sans-medium text-label text-clinic">
                   Tentar limpar sessão local
                 </Text>
               </View>

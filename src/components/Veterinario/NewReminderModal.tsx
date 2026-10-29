@@ -3,11 +3,11 @@ import { Modal, View, Text, Pressable, ScrollView, Platform } from "react-native
 import Feather from "@expo/vector-icons/Feather";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Input from "../common/Input";
-import PetAvatar from "../Tutor/PetAvatar";
+import PetAvatar from "../common/PetAvatar";
 import { useVeterinarianReminder } from "../../hooks/useVeterinarianReminders";
 import { formatReminderDate } from "../../utils/reminderUtils";
 import { useReminderForm } from "../../hooks/useReminderForm";
-import ReminderQueryStatus from "../Tutor/ReminderQueryStatus";
+import ReminderQueryStatus from "../common/ReminderQueryStatus";
 import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import type { PetResponse } from "../../models/pet";
 import type { LembreteResponse } from "../../models/reminder";

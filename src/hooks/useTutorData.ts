@@ -8,7 +8,7 @@ import { listarConsultas, listarVacinacoes } from "../repositories/tutor/history
 import { buildTutorHistory, TutorDataError } from "../utils/tutorDataUtils";
 import { usePets } from "./usePets";
 import { useReminders } from "./useReminders";
-import { buscarClinica } from "../repositories/veterinario/veterinarianRepository";
+import { buscarClinica } from "../repositories/clinics/clinicRepository";
 
 function useTutorScope() {
   const { session, authStatus } = useUserContext();
