@@ -7,6 +7,7 @@ import { buscarTutor } from "../repositories/tutor/tutorRepository";
 import { listarConsultas, listarVacinacoes } from "../repositories/tutor/historyRepository";
 import { buildTutorHistory, TutorDataError } from "../utils/tutorDataUtils";
 import { usePets } from "./usePets";
+import { useReminders } from "./useReminders";
 import { buscarClinica } from "../repositories/veterinario/veterinarianRepository";
 
 function useTutorScope() {
@@ -76,6 +77,7 @@ export function useTutorClinics() {
 
 export function useTutorHistory() {
   const petsQuery = usePets();
+  const remindersQuery = useReminders();
   const { active, requireTutor, scope } = useTutorScope();
   const pets = petsQuery.isError ? [] : petsQuery.data ?? [];
   const ids = pets.map((pet) => pet.id).sort((a, b) => a - b);
@@ -91,14 +93,15 @@ export function useTutorHistory() {
       return { consultas: consultas.filter((item) => ids.includes(item.petId)), vacinacoes: vacinacoes.filter((item) => ids.includes(item.petId)) };
     },
   });
-  const error = petsQuery.error ?? query.error;
+  const error = petsQuery.error ?? query.error ?? remindersQuery.error;
   return {
-    data: active && !error && query.data ? buildTutorHistory(query.data.consultas, query.data.vacinacoes, pets) : [],
+    data: active && !error && query.data && remindersQuery.data
+      ? buildTutorHistory(query.data.consultas, query.data.vacinacoes, pets, remindersQuery.data) : [],
     error,
-    isPending: petsQuery.isPending || (!petsQuery.isError && query.isPending),
-    isFetching: petsQuery.isFetching || query.isFetching,
+    isPending: petsQuery.isPending || (!petsQuery.isError && query.isPending) || remindersQuery.isPending,
+    isFetching: petsQuery.isFetching || query.isFetching || remindersQuery.isFetching,
     refetch: async () => {
-      const refreshed = await petsQuery.refetch();
+      const [refreshed] = await Promise.all([petsQuery.refetch(), remindersQuery.refetch()]);
       // Uma mudança de IDs inicia automaticamente a query correspondente.
       const nextIds = refreshed.data?.map((pet) => pet.id).sort((a, b) => a - b) ?? [];
       if (!refreshed.isError && nextIds.join(",") === ids.join(",")) await query.refetch();

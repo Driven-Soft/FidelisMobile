@@ -1,5 +1,7 @@
 import type { ConsultaResponse, VacinacaoResponse } from "../models/clinicalHistory";
 import type { PetResponse } from "../models/pet";
+import type { LembreteResponse } from "../models/reminder";
+import { parseReminderDate } from "./reminderUtils";
 
 export class TutorDataError extends Error {
   constructor(public readonly status: number) {
@@ -27,19 +29,25 @@ export function nameInitials(name: string): string {
 }
 
 // Modelo de apresentação derivado, não um DTO ou endpoint adicional.
-export function buildTutorHistory(consultas: ConsultaResponse[], vacinacoes: VacinacaoResponse[], pets: PetResponse[]) {
+export function buildTutorHistory(consultas: ConsultaResponse[], vacinacoes: VacinacaoResponse[], pets: PetResponse[], reminders: LembreteResponse[] = []) {
   const names = new Map(pets.map((pet) => [pet.id, pet.nome]));
   const events = [
     ...consultas.filter((item) => names.has(item.petId)).map((item) => ({
       id: `consulta-${item.id}`, petId: item.petId, petName: names.get(item.petId),
-      title: item.tipo, date: item.dataHora, type: "CONSULTA", note: item.observacoes ?? item.diagnostico,
+      title: item.tipo, date: item.dataHora, type: "CONSULTA", note: item.observacoes ?? item.diagnostico, completedReminder: false,
     })),
     ...vacinacoes.filter((item) => names.has(item.petId)).map((item) => ({
       id: `vacinacao-${item.id}`, petId: item.petId, petName: names.get(item.petId),
-      title: item.vacinaAplicada, date: item.dataAplicacao, type: "VACINA", note: item.observacao,
+      title: item.vacinaAplicada, date: item.dataAplicacao, type: "VACINA", note: item.observacao, completedReminder: false,
+    })),
+    ...reminders.filter(item => item.status === 'C' && pets.some(pet => pet.id === item.petId && pet.tutorId === item.tutorId)).map(item => ({
+      id: `lembrete-${item.id}`, petId: item.petId, petName: names.get(item.petId),
+      title: item.tipo, date: item.dataPrevista, type: item.tipo, note: item.descricao, completedReminder: true,
     })),
   ];
-  // Não apresentar agendamentos futuros como histórico. Sem inferir consulta concluída.
-  return events.filter((event) => Number.isFinite(Date.parse(event.date)) && Date.parse(event.date) <= Date.now())
-    .sort((a, b) => Date.parse(b.date) - Date.parse(a.date)).slice(0, 3);
+  const timestamp = (event: typeof events[number]) => event.completedReminder ? parseReminderDate(event.date).getTime() : Date.parse(event.date);
+  // A API não fornece data de conclusão. Ordena lembretes pela data prevista,
+  // incluindo os explicitamente concluídos antes dela, sem inferir realização pelo vencimento.
+  return events.filter(event => Number.isFinite(timestamp(event)) && (event.completedReminder || timestamp(event) <= Date.now()))
+    .sort((a, b) => timestamp(b) - timestamp(a) || a.id.localeCompare(b.id)).slice(0, 3);
 }

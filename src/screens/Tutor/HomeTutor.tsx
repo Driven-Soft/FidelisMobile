@@ -27,6 +27,10 @@ export default function HomeTutor({ navigation }: HomeTutorScreenProps) {
       <TutorHeader title={tutorName ? `Olá, ${tutorName.split(' ')[0]}` : 'Início'} />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]">
+        <Pressable accessibilityRole="button" disabled={profileQuery.isFetching || historyQuery.isFetching || remindersQuery.isFetching}
+          onPress={() => { void Promise.all([profileQuery.refetch(), historyQuery.refetch()]); }}>
+          <Text className="font-sans-medium text-body text-clinic">Atualizar início</Text>
+        </Pressable>
         <TutorDataStatus query={profileQuery} label="perfil" />
         <View>
           <Text className="font-sans-semibold text-title text-ink">Tudo sob controle para hoje</Text>
@@ -124,12 +128,14 @@ export default function HomeTutor({ navigation }: HomeTutorScreenProps) {
           <View>
             <Text className="font-sans-semibold text-title text-ink">Histórico recente</Text>
             <Text className="mt-[2px] font-sans text-label text-slate">
-              Consultas e vacinações dos seus pets
+              Consultas, vacinações e cuidados concluídos dos seus pets
             </Text>
           </View>
 
           <View className="overflow-hidden rounded-card border border-line bg-card">
-            <TutorDataStatus query={historyQuery} label="histórico" empty={historyQuery.data.length === 0} />
+            <View className="px-[14px] pt-2 pb-1">
+              <TutorDataStatus query={historyQuery} label="histórico" empty={historyQuery.data.length === 0} />
+            </View>
             {historyQuery.data.map((event, index) => (
               <View
                 key={event.id}
@@ -141,7 +147,7 @@ export default function HomeTutor({ navigation }: HomeTutorScreenProps) {
                   <View className="flex-1">
                     <Text className="font-sans-medium text-body text-ink">{event.title}</Text>
                     <Text className="font-mono text-label text-slate">
-                      {event.petName} · {formatReminderDate(event.date)}
+                      {event.petName} · {event.completedReminder ? 'Data prevista: ' : ''}{formatReminderDate(event.date)}
                     </Text>
                   </View>
                   <View className="self-start rounded-badge bg-hairline px-2 py-1">
@@ -149,6 +155,7 @@ export default function HomeTutor({ navigation }: HomeTutorScreenProps) {
                   </View>
                 </View>
                 <Text className="font-sans text-label text-slate">{event.note}</Text>
+                {event.completedReminder && <Text className="font-sans-semibold text-label text-clinic">Concluído</Text>}
               </View>
             ))}
           </View>
