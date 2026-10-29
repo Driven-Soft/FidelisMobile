@@ -8,6 +8,10 @@ export interface NotificationPermissionState {
 
 export interface CareNotificationTime { hour: number; minute: number }
 
+export type CareNotificationCategory = 'vaccines' | 'medicines' | 'returns' | 'checkups' | 'deworming' | 'other';
+export type CareNotificationTimes = Record<CareNotificationCategory, CareNotificationTime>;
+export type CareNotificationCounts = Record<CareNotificationCategory, number>;
+
 export interface CareNotificationData {
   kind: 'fidelis-care';
   version: 1;
@@ -19,6 +23,7 @@ export interface CareNotificationData {
 }
 
 export interface CareNotificationPlan {
+  category: CareNotificationCategory;
   identifier: string;
   title: string;
   body: string;
