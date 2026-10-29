@@ -15,9 +15,9 @@ const PetsTutor = ({ navigation }: PetsTutorScreenProps) => {
       <TutorHeader title="Meus Pets" />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]"
-        refreshControl={<RefreshControl refreshing={query.isFetching && !query.isPending} onRefresh={() => query.refetch()} />}>
+        refreshControl={<RefreshControl refreshing={query.isFetching && !query.isPending} onRefresh={async () => { await query.refetch(); }} />}>
         <Text className="font-sans text-body text-slate">
-          Acompanhe os pets e cuidados cadastrados pela sua cl?nica.
+          Acompanhe os pets e cuidados cadastrados pela sua clínica.
         </Text>
 
         <PetQueryStatus query={query} empty={pets.length === 0} />

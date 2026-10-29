@@ -4,7 +4,7 @@ import Feather from '@expo/vector-icons/Feather';
 import type { ReactNode, ComponentProps } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
-type Props = Omit<ComponentProps<typeof MaskInput>, 'style' | 'onChangeText'> & {
+type Props = Omit<ComponentProps<typeof MaskInput>, 'style' | 'onChangeText' | 'ref'> & {
   onChangeText?: (text: string, unmasked?: string, obfuscated?: string) => void;
   label?: string;
   error?: string | null;
