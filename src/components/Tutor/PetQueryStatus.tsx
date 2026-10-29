@@ -4,9 +4,10 @@ import { getPetErrorMessage } from "../../utils/petUtils";
 interface Props {
   query: { isPending: boolean; isFetching: boolean; error: unknown; refetch: () => unknown };
   empty?: boolean;
+  showBackgroundLoading?: boolean;
 }
 
-export default function PetQueryStatus({ query, empty = false }: Props) {
+export default function PetQueryStatus({ query, empty = false, showBackgroundLoading = true }: Props) {
   if (query.isPending) return <View className="items-center gap-2 py-5"><ActivityIndicator color="#0E7A63" /><Text className="font-sans text-body text-slate">Carregando pets...</Text></View>;
   if (query.error) return (
     <View className="gap-2 py-3">
@@ -17,5 +18,5 @@ export default function PetQueryStatus({ query, empty = false }: Props) {
     </View>
   );
   if (empty) return <Text className="py-5 text-center font-sans text-body text-slate">Nenhum pet cadastrado.</Text>;
-  return query.isFetching ? <ActivityIndicator color="#0E7A63" /> : null;
+  return showBackgroundLoading && query.isFetching ? <ActivityIndicator color="#0E7A63" /> : null;
 }

@@ -5,13 +5,14 @@ import { useUserContext } from '../../context/UserContext';
 import TutorHeader from '../../components/Tutor/TutorHeader';
 import { usePets } from '../../hooks/usePets';
 import PetQueryStatus from '../../components/Tutor/PetQueryStatus';
-import { useTutorProfile } from '../../hooks/useTutorData';
+import { useTutorClinics, useTutorProfile } from '../../hooks/useTutorData';
 import TutorDataStatus from '../../components/Tutor/TutorDataStatus';
 import { nameInitials } from '../../utils/tutorDataUtils';
 
 const ProfileTutor = ({ navigation }: ProfileTutorScreenProps) => {
   const petsQuery = usePets();
   const profileQuery = useTutorProfile();
+  const clinicsQuery = useTutorClinics();
   const tutor = profileQuery.data;
   const { logout } = useUserContext();
 
@@ -37,7 +38,10 @@ const ProfileTutor = ({ navigation }: ProfileTutorScreenProps) => {
             </View>
           </View>
         </>}
-        <PetQueryStatus query={petsQuery} />
+        <PetQueryStatus query={petsQuery} showBackgroundLoading={false} />
+        <Pressable accessibilityRole="button" disabled={clinicsQuery.isFetching} onPress={() => { void clinicsQuery.refetch(); }}>
+          <Text className="font-sans-medium text-body text-clinic">{clinicsQuery.isFetching ? 'Atualizando resumo...' : 'Atualizar resumo'}</Text>
+        </Pressable>
         <View className="gap-[10px]">
           <Text className="font-sans-semibold text-title text-ink">Resumo</Text>
           <View className="flex-row gap-[10px]">
@@ -46,15 +50,12 @@ const ProfileTutor = ({ navigation }: ProfileTutorScreenProps) => {
               <Text className="mt-[3px] font-mono-medium text-metric text-ink">{petsQuery.isPending || petsQuery.isError ? '—' : petsQuery.data?.length ?? 0}</Text>
             </View>
             <View className="flex-1 rounded-card border border-line bg-card p-[13px]">
-              <Text className="font-sans text-label text-slate">CLÍNICA VINCULADA</Text>
-              <Text className="mt-[3px] font-sans-medium text-body text-ink">Vínculo do tutor não disponível</Text>
+              <Text className="font-sans text-label text-slate">CLÍNICAS DOS PETS</Text>
+              {clinicsQuery.isPending ? <Text className="mt-[3px] font-sans text-body text-slate">Carregando...</Text>
+                : clinicsQuery.error ? <Text accessibilityRole="alert" className="mt-[3px] font-sans text-body text-alert">Não foi possível carregar. Atualize o resumo para tentar novamente.</Text>
+                  : clinicsQuery.data.length === 0 ? <Text className="mt-[3px] font-sans text-body text-slate">Nenhuma clínica vinculada aos pets.</Text>
+                    : clinicsQuery.data.map(clinic => <Text key={clinic.id} className="mt-[3px] font-sans-medium text-body text-ink">{clinic.nome}</Text>)}
             </View>
-          </View>
-        </View>
-        <View className="gap-[10px]">
-          <Text className="font-sans-semibold text-title text-ink">Clínica vinculada</Text>
-          <View className="rounded-card border border-line bg-card p-[14px]">
-            <Text className="font-sans text-label text-slate">O perfil do tutor não informa vínculo com clínica. Consulte o vínculo de cada pet em seu perfil.</Text>
           </View>
         </View>
         <NotificationPermissionsCard />

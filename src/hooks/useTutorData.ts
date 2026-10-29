@@ -7,6 +7,7 @@ import { buscarTutor } from "../repositories/tutor/tutorRepository";
 import { listarConsultas, listarVacinacoes } from "../repositories/tutor/historyRepository";
 import { buildTutorHistory, TutorDataError } from "../utils/tutorDataUtils";
 import { usePets } from "./usePets";
+import { buscarClinica } from "../repositories/veterinario/veterinarianRepository";
 
 function useTutorScope() {
   const { session, authStatus } = useUserContext();
@@ -37,6 +38,40 @@ export function useTutorProfile() {
     },
   });
   return { ...query, data: active && !query.isError ? query.data : undefined };
+}
+
+export function useTutorClinics() {
+  const pets = usePets();
+  const { active, requireTutor, scope } = useTutorScope();
+  const clinicIds = (items: typeof pets.data) => [...new Set((items ?? [])
+    .map(pet => pet.clinicaId)
+    .filter((id): id is number => typeof id === 'number' && Number.isInteger(id) && id > 0))].sort((a, b) => a - b);
+  const ids = clinicIds(pets.data);
+  const query = useQuery({
+    ...manualTutorQueryOptions,
+    queryKey: [...scope, 'pet-clinics', ids],
+    enabled: active && pets.isSuccess,
+    retry: false,
+    queryFn: async ({ signal }) => {
+      requireTutor();
+      const clinics = await Promise.all(ids.map(id => buscarClinica(id, signal)));
+      requireTutor();
+      if (clinics.some((clinic, index) => !clinic || clinic.id !== ids[index])) throw new TutorDataError(404);
+      return clinics;
+    },
+  });
+  const error = pets.error ?? query.error;
+  return {
+    data: active && !error ? query.data ?? [] : [],
+    error,
+    isPending: pets.isPending || (!pets.isError && query.isPending),
+    isFetching: pets.isFetching || query.isFetching,
+    refetch: async () => {
+      const updated = await pets.refetch();
+      // Novos vínculos iniciam a query com os novos IDs; não consulta clínicas antigas.
+      if (!updated.isError && clinicIds(updated.data).join(',') === ids.join(',')) await query.refetch();
+    },
+  };
 }
 
 export function useTutorHistory() {
