@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { manualTutorQueryOptions } from "../config/queryClient";
 import { useUserContext } from "../context/UserContext";
 import { isValidSession } from "../services/authSession";
 import { buscarTutor } from "../repositories/tutor/tutorRepository";
@@ -24,6 +25,7 @@ function useTutorScope() {
 export function useTutorProfile() {
   const { active, requireTutor, scope } = useTutorScope();
   const query = useQuery({
+    ...manualTutorQueryOptions,
     queryKey: [...scope, "profile"], enabled: active, retry: false,
     queryFn: async ({ signal }) => {
       const id = requireTutor();
@@ -43,6 +45,7 @@ export function useTutorHistory() {
   const pets = petsQuery.isError ? [] : petsQuery.data ?? [];
   const ids = pets.map((pet) => pet.id).sort((a, b) => a - b);
   const query = useQuery({
+    ...manualTutorQueryOptions,
     queryKey: [...scope, "history", ids], enabled: active && petsQuery.isSuccess, retry: false,
     queryFn: async ({ signal }) => {
       requireTutor();

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { manualTutorQueryOptions } from "../config/queryClient";
 import { useUserContext } from "../context/UserContext";
 import type { PetResponse } from "../models/pet";
 import * as repository from "../repositories/pets/petRepository";
@@ -31,7 +32,8 @@ function usePetScope() {
 export function usePets() {
   const { active, scope, requireTutor } = usePetScope();
   return useQuery<PetResponse[], Error>({
-    queryKey: petKeys.list(scope), enabled: active, retry: false, refetchInterval: 30000,
+    ...manualTutorQueryOptions,
+    queryKey: petKeys.list(scope), enabled: active, retry: false,
     queryFn: async ({ signal }) => {
       const tutorId = requireTutor();
       const pets = await repository.listarPets(signal);
@@ -46,7 +48,8 @@ export function usePet(value: unknown) {
   const id = normalizePetId(value);
   const { active, scope, requireTutor } = usePetScope();
   const query = useQuery<PetResponse | null, Error>({
-    queryKey: petKeys.detail(scope, id), enabled: active && id !== null, retry: false, refetchInterval: 30000,
+    ...manualTutorQueryOptions,
+    queryKey: petKeys.detail(scope, id), enabled: active && id !== null, retry: false,
     queryFn: async ({ signal }) => {
       if (id === null) throw new PetFlowError(404);
       const tutorId = requireTutor();

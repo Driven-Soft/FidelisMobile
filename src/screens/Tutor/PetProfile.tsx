@@ -46,6 +46,10 @@ const PetProfile = ({ route, navigation }: PetProfileScreenProps) => {
       <TutorHeader title={pet.nome} onBack={() => navigation.goBack()} />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-6 pt-[14px]">
+        <Pressable accessibilityRole="button" disabled={query.isFetching || reminders.isFetching}
+          onPress={() => { void Promise.all([query.refetch(), reminders.refetch()]); }}>
+          <Text className="font-sans-medium text-body text-clinic">Atualizar pet e cuidados</Text>
+        </Pressable>
         {notificationReminderId !== undefined && <View className="gap-2 rounded-card border border-clinic bg-clinic-50 p-[14px]">
           <Text className="font-sans-semibold text-title text-clinic-ink">Cuidado do aviso</Text>
           <ReminderQueryStatus query={reminders} />

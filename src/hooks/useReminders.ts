@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { manualTutorQueryOptions } from "../config/queryClient";
 import { useUserContext } from "../context/UserContext";
 import type { AuthSession } from "../models/auth";
 import type { LembreteResponse } from "../models/reminder";
@@ -30,7 +31,8 @@ function useReminderScope() {
 export function useReminders() {
   const { active, scope, requireTutor } = useReminderScope();
   return useQuery<LembreteResponse[], Error>({
-    queryKey: reminderKeys.list(scope), enabled: active, retry: false, refetchInterval: 30000,
+    ...manualTutorQueryOptions,
+    queryKey: reminderKeys.list(scope), enabled: active, retry: false,
     queryFn: async ({ signal }) => {
       const tutorId = requireTutor();
       const items = await repository.listarLembretes(signal);
